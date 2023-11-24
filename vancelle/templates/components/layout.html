@@ -1,0 +1,36 @@
+{%- macro _h1(text) -%}
+  <h1 class="title is-3">{{ text }}</h1>
+{%- endmacro -%}
+
+{%- macro _h2(text) -%}
+  <h1 class="title is-4">{{ text }}</h1>
+{%- endmacro -%}
+
+{%- macro _subtitle(text) -%}
+  {%- if text -%}<p class="subtitle">{{ text }}</p>{%- endif -%}
+{%- endmacro -%}
+
+{%- macro _header(title, subtitle=None, h1=False) -%}
+  <header class="block">
+    {{ _h1(title) if h1 else _h2(title) }}
+    {{ _subtitle(subtitle) }}
+  </header>
+{%- endmacro -%}
+
+{% macro section(title, subtitle=None, controls=None, id='', h1=False) %}
+  <section id="{{ id if id else '' }}" class="block">
+    {% if controls %}
+      <div class="level">
+        <div class="level-left">
+          {{ _header(title, subtitle, h1=h1) }}
+        </div>
+        <div class="level-right">
+          <div class="field is-grouped">{{ controls }}</div>
+        </div>
+      </div>
+    {% else %}
+      {{ _header(title, subtitle, h1=h1) }}
+    {% endif %}
+    {{ caller() if caller is defined else '' }}
+  </section>
+{% endmacro %}

@@ -1,0 +1,154 @@
+{% from 'components/layout.html' import section %}
+
+{% from 'components/metadata.html' import details_combined_title %}
+{% from 'components/work/small_card.html' import small_card_list, small_card %}
+
+{%- macro app_id(appid) -%}
+  <span class="tag">{{ appid }}</span>
+{%- endmacro -%}
+
+{% macro steam_capsule_imagev5(steam_application, href) %}
+  <a href="{{ href }}" class="is-block x-is-container" title="{{ steam_application.name }}"><img src="{{ steam_application.capsule_imagev5 or '' }}" alt="{{ steam_application.name }}" loading="lazy" width="184px" height="69px"></a>
+{% endmacro %}
+
+{% macro steam_appdetails_item(app) %}
+  {% set details = app.into_details() %}
+  <div class="x-steam-appdetails-item">
+    <div>
+      {{ steam_capsule_imagev5(app, href=app.external_url) }}
+    </div>
+    <div>
+      {{ details_combined_title(details, href=app.external_url) }}
+      <br>
+      {{ app_id(app.id) }}
+    </div>
+    <div class="has-text-right">
+      {{ caller(app) }}
+    </div>
+  </div>
+{% endmacro %}
+
+{% macro steam_apps_list(apps, empty = "No Steam applications found.") %}
+  {%- if apps is not none -%}
+    <div class="x-steam-appdetails-list">
+      {%- for app in apps|select -%}
+        {{- steam_appdetails_item(app, caller=caller) -}}
+      {%- else -%}
+        <div class="has-text-centered"><em>{{ empty }}</em></div>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+{% endmacro %}
+
+{% macro steam_search(items, query, action, placeholder='', hidden_inputs={}) %}
+  <form
+    id="steam-search"
+    method="get"
+    action="{{ action }}"
+    hx-get="{{ action }}"
+    hx-trigger="keyup changed delay:500ms from:#steam-search, search from:#steam-search"
+    hx-select="#steam-search-results"
+    hx-swap="outerHTML"
+    hx-target="#steam-search-results"
+    class="">
+    {% for name, value in hidden_inputs|dictsort %}
+      <input type="hidden" name="{{ name }}" value="{{ value }}">
+    {% endfor %}
+    <div class="field has-addons">
+      <div class="control is-expanded" data-loading-class="is-loading">
+        <label for="steam-search" class="is-hidden">Search</label>
+        <input id="steam-search" type="text" name="query" class="input" placeholder="{{ placeholder }}" value="{{ query or '' }}">
+      </div>
+      <div class="control">
+        <button class="button" type="submit" hx-get="{{ action }}" hx-include="closest form">Search</button>
+      </div>
+    </div>
+  </form>
+  <div id="steam-search-results" class="block mt-5 {% if items is none %}is-hidden{% endif %}">
+    {{ caller(items) }}
+  </div>
+{% endmacro %}
+
+{% macro steam_search_add(items, query) %}
+  {% call section("Add Steam game", "Source information about games from the Steam store", id='steam') %}
+    <div class="box">
+      {% call(items) steam_search(items=items, query=query, action=url_for('sources.steam.create-work')) %}
+        {% call(app) steam_apps_list(items) %}
+          <form method="post" action="{{ url_for('sources.steam.create-work') }}">
+            <input type="hidden" name="app_id" value="{{ app.id }}">
+            <button class="button is-primary" type="submit">Add to collection</button>
+          </form>
+        {% endcall %}
+      {% endcall %}
+    </div>
+  {% endcall %}
+{% endmacro %}
+
+{# TODO: This should be disabled if the application is already linked to _any_ game. #}
+{% macro steam_link_button(app_id, work) %}
+  <button
+    type="submit"
+    formmethod="post"
+    formaction="{{ url_for('sources.steam.link', work_id=work.id, app_id=app_id) }}"
+    hx-post="{{ url_for('sources.steam.link', work_id=work.id, app_id=app_id) }}"
+    class="button is-outlined is-info">Link</button>
+{% endmacro %}
+
+{% macro steam_unlink_button(app_id, work_id) %}
+  <button
+    type="submit"
+    formaction="{{ url_for('sources.steam.unlink', work_id=work_id, app_id=app_id) }}"
+    hx-post="{{ url_for('sources.steam.unlink', work_id=work_id, app_id=app_id) }}"
+    class="button is-outlined is-danger">Unlink</button>
+{% endmacro %}
+
+{% macro steam_refresh_button(app_id) %}
+  <button
+    type="submit"
+    formmethod="post"
+    formaction="{{ url_for('sources.steam.refresh', app_id=app_id) }}"
+    hx-post="{{ url_for('sources.steam.refresh', app_id=app_id) }}"
+    class="button is-ghost"
+    title="Refresh cached details for Steam application {{ app_id }}"><span class="icon"><ion-icon name="refresh-outline"></ion-icon></span></button>
+{% endmacro %}
+
+
+{# Note that this doesn't always return a search control. #}
+{% macro steam_search_link(work, apps, query) %}
+  {% if work.steam_application %}
+        {# If we have a linked Steam application and details loaded, show that. #}
+    {% call(appdetails) steam_apps_list([work.steam_application]) %}
+      <form method="post" >
+        {{ steam_refresh_button(app_id=work.steam_application_id) }}
+        {{ steam_unlink_button(app_id=work.steam_application_id, work_id=work.id) }}
+      </form>
+    {% endcall %}
+
+  {% elif work.steam_application_id %}
+        {# If we have a linked Steam application, and details are missing, show a warning. #}
+    <div class="is-flex is-align-items-center is-justify-content-space-between">
+      <div>
+        <p class="has-text-warning-dark">Steam application details for <em>{{ work.steam_application_id }}</em> missing.</p>
+        {% if not work.steam_app %}
+          <p class="has-text-danger">Steam AppID for <em>{{ work.steam_application_id }}</em> missing — ensure the Steam AppID cache has been loaded.</p>
+        {% endif %}
+      </div>
+      <form method="post">
+        {{ steam_refresh_button(app_id=work.steam_application_id) }}
+        {{ steam_unlink_button(app_id=work.steam_application_id, work_id=work.id) }}
+      </form>
+    </div>
+
+  {% else %}
+        {# And if we don't have a linked application, we can show a search box. #}
+    {% set details = work.resolve_details() %}
+    {% call(apps) steam_search(items=apps, query=query, action=url_for('sources.steam.link'), placeholder=details.title, hidden_inputs={'work_id': work.id}) %}
+      {% call(app) steam_apps_list(apps) %}
+        <form method="post">
+          {{ steam_refresh_button(app_id=app.id) }}
+          {{ steam_link_button(app_id=app.id, work=work) }}
+        </form>
+      {% endcall %}
+    {% endcall %}
+  {% endif %}
+{% endmacro %}

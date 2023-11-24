@@ -1,0 +1,129 @@
+{% from 'components/layout.html' import section %}
+{% from 'components/links.html' import external_link %}
+
+{% macro source_tag(source) %}
+  <span class="tag is-info">{{ source.name }}</span>
+{% endmacro %}
+
+{# Display the source for one or more Details #}
+{%- macro sources_list(work) -%}
+  {%- for remote in work.iter_remotes() -%}
+    {%- set source = remote.into_source() -%}
+    {{ source.name }}
+    {%- if not loop.last %}, {% endif -%}
+  {%- else -%}
+    {{ absent }}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro shelf_tag(shelf) -%}
+  {%- set class_background = "has-background-{}-light".format(shelf.value) -%}
+  {%- set class_text = "has-text-{}-invert".format(shelf.value) -%}
+  <span class="tag {{ class_background }} {{ class_text }}" title="{{ shelf.description }}">{{ shelf.title }}</span>
+{%- endmacro -%}
+
+{% macro _details_title(details, href=None) %}
+  {%- if href -%}
+    <a href="{{ href }}">{{ details.title|absent }}</a>
+  {%- else -%}
+    <span>{{ details.title|absent }}</span>
+  {%- endif -%}
+{% endmacro %}
+
+{% macro details_combined_title(details, href = None) %}
+  {{ _details_title(details, href=href) }}
+  {% if details.author or details.release_date -%}
+    <span class="has-text-grey">({%- if details.author -%}{{ details.author|absent }}{%- endif -%}
+      {%- if details.author and details.release_date -%}, {% endif -%}
+      {%- if details.release_date -%}{{ details.release_date.year }}{%- endif -%})</span>
+  {%- endif -%}
+{% endmacro %}
+
+{%- macro details_combined_authorship(details) -%}
+  {%- if details.author %}{{ details.author }}{% endif -%}
+  {%- if details.author and details.release_date %}, {% endif -%}
+  {%- if details.release_date %}{{ details.release_date.year }}{% endif -%}
+{%- endmacro -%}
+
+{%- macro _style_background_image(details) -%}
+  {%- if details.background -%}
+    style="background-image: url('{{ details.background }}');"
+  {%- endif -%}
+{%- endmacro -%}
+
+{% macro panel_details_partial(details, title) %}
+  <div class="panel is-info">
+    <div class="panel-heading x-background" {{ _style_background_image(details) }}>{{ title }}</div>
+    <div>{{ caller() }}</div>
+  </div>
+{% endmacro %}
+
+{% macro panel_details(details, href) %}
+  <div class="panel is-info x-details">
+    <div class="panel-heading x-background" {{ _style_background_image(details) }}></div>
+    <figure class="x-cover has-background-info-dark">
+      {%- if details.cover -%}
+        <img src="{{ details.cover }}" alt="" loading="lazy">
+      {%- endif -%}
+    </figure>
+    <div class="x-title">
+      <h3 class="title is-4">{{ _details_title(details, href=href) }}</h3>
+      <p class="subtitle is-6">{{ details_combined_authorship(details) }}</p>
+      {% if caller is defined %}
+        {{ caller() }}
+      {% else %}
+        <p class="block">{{ shelf_tag(details.shelf) if details.shelf else '' }}</p>
+      {% endif %}
+    </div>
+    {% if details.description %}
+      <div class="x-description has-background-white-bis">
+        <p>{{ details.description|escape }}</p>
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{%- macro list_property(property) -%}
+  {{ p.join(property.items|map('string')|list) if property else absent }}
+{%- endmacro -%}
+
+{% macro _property_name(property) %}
+  <span class="has-text-weight-bold">{{ property.name }}</span>
+{% endmacro %}
+
+{% macro _property_value(property) %}
+  {{ property|safe }}
+{% endmacro %}
+
+{% macro _properties(properties) %}
+  {% for property in properties %}
+    {% if property %}
+      <div class="panel-block">{{ _property_name(property) }}</div>
+      <div class="panel-block">{{ _property_value(property) }}</div>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{% macro panel_properties(remote) %}
+  {% set details = remote.into_details() %}
+  {% set properties = remote.into_properties() %}
+  {% set more_properties = remote.more_properties() %}
+  <div class="panel is-info x-properties">
+    <p class="panel-heading x-background" {{ _style_background_image(details) }}>Properties</p>
+    <div class="x-properties-grid">
+      {{ _properties(properties) }}
+      {% if more_properties %}
+        <details>
+          <summary class="panel-block">More...</summary>
+          {{ _properties(more_properties) }}
+        </details>
+      {% endif %}
+      {% if remote.data %}
+        <details>
+          <summary class="panel-block">Data...</summary>
+          <div class="x-properties-grid-json"><pre><code>{{ remote.data|tojson(indent=2) }}</code></pre></div>
+        </details>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}

@@ -1,0 +1,99 @@
+{% from "components/metadata.html" import panel_details_partial %}
+
+{% macro button(a_href, button_title, ion_icon, button_class = 'is-text', button_text = None, ion_icon_class = '') %}
+  <a href="{{ a_href }}" title="{{ button_title }}" class="button is-small is-outlined {{ button_class }}">
+    {% if ion_icon %}
+      <span class="icon {{ ion_icon_class }}">
+        <ion-icon name="{{ ion_icon }}"></ion-icon>
+      </span>
+    {% endif %}
+    {% if button_text %}
+      <span>{{ button_text }}</span>
+    {% endif %}
+  </a>
+{% endmacro %}
+
+{% macro form_button(form_action, button_title, ion_icon, button_class = 'is-text', button_text = None, ion_icon_class = '') %}
+  <button class="button is-small is-outlined {{ button_class }}" type="submit" formmethod="post" formaction="{{ form_action }}" title="{{ button_title }}">
+    {% if ion_icon %}
+      <span class="icon {{ ion_icon_class }}">
+        <ion-icon name="{{ ion_icon }}"></ion-icon>
+      </span>
+    {% endif %}
+    {% if button_text %}
+      <span>{{ button_text }}</span>
+    {% endif %}
+  </button>
+{% endmacro %}
+
+{% macro panel_library_card(work, max_empty_rows=0) %}
+  {% set details = work.resolve_details() %}
+  {% call panel_details_partial(details, title="Library card") %}
+    <table class="table is-narrow is-striped is-hoverable is-fullwidth x-is-fixed x-has-fixed-row-height">
+      <tbody>
+        <tr><!-- A really terrible way to make strips start on odd numbers. --></tr>
+        {% for record in work.records %}
+          <tr class="" {% if record.deleted %}data-deleted{% endif %}>
+            <td class="has-text-centered">
+              {% if record.date_started %}
+                {{ record.date_started|exact_date }}
+              {% else %}
+                <form action="">
+                  {{ form_button(url_for('records.start_today', work_id=work.id, record_id=record.id), button_title='Start today', button_class='is-ghost', ion_icon='add-outline', ion_icon_class='has-text-success', button_text='Started today') }}
+                </form>
+              {% endif %}
+            </td>
+            <td class="has-text-centered">
+              {% if record.date_stopped %}
+                {{ record.date_stopped|exact_date }}
+              {% else %}
+                <form action="">
+                  {{ form_button(url_for('records.stop_today', work_id=work.id, record_id=record.id), button_title='Finish today', button_class='is-ghost', ion_icon='add-outline', ion_icon_class='has-text-success', button_text='Stopped today') }}
+                </form>
+              {% endif %}
+            </td>
+            <td class="has-text-right">
+              <form>
+                <div class="buttons is-right">
+                  {% if not record.deleted %}
+                    {{ button(url_for('records.detail', work_id=work.id, record_id=record.id), button_title='Edit record', ion_icon='pencil-outline') }}
+                    {{ form_button(url_for('records.delete', work_id=work.id, record_id=record.id), button_title='Delete record', ion_icon='trash-outline') }}
+                  {% else %}
+                    {{ form_button(url_for('records.permanently_delete', work_id=work.id, record_id=record.id), button_title='Permanently delete record', ion_icon='trash-outline', ion_icon_class='has-text-danger') }}
+                    {{ form_button(url_for('records.restore', work_id=work.id, record_id=record.id), button_title='Restore record', ion_icon='arrow-undo-outline', ion_icon_class='has-text-success') }}
+                  {% endif %}
+                </div>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+        <tr>
+          <td class="has-text-centered">
+            <form>
+              {{ form_button(url_for('records.create', work_id=work.id, started_today=True), button_title='Add record with a start date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Started today') }}
+            </form>
+          </td>
+          <td class="has-text-centered">
+            <form>
+              {{ form_button(url_for('records.create', work_id=work.id, stopped_today=True), button_title='Add record with a completion date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Stopped today') }}
+            </form>
+          </td>
+          <td class="has-text-right">
+            <form>
+              <div class="buttons is-right">
+                {{ form_button(url_for('records.create', work_id=work.id), button_title='Add an empty record', ion_icon='add-outline') }}
+              </div>
+            </form>
+          </td>
+        </tr>
+        {% for n in range(work.records|length, max_empty_rows - 1) %}
+          <tr>
+            <td><div class="empty"></div></td>
+            <td><div class="empty"></div></td>
+            <td><div class="empty"></div></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endcall %}
+{% endmacro %}

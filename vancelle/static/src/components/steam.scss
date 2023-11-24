@@ -1,0 +1,25 @@
+.x-steam-appdetails-list {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  gap: 1em;
+
+  .x-steam-appdetails-item {
+    grid-column: span 3;
+    grid-row: span 1;
+
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: 1fr;
+    align-items: center;
+  }
+
+  // "Not found" or similar information spans the entire grid.
+  & > :not(.x-steam-appdetails-item) {
+    grid-column: span 3;
+  }
+}
+
+// Remove line height from links containing block elements like images.
+a.x-is-container {
+  line-height: 0;
+}

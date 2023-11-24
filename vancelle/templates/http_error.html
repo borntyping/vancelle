@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div>
+    <h2 class="title has-text-danger">{{ exception.code }} {{ exception.name }}</h2>
+    <p class="">{{ exception.description }}</p>
+  </div>
+{% endblock %}

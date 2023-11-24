@@ -1,0 +1,12 @@
+*.egg-info/
+.env
+.idea/
+.pytest_cache/
+.sass-cache/
+__pycache__/
+__pypackages__/
+dist/
+node_modules/
+pip-delete-this-directory.txt
+pip-log.txt
+vancelle-backup.json

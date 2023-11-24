@@ -1,0 +1,15 @@
+{% from "components/metadata.html" import shelf_tag %}
+
+{% macro work_type_tag(work) %}
+  {% if work.type == 'book' %}
+    <span class="tag is-light is-primary" style="width: 4em;">Book</span>
+  {% elif work.type == 'film' %}
+    <span class="tag is-light is-info" style="width: 4em;">Film</span>
+  {% elif work.type == 'game' %}
+    <span class="tag is-light is-danger" style="width: 4em;">Game</span>
+  {% elif work.type == 'show' %}
+    <span class="tag is-light is-link" style="width: 4em;">Show</span>
+  {% else %}
+    <span class="tag is-light" style="width: 4em;">{{ work.type }}</span>
+  {% endif %}
+{% endmacro %}

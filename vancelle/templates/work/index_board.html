@@ -1,0 +1,7 @@
+{% extends 'work/index.html' %}
+
+{% from 'components/work/board.html' import board %}
+
+{% block content %}
+  {{ board(shelves) }}
+{% endblock %}

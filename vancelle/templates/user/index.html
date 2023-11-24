@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% from "components/layout.html" import section %}
+{% from "components/pagination.html" import pagination %}
+
+{% block content %}
+  {% call section(title="Users") %}
+    <div class="box">
+      <table class="table is-striped is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr id="{{ user.id }}">
+              <td>{{ user.username }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {{ pagination(users) }}
+    </div>
+  {% endcall %}
+{% endblock %}

@@ -1,0 +1,59 @@
+{%- macro _li_tab(endpoint, name) -%}
+  <li class="{% if endpoint == request.endpoint %}is-active{% endif %}"><a href="{{ url_for(endpoint) }}">{{ name }}</a></li>
+{%- endmacro -%}
+
+{%- macro _li_tab_divider() -%}
+  <li class="is-flex-grow-1"></li>
+{%- endmacro -%}
+
+{% macro nav_tabs(groups) %}
+  <nav class="block">
+    <div class="tabs is-centered">
+      <ul>
+        {% for group in groups %}
+          {% for endpoint, name in group %}
+            {{ _li_tab(endpoint, name) }}
+          {% endfor %}
+          {% if loop.first or not loop.last %}
+            {{ _li_tab_divider() }}
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </nav>
+{% endmacro %}
+
+{% macro tabs_select(active, mapping, parameter, add_all_option=True) %}
+  <div class="tabs is-centered is-small is-toggle is-toggle-rounded is-fullwidth">
+    <ul>
+      {% if add_all_option %}
+        <li class="{% if active is none %}is-active{% endif %}">
+          <a href="{{ url_with(page=1, **{parameter: None}) }}">All</a>
+        </li>
+      {% endif %}
+      {% for key, value in mapping|dictsort %}
+        <li class="{% if active == key %}is-active{% endif %}">
+          <a href="{{ url_with(page=1, **{parameter: key}) }}">{{ value }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}
+
+
+{% macro toggle(definition) %}
+  <div class="tabs is-centered is-small is-toggle is-toggle-rounded is-fullwidth">
+    <ul>
+      {% if definition.default %}
+        <li class="{% if active is none %}is-active{% endif %}">
+          <a href="{{ url_with(page=1, **{parameter: None}) }}">All</a>
+        </li>
+      {% endif %}
+      {% for key, value in definition.mapping|dictsort %}
+        <li class="{% if active == key %}is-active{% endif %}">
+          <a href="{{ url_with(page=1, **{definition.parameter: key}) }}">{{ value }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}

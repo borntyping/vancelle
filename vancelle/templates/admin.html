@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% macro tile(title, description) %}
+  <div class="tile is-parent">
+    <div class="tile is-child box is-flex is-flex-direction-column">
+      <h2 class="title">{{ title }}</h2>
+      <p class="block is-flex-grow-1">{{ description }}</p>
+      <div class="block">{{ caller() }}</div>
+    </div>
+  </div>
+{% endmacro %}
+
+{% block content %}
+  <div class="tile is-ancestor">
+    {% call tile('Requests cache', 'Vancelle caches all HTTP requests to external services.') %}
+      <a href="{{ url_for('admin.clear_request_cache') }}" class="button">Clear</a>
+    {% endcall %}
+
+    {% call tile('Steam', 'Vancelle needs to download the Steam AppID list before searching for Steam games.') %}
+      <form method="post" action="{{ url_for('sources.steam.cache') }}">
+        <button class="button" type="submit">Reload</button>
+      </form>
+    {% endcall %}
+  </div>
+{% endblock %}

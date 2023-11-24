@@ -1,0 +1,5 @@
+{%- from 'components/toast.html' import toast -%}
+<span id="app-htmx-response" class="{{ text_classes }}">{{ title }}</span>
+<section id="app-toasts" hx-swap-oob="beforeend">
+  {{ toast(title, body, toast_classes) }}
+</section>

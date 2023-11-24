@@ -1,0 +1,45 @@
+{%- macro date(d) -%}
+  <span class="has-text-weight-semibold">{{ d }}</span>
+{%- endmacro -%}
+
+{% macro big_card() %}
+  <div class="card app-big-card">
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
+{% macro big_card_header(details) %}
+  <header class="app-big-card-header">
+    <figure class="app-big-card-cover has-background-info">
+      {%- if details.cover -%}
+        <img src="{{ details.cover }}" alt="" loading="lazy">
+      {%- endif -%}
+    </figure>
+    {%- if details.background -%}
+      <figure class="app-big-card-background has-background-link">
+        <img src="{{ details.background }}" alt="" loading="lazy">
+      </figure>
+    {%- endif -%}
+    <div class="app-big-card-title">
+      <p class="title is-4">{{ details.title|absent }}</p>
+      <p class="subtitle is-6">
+        {%- if details.author %}{{ details.author }}{% endif -%}
+        {%- if details.author and details.release_date %}, {% endif -%}
+        {%- if details.release_date %}{{ details.release_date.year }}{% endif -%}
+      </p>
+      {{ caller() if caller is defined else '' }}
+    </div>
+  </header>
+{% endmacro %}
+
+{% macro big_card_content() %}
+  <div class="card-content is-flex-grow-1">{{ caller() }}</div>
+{% endmacro %}
+
+{% macro big_card_content_description(details) %}
+  {% if details.description %}<p class="is-italic">{{ details.description }}</p>{% endif %}
+{% endmacro %}
+
+{% macro big_card_footer() %}
+  <div class="card-footer">{{ caller() }}</div>
+{% endmacro %}

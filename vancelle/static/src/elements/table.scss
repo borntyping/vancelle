@@ -1,0 +1,15 @@
+table {
+  th, td {
+    vertical-align: middle !important;
+  }
+
+  &.x-is-fixed {
+    table-layout: fixed;
+  }
+
+  &.x-has-fixed-row-height {
+    .empty {
+      height: 31px;
+    }
+  }
+}

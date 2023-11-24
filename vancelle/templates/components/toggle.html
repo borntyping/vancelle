@@ -1,0 +1,11 @@
+{% macro toggle(definition) %}
+  <div class="tabs is-small is-toggle is-toggle-rounded is-flex-grow-1 m-0">
+    <ul>
+      {% for toggle_item in definition %}
+        <li class="{% if toggle_item.active %}is-active{% endif %} is-flex-grow-1">
+          <a href="{{ toggle_item.url }}">{{ toggle_item.title }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}

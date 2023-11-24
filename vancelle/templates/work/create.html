@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% from "components/layout.html" import section %}
+{% from 'components/forms.html' import bulma_form_field %}
+{% from "components/remote/sources.html" import section_sources %}
+
+{% block content %}
+  {{ section('Create new work', h1=True) }}
+
+  {{ section_sources() }}
+
+  {% call section('Manually enter metadata') %}
+    <div class="box">
+      <form
+        id="work"
+        method="post"
+        action=""
+        class="block">
+        {{ form.csrf_token }}
+        <div class="block">
+          {{ bulma_form_field(form.type) }}
+          {{ bulma_form_field(form.title) }}
+          {{ bulma_form_field(form.author) }}
+          {{ bulma_form_field(form.description) }}
+          {{ bulma_form_field(form.release_date) }}
+          {{ bulma_form_field(form.cover) }}
+          {{ bulma_form_field(form.background) }}
+          {{ bulma_form_field(form.shelf) }}
+        </div>
+        <div class="block">
+          <div class="field has-text-centered">
+            <button class="button is-primary" type="submit">Create work</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  {% endcall %}
+{% endblock %}

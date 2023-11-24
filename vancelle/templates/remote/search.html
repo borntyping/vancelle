@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% from 'components/layout.html' import section %}
+{% from 'components/pagination.html' import pagination %}
+{% from 'components/remote/table.html' import table_remotes %}
+{% from 'components/metadata.html' import details_combined_title %}
+
+{% block content %}
+  {% set id = 'search' %}
+  {% set id_subtitle = '{}-subtitle'.format(id) %}
+  {% set id_input = '{}-input'.format(id) %}
+  {% set id_results = '{}-results'.format(id) %}
+  {% set id_input = '{}-input'.format(id) %}
+  {% set id_submit = '{}-submit'.format(id) %}
+
+  {% set url = url_with(query=None) %}
+
+  {% set title %}
+    {% if work %}
+      Link {{ p.a(source.full_noun) }}
+    {% else %}
+      Add {{ p.a(source.noun) }} to your collection
+    {% endif %}
+  {% endset %}
+
+  {% set subtitle %}
+    {% if work %}
+      {{ details_combined_title(work.resolve_details(), work.url_for()) }},
+    {% endif %}
+    <span id="{{ id_subtitle }}" hx-swap-oob="true">{{ p.no('result', items.total) }}</span>
+  {% endset %}
+
+  {% set controls %}
+    {% if work %}
+      <a href="{{ url_with(work_id=None) }}" title="Search without linking to {{ work.resolve_details().title }}" class="delete"></a>
+    {% endif %}
+  {% endset %}
+
+  {% call section(title=title, subtitle=subtitle, controls=controls, id=id) %}
+    <div class="box">
+      <form
+        method="get"
+        action="{{ url }}"
+        hx-get="{{ url }}"
+        hx-trigger="input changed delay:500ms from:#{{ id_input }}, search from:#{{ id_input }}"
+        hx-swap="innerHTML"
+        hx-push-url="true"
+        hx-select="#{{ id_results }}"
+        hx-target="#{{ id_results }}"
+        class="block">
+        <input type="hidden" name="work_id" value="{{ work.id if work else '' }}">
+        <input type="hidden" name="remote_type" value="{{ remote_type }}">
+        <div class="field has-addons">
+          <div class="control is-expanded">
+            <label for="{{ id_input }}" class="is-hidden">Search</label>
+            <input
+              id="{{ id_input }}"
+              type="text"
+              name="query"
+              value="{{ query }}"
+              placeholder="Title, ID or link"
+              class="input">
+          </div>
+          <div class="control">
+            <button id="{{ id_submit }}" class="button" type="submit" data-loading-class="is-loading" hx-get="{{ url }}" hx-include="#{{ id }}">Search</button>
+          </div>
+        </div>
+      </form>
+      <div id="{{ id_results }}" class="block">
+        {{ table_remotes(remotes=items, work=work) }}
+      </div>
+      {{ pagination(items) }}
+    </div>
+  {% endcall %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% from "components/remote/section.html" import section_remote %}
+
+{% block content %}
+  {{ section_remote(remote, work=work, h1=True) }}
+{% endblock %}

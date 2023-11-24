@@ -1,0 +1,32 @@
+{% macro pagination(pagination) %}
+  <nav class="pagination is-left" role="navigation" aria-label="pagination">
+    {% if pagination.has_prev %}
+      <a
+        href="{{ url_with(page=pagination.prev_num) }}"
+        class="pagination-previous">Previous</a>
+    {% else %}
+      <a class="pagination-previous is-disabled">Previous</a>
+    {% endif %}
+
+    {% if pagination.has_next %}
+      <a
+        href="{{ url_with(page=pagination.next_num) }}"
+        class="pagination-next">Next</a>
+    {% else %}
+      <a class="pagination-next is-disabled">Next</a>
+    {% endif %}
+
+    <ul class="pagination-list">
+      {% for page in pagination.iter_pages(left_edge=2, left_current=2, right_current=2, right_edge=2) %}
+        {% if page %}
+          <li><a
+            href="{{ url_with(page=page) }}"
+            class="pagination-link {% if page == pagination.page %}is-current{% endif %}">{{ page }}</a>
+          </li>
+        {% else %}
+          <li><span class="pagination-ellipsis">&hellip;</span></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
+{% endmacro %}

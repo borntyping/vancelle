@@ -1,0 +1,104 @@
+/**
+ * Big cards for displaying lots of information about a piece of media.
+ */
+
+.app-big-card {
+    overflow: hidden;
+
+    /*
+     * Stop header from clipping over the border-radius.
+     * .25rem matches Bulma's builtin card.
+     */
+    --border-radius: .25rem;
+    border-radius: var(--border-radius);
+    background-clip: border-box;
+
+    & .app-big-card-header,
+    & .app-big-card-background,
+    & .app-big-card-background img {
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+    }
+
+    /* Stop background from bleeding through the border-radius. */
+    background: unset;
+
+    & .card-content,
+    & .card-footer {
+        background: white;
+    }
+
+    /* Header with a background overlaid with a cover, and title in the remaining space. */
+
+    & .app-big-card-header {
+        width: 100%;
+        position: relative;
+        background: transparent;
+
+        --margin: 20px;
+        --background-height: 100px;
+        --cover-width: 200px;
+        --cover-height: 300px;
+
+        & .delete {
+            position: absolute;
+            top: var(--margin);
+            right: var(--margin);
+        }
+
+        & .app-big-card-background {
+            height: var(--background-height);
+            width: 100%;
+
+            box-shadow: 0 .125em .25em rgba(10, 10, 10, .1);
+
+            & img {
+                object-fit: cover;
+                object-position: 50% top;
+            }
+        }
+
+        & .app-big-card-cover {
+            position: absolute;
+            top: var(--margin);
+            left: var(--margin);
+
+            width: var(--cover-width);
+            height: var(--cover-height);
+            border: 3px solid hsl(0, 0%, 21%);
+            border-radius: var(--border-radius);
+
+            & img {
+                object-fit: cover;
+                object-position: 50% top;
+            }
+        }
+
+        & .app-big-card-background img,
+        & .app-big-card-cover img {
+            height: 100%;
+            width: 100%;
+        }
+
+        & .app-big-card-title {
+            background: white;
+            padding: calc(var(--margin) * 2) var(--margin) 0 calc(var(--cover-width) + var(--margin) * 2);
+            min-height: calc(var(--cover-height) + var(--margin));
+        }
+
+        & .app-big-card-background+.app-big-card-title {
+            padding-top: var(--margin);
+            min-height: calc(var(--cover-height) + var(--margin) - var(--background-height));
+        }
+    }
+
+    & .app-big-card-record-controls {
+        & {
+            opacity: 0.25;
+        }
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}

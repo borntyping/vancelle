@@ -1,0 +1,11 @@
+.app-count-h3 {
+  counter-reset: app-h3;
+}
+
+.app-count-h3 h3 {
+  counter-increment: app-h3 1;
+}
+
+.app-count-h3 h3::before {
+  content: counter(app-h3) '. ';
+}

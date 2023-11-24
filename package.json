@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "bulma": "^0.9.4"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "reasonable-colors": "^0.4.0"
+  }
+}

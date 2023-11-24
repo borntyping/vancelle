@@ -1,0 +1,39 @@
+{% from "components/controls.html" import control_remote_link_work, control_remote_create_work, control_remote_has_cover %}
+{% from 'components/metadata.html' import details_combined_title %}
+
+{% macro table_remotes(remotes, work) %}
+  <table class="table is-fullwidth is-striped is-hoverable is-narrow">
+    <thead>
+      <tr>
+        <th class="has-text-left" style="width: 5em;">Id</th>
+        <th class="has-text-left">Title</th>
+        <th class="has-text-centered"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for remote in remotes %}
+        {% set details = remote.into_details() %}
+        <tr>
+          <td class="has-text-left is-family-monospace is-size-7">{{ remote.id }}</td>
+          <td>{{ details_combined_title(details, href=remote.url_for(work=work)) }}</td>
+          <td class="has-text-right">
+            <div class="field is-grouped is-grouped-right">
+              {{ control_remote_has_cover(remote=remote, details=details) }}
+              {% if work %}
+                {{ control_remote_link_work(remote=remote, work=work, class_="is-info is-small") }}
+              {% else %}
+                {{ control_remote_create_work(remote=remote, class_="is-primary is-small") }}
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td class="has-text-centered" colspan="3">
+            <em>No results.</em>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}

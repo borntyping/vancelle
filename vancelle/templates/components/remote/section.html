@@ -1,0 +1,28 @@
+{% from "components/controls.html" import control_remote_detail, control_remote_delete, control_remote_restore, control_remote_permanently_delete, control_remote_refresh, control_remote_link_work, control_remote_create_work, control_source_priority %}
+{% from "components/layout.html" import section %}
+{% from "components/metadata.html" import panel_details, panel_properties %}
+
+{%- macro section_remote(remote, work=None, h1=False) -%}
+  {%- set source = remote.into_source() -%}
+  {% set controls %}
+    {% if remote.deleted %}
+      {{ control_remote_permanently_delete(remote=remote) }}
+      {{ control_remote_restore(remote=remote) }}
+    {% elif remote.work %}
+      {{ control_remote_refresh(remote=remote, source=source) }}
+      {{ control_remote_delete(remote=remote) }}
+    {% elif work %}
+      {{ control_remote_link_work(remote=remote, work=work) }}
+    {% else %}
+      {{ control_remote_create_work(remote=remote) }}
+    {% endif %}
+    {{ control_remote_detail(remote=remote) }}
+    {{ control_source_priority(source=source) }}
+  {% endset %}
+  {%- call section(title=source.full_noun, subtitle=remote.id, controls=controls, h1=h1) -%}
+    <div class="columns x-has-fullheight-containers">
+      <div class="column">{{ panel_details(details=remote.into_details(), href=remote.url_for(work=work)) }}</div>
+      <div class="column">{{ panel_properties(remote=remote) }}</div>
+    </div>
+  {%- endcall -%}
+{%- endmacro -%}

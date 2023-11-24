@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% from "components/controls.html" import control_work_update, control_work_delete, control_work_restore, control_work_permanently_delete %}
+{% from "components/forms.html" import search_field %}
+{% from "components/layout.html" import section %}
+{% from "components/metadata.html" import panel_details, panel_properties %}
+{% from "components/record/library_card.html" import panel_library_card %}
+{% from "components/remote/section.html" import section_remote %}
+{% from "components/remote/sources.html" import section_sources %}
+
+{% set details = work.resolve_details() %}
+
+{% macro _form_change_shelf(work, details) %}
+  <form
+    method="post"
+    action="{{ url_for('work.update', work_id=work.id) }}"
+    hx-post="{{ url_for('work.update', work_id=work.id) }}"
+    hx-trigger="input changed from:find select throttle:1000ms"
+    data-loading-target="#shelf-loading"
+    class="">
+    {{ form.csrf_token }}
+    <div class="field has-addons">
+      <div class="control">
+        <div id="shelf-loading" class="button is-{{ details.shelf }}" data-loading-class="is-loading">
+          <span class="icon"><ion-icon name="book-outline"></ion-icon></span>
+        </div>
+      </div>
+      <div class="control">
+        {{ form.shelf(fullwidth=False, placeholder=details.shelf) }}
+      </div>
+    </div>
+    <noscript>
+      <div class="field">
+        <div class="control">
+          <button class="button" type="submit">Change shelf</button>
+        </div>
+      </div>
+    </noscript>
+  </form>
+{% endmacro %}
+
+{% macro _section_work(work, details, form) %}
+  {% set controls %}
+    {% if work.deleted %}
+      {{ control_work_permanently_delete(work, False) }}
+      {{ control_work_restore(work, False) }}
+    {% else %}
+      {{ control_work_update(work, False) }}
+      {{ control_work_delete(work, False) }}
+    {% endif %}
+  {% endset %}
+
+  {% call section(title=work.type|capitalize, subtitle=work.id, controls=controls, h1=True) %}
+    <div class="columns x-has-fullheight-containers">
+      <div class="column">
+        {% call panel_details(details, href=work.url_for()) %}
+          {{ _form_change_shelf(work, details) }}
+        {% endcall %}
+      </div>
+      <div class="column">{{ panel_library_card(work=work) }}</div>
+    </div>
+  {% endcall %}
+{% endmacro %}
+
+{% macro _section_link(work) %}
+  {% call section("Available sources") %}
+    <div class="box">
+
+    </div>
+
+    <div class="columns x-has-fullheight-containers">
+      {% for remote_type, absent_remote in work.linkable_remotes().items() %}
+        {% set source = absent_remote.into_source() %}
+        <div class="column">
+          <div class="box is-flex has-text-centered is-flex-direction-column">
+            <div class="block is-flex-grow-1">
+              <h4 class="title is-5">{{ source.name }}</h4>
+              <p class="subtitle is-5">Link {{ source.noun }}</p>
+            </div>
+            <div class="block">
+              <a href="{{ url_for('remote.search_source', work_id=work.id, remote_type=remote_type, query=None) }}" class="button is-primary">Link</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endcall %}
+{% endmacro %}
+
+{% block content %}
+  {{ _section_work(work, details, form) }}
+
+  {% for remote in work.iter_remotes() %}
+    {{ section_remote(remote) }}
+  {% endfor %}
+
+  {{ section_sources(work_id=work.id) }}
+{% endblock %}

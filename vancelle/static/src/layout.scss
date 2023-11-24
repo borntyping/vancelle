@@ -1,0 +1,36 @@
+@import "bulma/sass/helpers/spacing";
+
+@each $property, $value in $spacing-values {
+  .x-gap-#{$property} {
+    gap: $value;
+  }
+}
+
+.columns.x-has-fullheight-containers {
+  // This uses flex instead of `height: 100%`, as 100% will cause overflow if
+  // the column contains multiple elements.
+  .column, .column > section {
+    display: flex;
+    flex-direction: column;
+
+    section,
+    .box,
+    .card,
+    .panel {
+      flex-grow: 1;
+    }
+  }
+}
+
+
+section.block:not(:last-child) {
+  margin-bottom: 3rem; // Double the standard .block margin.
+}
+
+.x-overflow-hidden {
+  overflow: hidden;
+}
+
+.x-is-fullheight {
+  height: 100%;
+}

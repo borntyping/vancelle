@@ -1,0 +1,12 @@
+button {
+  &.x-is-link {
+    appearance: none;
+    background: unset;
+    border-radius: unset;
+    border: unset;
+    font: inherit;
+    margin: unset;
+    padding: unset;
+    text-align: inherit;
+  }
+}

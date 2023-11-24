@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% set toggles %}
+  <div class="container is-flex is-flex-wrap-wrap is-align-content-flex-start x-gap-4">
+    {{ layout }}
+    {{ work_type }}
+    {{ remote_type }}
+  </div>
+{% endset %}
+
+{% block before %}
+  <section class="has-background-white-bis py-4">
+    {{ toggles }}
+  </section>
+{% endblock %}

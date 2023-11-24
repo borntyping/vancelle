@@ -1,0 +1,11 @@
+{%- macro toast(title, body, classes = "") -%}
+  <div class="message is-small app-toast {{ classes }}">
+    <div class="message-header">
+      <p>{{- title -}}</p>
+      <button class="delete is-small" aria-label="delete" hx-on:click="closeToast(this)"></button>
+    </div>
+    <div class="message-body">
+      {{- body -}}
+    </div>
+  </div>
+{%- endmacro -%}

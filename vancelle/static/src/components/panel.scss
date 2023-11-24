@@ -1,0 +1,38 @@
+@import "bulma/sass/components/panel";
+@import "bulma/sass/utilities/derived-variables";
+
+.x-properties-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: min-content;
+
+  .panel-heading, summary {
+    grid-column: span 2;
+  }
+
+  .panel-block {
+    overflow: hidden;
+  }
+
+  details {
+    display: contents;
+
+    .panel-block {
+      border-bottom: $panel-item-border;
+    }
+
+    summary {
+      cursor: pointer;
+    }
+  }
+
+  .x-properties-grid-json {
+    grid-column: span 2;
+
+    pre {
+      background: $white-bis;
+      font-size: $size-small;
+      //padding: 0.5em 0.75em;
+    }
+  }
+}

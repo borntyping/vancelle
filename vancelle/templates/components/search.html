@@ -1,0 +1,33 @@
+{% macro legacy_search(title, query, get, css_id_prefix, placeholder = 'Title') %}
+  <div id="{{ css_id_prefix }}-container">
+    <div class="my-3">
+      <h2 class="title">{{ title }}</h2>
+      {% if query %}
+        <h3 class="subtitle">Results for {{ query }}</h3>
+      {% endif %}
+    </div>
+    <div class="field my-3">
+      <label for="{{ css_id_prefix }}-input" class="label">Search</label>
+      <div class="control">
+        <input
+          id="{{ css_id_prefix }}-input"
+          class="input"
+          type="search"
+          name="search"
+          value="{{ query if query else '' }}"
+          placeholder="{{ placeholder }}"
+          hx-get="{{ get }}"
+          hx-select="#{{ css_id_prefix }}-container"
+          hx-swap="innerHTML"
+          hx-target="#{{ css_id_prefix }}-container"
+          hx-trigger="keyup changed delay:500ms, search"
+          hx-push-url="true">
+      </div>
+    </div>
+    <div class="my-3">
+      <div id="{{ css_id_prefix }}-results">
+        {{ caller() }}
+      </div>
+    </div>
+  </div>
+{% endmacro %}

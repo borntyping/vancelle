@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% from 'components/layout.html' import section, section %}
+{% from 'components/pagination.html' import pagination %}
+{% from 'components/metadata.html' import details_combined_title, source_tag %}
+{% from 'components/remote/id.html' import span_remote_id %}
+
+{% block content %}
+  {% call section("Remote data", "Work details from external sources", h1=True) %}
+    <div class="box">
+      <div class="block">
+        {{ remote_type }}
+      </div>
+
+      <table class="block table is-fullwidth is-striped is-hoverable is-narrow">
+        <thead>
+          <tr>
+            <th class="has-text-centered">Source</th>
+            <th class="has-text-left" style="">Title</th>
+            <th class="has-text-centered"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for remote in remotes %}
+            {% set details = remote.into_details() %}
+            {% set source = remote.into_source() %}
+            <tr>
+              <td class="has-text-centered">{{ source_tag(source) }}</td>
+              <td>{{ details_combined_title(details) }}</td>
+              <td class="has-text-right">
+                <div class="field">
+                  <a href="{{ remote.work.url_for() }}" class="button is-small">See in collection</a>
+                </div>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td class="has-text-centered" colspan="3">
+                <em>No results.</em>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {{ pagination(remotes) }}
+    </div>
+  {% endcall %}
+{% endblock %}

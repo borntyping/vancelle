@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% from 'components/layout.html' import section %}
+{% from 'components/forms.html' import bulma_form_field %}
+{% from 'components/controls.html' import control_work_update, control_work_delete, control_work_restore, control_work_permanently_delete %}
+{% from 'components/metadata.html' import details_combined_title %}
+
+{% set details = work.resolve_details() %}
+
+{% block content %}
+  {% call section("Update work", subtitle=details_combined_title(details, work.url_for())) %}
+    <div class="box">
+      <form
+        id="work"
+        method="post"
+        action="{{ url_for('work.update', work_id=work.id) }}"
+        class="block">
+        {{ form.csrf_token }}
+        <div class="block">
+          {{ bulma_form_field(form.type) }}
+          {{ bulma_form_field(form.title, placeholder=details.title) }}
+          {{ bulma_form_field(form.author, placeholder=details.author) }}
+          {{ bulma_form_field(form.description, placeholder=details.description) }}
+          {{ bulma_form_field(form.release_date) }}
+          {{ bulma_form_field(form.cover, placeholder=details.cover) }}
+          {{ bulma_form_field(form.background, placeholder=details.background) }}
+          {{ bulma_form_field(form.shelf, placeholder=details.shelf) }}
+        </div>
+        <div class="block">
+          <div class="field is-grouped">
+            {%- if work.deleted -%}
+              {{ control_work_restore(work, text=True) }}
+              {{ control_work_permanently_delete(work, text=True) }}
+            {%- else -%}
+              {{ control_work_delete(work, True) }}
+            {%- endif -%}
+            <div class="control is-expanded"></div>
+            <div class="control">
+              <button type="submit" class="button is-link">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  {% endcall %}
+{% endblock %}

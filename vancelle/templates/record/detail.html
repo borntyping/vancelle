@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% from 'components/layout.html' import section %}
+{% from 'components/forms.html' import bulma_form_field %}
+
+{% set details = record.work.resolve_details() %}
+{% set subtitle %}
+  Record for <a href="{{ url_for('work.detail', work_id=record.work_id) }}">{{ details.title }}</a>
+{% endset %}
+
+{% block content %}
+  {% call section("Update record", subtitle) %}
+    <div class="box">
+      <form
+        id="record"
+        method="post"
+        action="{{ url_for('records.detail', work_id=record.work_id, record_id=record.id) }}"
+        class="block">
+        {{ bulma_form_field(form.date_started) }}
+        {{ bulma_form_field(form.date_stopped) }}
+        {{ bulma_form_field(form.notes, rows=5, cols=20, autocomplete='off', autocorrect='on', maxlength=256) }}
+        {{ form.csrf_token }}
+      </form>
+      <div class="field is-grouped">
+        {%- if record.deleted -%}
+          <form class="control">
+            <button
+              type="submit"
+              formmethod="post"
+              formaction="{{ url_for('records.restore', work_id=record.work_id, record_id=record.id) }}"
+              class="button is-light is-success app-ellipsis-indicator">Restore
+            </button>
+          </form>
+          <form class="control">
+            <button
+              type="submit"
+              formmethod="post"
+              formaction="{{ url_for('records.permanently_delete', work_id=record.work_id, record_id=record.id) }}"
+              class="button is-light app-ellipsis-indicator">Delete permanently
+            </button>
+          </form>
+        {%- else -%}
+          <form action="" class="control is-expanded">
+            <button
+              type="submit"
+              formmethod="post"
+              formaction="{{ url_for('records.delete', work_id=record.work_id, record_id=record.id) }}"
+              class="button is-danger is-light app-ellipsis-indicator">Delete
+            </button>
+          </form>
+        {%- endif -%}
+        <div class="control is-expanded"></div>
+        <div class="control">
+          <button
+            type="submit"
+            form="record"
+            class="button is-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  {% endcall %}
+{% endblock %}

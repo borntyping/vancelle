@@ -1,0 +1,115 @@
+{%- from 'components/navbar.html' import navbar_item -%}
+{%- from 'components/toast.html' import toast -%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="htmx-config" content='{"globalViewTransitions":true}'>
+    <title>Vancelle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/style.css') }}">
+    <meta name="htmx-config" content='{"requestClass": "is-loading"}'>
+  </head>
+  <body hx-ext="loading-states">
+    <nav class="navbar is-link">
+      <div class="container">
+        <div class="navbar-brand">
+          <a href="{{ url_for('work.home') }}" class="navbar-item has-text-weight-bold">Vancelle</a>
+        </div>
+        <div class="navbar-menu">
+          <div class="navbar-start">
+            {{ navbar_item('work.index', 'Works') }}
+            {{ navbar_item('work.create', 'Add work') }}
+          </div>
+          <div class="navbar-end">
+            {% if current_user.is_authenticated %}
+              <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">{{ current_user.username }}</a>
+                <div class="navbar-dropdown is-right">
+                  {{ navbar_item('remote.index', 'Remote data') }}
+                  {{ navbar_item("admin.index", "Admin") }}
+                  {{ navbar_item("user.logout", "Logout") }}
+                </div>
+              </div>
+            {% else %}
+              {{ navbar_item("user.login", "Login") }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    {% block before %}
+    {% endblock before %}
+
+    <div class="section">
+      <div class="container block">
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+
+    {% block after %}
+    {% endblock after %}
+
+    <footer id="app-footer" class="footer">
+      <div class="content has-text-centered">
+        <p>
+          Created by <a href="https://borntyping.co.uk">@borntyping</a>.
+        </p>
+        <p id="app-dependency-logos">
+          <!-- Open Library requests a "courtesy link". https://openlibrary.org/dev/docs/api/covers -->
+          <a href="https://openlibrary.org/" title="Open Library">
+            <img src="{{ url_for('static', filename='img/openlibrary.svg') }}" alt="Open Library" style="height: 2em !important">
+          </a>
+          <!-- TMDB terms of use require this notice: https://developer.themoviedb.org/docs/faq -->
+          <a href="https://www.themoviedb.org" title="The Movie Database">
+            <img src="{{ url_for('static', filename='img/tmdb.svg') }}" alt="TMDB" style="height: 2em !important">
+          </a>
+          <a href="https://store.steampowered.com" title="Steam">
+            <img src="{{ url_for('static', filename='img/steam.svg') }}" alt="Steam" style="height: 2em !important">
+          </a>
+        </p>
+        <!-- TMDB terms of use require this notice: https://developer.themoviedb.org/docs/faq -->
+        <p class="has-text-grey">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+        {% set queries = get_recorded_queries() %}
+        <details>
+          <summary>Debug ({{ queries|length }} queries)</summary>
+          <div class="block has-text-left is-size-7 is-clipped">
+            <table class="table">
+              <tr>
+                <th></th>
+                <th>Statement</th>
+              </tr>
+              {% for query in queries %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                  <td>
+                    <p class="">{{ query.location }}, {{ query.duration|round(2) }} seconds</p>
+                    <pre class="" style="white-space: pre-wrap; word-wrap: break-word;">{{ query.statement }}</pre>
+                    <pre class="" style="white-space: pre-wrap; word-wrap: break-word;">{{ query.parameters|tojson() }}</pre>
+                  </td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </details>
+      </div>
+    </footer>
+    <footer id="app-toasts" hx-preserve="true">
+      {% if not htmx %}
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+          {{ toast(category, message) }}
+        {% endfor %}
+      {% endif %}
+    </footer>
+    {% block scripts %}
+      <script src="https://unpkg.com/htmx.org@1.9.6/dist/htmx.js" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/debug.js" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/loading-states.js" crossorigin="anonymous"></script>
+      <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+      <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+      <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    {% endblock %}
+  </body>
+</html>

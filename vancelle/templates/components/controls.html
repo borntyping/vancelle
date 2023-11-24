@@ -1,0 +1,106 @@
+{%- macro _ion_icon(icon, text=None, enable_text=True) -%}
+  <span class="icon"><ion-icon name="{{ icon }}"></ion-icon></span>
+  {%- if text and enable_text -%}<span>{{ text }}</span>{%- endif -%}
+{%- endmacro -%}
+
+{% macro _control_post(url, icon, text, title, enable_text = False, class_="") %}
+  <form action="{{ url }}" method="post" class="control" title="{{ title }}">
+    <button type="submit" hx-post="{{ url }}" class="button {{ class_ }}">
+      {{- _ion_icon(icon=icon, text=text, enable_text=enable_text) -}}
+    </button>
+  </form>
+{% endmacro %}
+
+{% macro _control_link(url, icon, text, title, enable_text = False, class_="") %}
+  <div class="control" title="{{ title }}">
+    <a href="{{ url }}" class="button {{ class_ }}">
+      {{- _ion_icon(icon=icon, text=text, enable_text=enable_text) -}}
+    </a>
+  </div>
+{% endmacro %}
+
+{% macro _control_static(icon, text, title, enable_text = False, class_="") %}
+  <div class="control" title="{{ title }}">
+    <span class="button is-static {{ class_ }}">
+      {{- _ion_icon(icon=icon, text=text, enable_text=enable_text) -}}
+    </span>
+  </div>
+{% endmacro %}
+
+{% macro _control_static_text(text, title, enable_text = False, class_="") %}
+  <div class="control" title="{{ title }}">
+    <span class="button is-static {{ class_ }}">
+      <span class="icon">
+        {{- text -}}
+      </span>
+    </span>
+  </div>
+{% endmacro %}
+
+{% macro control_work_update(work, text = True) %}
+  {{ _control_link(url=url_for('work.update', work_id=work.id), text="Edit", enable_text=text, icon="pencil-outline", title="Edit details of this work.", class_="") }}
+{% endmacro %}
+
+{% macro control_work_restore(work, text = True) %}
+  {{ _control_post(url=url_for('work.restore', work_id=work.id), text="Restore", enable_text=text, icon="trash-outline", title="Restore this work.", class_="is-success is-light") }}
+{% endmacro %}
+
+{% macro control_work_delete(work, text = True) %}
+  {{ _control_post(url=url_for('work.delete', work_id=work.id), text="Delete", enable_text=text, icon="trash-outline", title="Delete this work. Confirmation will be required before any data is permanently deleted.") }}
+{% endmacro %}
+
+{% macro control_work_permanently_delete(work, text = True) %}
+  {{ _control_post(url=url_for('work.permanently_delete', work_id=work.id), text="Permanently delete", enable_text=text, icon="trash-outline", title="Permanently delete this work. It will not be possible to recover any details or records of this work.", class_="is-danger is-light") }}
+{% endmacro %}
+
+{% macro control_remote_detail(remote) %}
+  {{ _control_link(url=remote.url_for(work=None), text="View remote", icon="document-text-outline", title="View this remote data.") }}
+{% endmacro %}
+
+{% macro control_remote_delete(remote) %}
+  {% with url = url_for("remote.delete", work_id=remote.work_id, remote_type=remote.type, remote_id=remote.id) %}
+    {{ _control_post(url=url, text="Delete", icon="trash-outline", title="Delete this remote data. You will be able to restore it.") }}
+  {% endwith %}
+{% endmacro %}
+
+{% macro control_remote_restore(remote) %}
+  {% with url = url_for("remote.restore", work_id=remote.work_id, remote_type=remote.type, remote_id=remote.id) %}
+    {{ _control_post(url=url, text="Restore", icon="trash-outline", class_="is-success is-light", title="Restore this remote data.") }}
+  {% endwith %}
+{% endmacro %}
+
+{% macro control_remote_permanently_delete(remote) %}
+  {% with url = url_for("remote.permanently_delete", work_id=remote.work_id, remote_type=remote.type, remote_id=remote.id) %}
+    {{ _control_post(url=url, text="Permanently delete", icon="trash-outline", class_="is-danger is-light", title="Delete this remote data. It will not be possible to recover these details without fetching them from the original source.") }}
+  {% endwith %}
+{% endmacro %}
+
+{%- macro control_remote_refresh(remote, source=None) -%}
+  {%- if (source or remote.into_source()).can_refresh and remote.work_id -%}
+    {% with url = url_for("remote.refresh", work_id=remote.work_id, remote_type=remote.type, remote_id=remote.id) %}
+      {{ _control_post(url=url, text="Refresh", icon="refresh-outline", title="Update this remote data from it's source.") }}
+    {% endwith %}
+  {%- endif -%}
+{%- endmacro -%}
+
+{% macro control_remote_link_work(remote, work, class_="is-info") %}
+  {% with url = url_for("remote.link_work", work_id=work.id, remote_type=remote.type, remote_id=remote.id) %}
+    {{ _control_post(url=url, text="Link work", icon="add-outline", class_=class_, title="Link work to {}".format(work.resolve_details().title)) }}
+  {% endwith %}
+{% endmacro %}
+
+{% macro control_remote_create_work(remote, class_="is-primary") %}
+  {% with url = url_for("remote.create_work", remote_type=remote.type, remote_id=remote.id) %}
+    {{ _control_post(url=url, text="Create work", icon="add-outline", class_=class_, title="Create a new work linked to this remote") }}
+  {% endwith %}
+{% endmacro %}
+
+{% macro control_remote_has_cover(remote, details=None) %}
+  {%- if (details or remote.into_details()).cover -%}
+    {{ _control_static(icon='document-outline', text=None, title='Remote data includes cover', class_="is-small") }}
+  {% endif %}
+{% endmacro %}
+
+{% macro control_source_priority(source) %}
+  {{ _control_static_text(text=source.priority, title="Priority for details from {}".format(source.name)) }}
+{% endmacro %}

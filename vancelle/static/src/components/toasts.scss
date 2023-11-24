@@ -1,0 +1,52 @@
+@use 'sass:list';
+@import "../../../../node_modules/bulma/bulma";
+
+/**
+ * Toast messages
+ */
+
+:root {
+  /* https://bulma.io/documentation/helpers/spacing-helpers/ */
+  --bulma-spacing-0: 0;
+  --bulma-spacing-1: 0.25rem;
+  --bulma-spacing-2: 0.5rem;
+  --bulma-spacing-3: 0.75rem;
+  --bulma-spacing-4: 1rem;
+  --bulma-spacing-5: 1.5rem;
+  --bulma-spacing-6: 3rem;
+}
+
+
+#app-toasts {
+  position: fixed;
+  margin: 1rem;
+  z-index: 41; /* Bulma .modal has {z-index: 40}. */
+
+  /* Fix border-radius bleeding the colour of the background behind it */
+  .message {
+    background: unset;
+    min-width: 25rem;
+
+    .message-body {
+      background: whitesmoke;
+    }
+  }
+
+  @include touch {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: unset;
+  }
+
+  @include desktop {
+    bottom: 0;
+    left: 0;
+    right: unset;
+    width: 20%;
+  }
+
+  @include widescreen {
+    width: 10%;
+  }
+}

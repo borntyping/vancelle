@@ -1,0 +1,15 @@
+- .git/
+- .gitattributes
+- .gitignore
+- .justfile
+- .local/
+- .rsync-filter
+- .run/
+- .venv/
+- __pycache__/
+- docs/
+- LICENSE
+- node_modules/
+- package-lock.json
+- package.json
+- vancelle-backup.json

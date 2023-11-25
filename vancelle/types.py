@@ -72,32 +72,19 @@ class WorkType(enum.StrEnum):
     GAME = "game"
     FILM = "film"
     SHOW = "show"
+    OTHER = "other"
 
-    titles: dict[Self, str] = enum.nonmember(
-        {
-            BOOK: "Book",
-            GAME: "Game",
-            FILM: "Movie",
-            SHOW: "TV show",
-        }
-    )
+    titles: dict[Self, str] = enum.nonmember({SHOW: "TV show"})
 
     @enum.property
     def title(self) -> str:
-        return self.titles[self.value]
+        return self.titles.get(self.value, self.value.capitalize())
 
-    nouns: dict[Self, str] = enum.nonmember(
-        {
-            BOOK: "book",
-            GAME: "game",
-            FILM: "film",
-            SHOW: "show",
-        }
-    )
+    nouns: dict[Self, str] = enum.nonmember({})
 
     @enum.property
     def noun(self) -> str:
-        return self.nouns[self.value]
+        return self.nouns.get(self.value, self.value)
 
     @enum.property
     def plural(self) -> str:

@@ -66,11 +66,11 @@ class SteamStoreAPI:
         url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
         response = self.session.get(url)
         response.raise_for_status()
-        container: AppDetailsContainer = response.json()
+        data: AppDetailsContainer = response.json()
 
-        wrapper = container[appid]
+        wrapper = data[appid]
         if not wrapper["success"]:
-            logger.warning(f"Steam appdetails request failed", appid=appid)
+            logger.warning(f"Steam appdetails request failed", appid=appid, data=data)
             return None
 
         logger.info(

@@ -40,6 +40,30 @@ def create_work(remote_type: str, remote_id: str):
     return htmx.redirect(work.url_for())
 
 
+@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/refresh", methods={"post"})
+def refresh(remote_type: str, remote_id: str):
+    controller.refresh(remote_type=remote_type, remote_id=remote_id)
+    return htmx.refresh()
+
+
+@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/delete", methods={"post"})
+def delete(remote_type: str, remote_id: str):
+    controller.delete(remote_type=remote_type, remote_id=remote_id)
+    return htmx.refresh()
+
+
+@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/restore", methods={"post"})
+def restore(remote_type: str, remote_id: str):
+    controller.restore(remote_type=remote_type, remote_id=remote_id)
+    return htmx.refresh()
+
+
+@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/permanently-delete", methods={"post"})
+def permanently_delete(remote_type: str, remote_id: str):
+    controller.permanently_delete(remote_type=remote_type, remote_id=remote_id)
+    return htmx.refresh()
+
+
 @bp.route("/sources/<string:remote_type>/")
 def search_source(remote_type: str):
     query = flask.request.args.get("query", default="", type=str)
@@ -55,27 +79,3 @@ def link_work(work_id: uuid.UUID):
 
     work = controller.link_work(work_id=work_id, remote_type=remote_type, remote_id=remote_id)
     return htmx.redirect(work.url_for())
-
-
-@bp.route("/works/<uuid:work_id>/remotes/<string:remote_type>/-/refresh", methods={"post"})
-def refresh(work_id: uuid.UUID, remote_type: str):
-    controller.refresh(work_id=work_id, remote_type=remote_type)
-    return htmx.refresh()
-
-
-@bp.route("/works/<uuid:work_id>/remotes/<string:remote_type>/-/delete", methods={"post"})
-def delete(work_id: uuid.UUID, remote_type: str):
-    controller.delete(work_id=work_id, remote_type=remote_type)
-    return htmx.refresh()
-
-
-@bp.route("/works/<uuid:work_id>/remotes/<string:remote_type>/-/restore", methods={"post"})
-def restore(work_id: uuid.UUID, remote_type: str):
-    controller.restore(work_id=work_id, remote_type=remote_type)
-    return htmx.refresh()
-
-
-@bp.route("/works/<uuid:work_id>/remotes/<string:remote_type>/-/permanently-delete", methods={"post"})
-def permanently_delete(work_id: uuid.UUID, remote_type: str):
-    controller.permanently_delete(work_id=work_id, remote_type=remote_type)
-    return htmx.refresh()

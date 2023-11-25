@@ -1,13 +1,9 @@
-import typing
-
-import pydantic
 import requests
 import requests_cache
 import sqlalchemy
 import structlog
 
 from vancelle.extensions import db
-from vancelle.models import Base
 
 logger = structlog.get_logger(logger_name=__name__)
 

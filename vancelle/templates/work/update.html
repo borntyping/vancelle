@@ -16,31 +16,32 @@
         action="{{ url_for('work.update', work_id=work.id) }}"
         class="block">
         {{ form.csrf_token }}
-        <div class="block">
-          {{ bulma_form_field(form.type) }}
-          {{ bulma_form_field(form.title, placeholder=details.title) }}
-          {{ bulma_form_field(form.author, placeholder=details.author) }}
-          {{ bulma_form_field(form.description, placeholder=details.description) }}
-          {{ bulma_form_field(form.release_date) }}
-          {{ bulma_form_field(form.cover, placeholder=details.cover) }}
-          {{ bulma_form_field(form.background, placeholder=details.background) }}
-          {{ bulma_form_field(form.shelf, placeholder=details.shelf) }}
-        </div>
-        <div class="block">
-          <div class="field is-grouped">
+        {{ bulma_form_field(form.type) }}
+        {{ bulma_form_field(form.title, placeholder=details.title) }}
+        {{ bulma_form_field(form.author, placeholder=details.author) }}
+        {{ bulma_form_field(form.description, placeholder=details.description) }}
+        {{ bulma_form_field(form.release_date) }}
+        {{ bulma_form_field(form.cover, placeholder=details.cover) }}
+        {{ bulma_form_field(form.background, placeholder=details.background) }}
+        {{ bulma_form_field(form.shelf, placeholder=details.shelf) }}
+      </form>
+      <div class="block">
+        <div class="field is-grouped">
+          <div class="control">
             {%- if work.deleted -%}
               {{ control_work_restore(work, text=True) }}
               {{ control_work_permanently_delete(work, text=True) }}
             {%- else -%}
               {{ control_work_delete(work, True) }}
             {%- endif -%}
-            <div class="control is-expanded"></div>
-            <div class="control">
-              <button type="submit" class="button is-link">Save changes</button>
-            </div>
+          </div>
+          <div class="control is-expanded"></div>
+          <div class="control">
+            <button form="work" type="submit" class="button is-link">Save changes</button>
           </div>
         </div>
-      </form>
+      </div>
+    </form>
     </div>
   {% endcall %}
 {% endblock %}

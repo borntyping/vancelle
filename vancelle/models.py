@@ -179,11 +179,10 @@ class Record(Base):
 
 class Remote(Base, IntoSource, IntoDetails, IntoProperties):
     __tablename__ = "remote"
-    __table__args = (UniqueConstraint("work_id", "type", name="work"),)
     __mapper_args__ = {"polymorphic_on": "type"}
 
     work_id: Mapped[UUID] = mapped_column(ForeignKey("work.id", ondelete="cascade"))
-    type: Mapped[str] = mapped_column()
+    type: Mapped[str] = mapped_column(primary_key=True)
 
     time_created: Mapped[datetime] = mapped_column(default=func.now(), insert_default=func.now())
     time_updated: Mapped[Optional[datetime]] = mapped_column(default=None, onupdate=func.now())

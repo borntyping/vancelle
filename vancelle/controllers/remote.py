@@ -53,22 +53,22 @@ class RemotesController:
     def _get_work_by_id(self, work_id: uuid.UUID) -> Work:
         return db.get_or_404(Work, work_id, description="Work not found")
 
-    def _get_remote_by_work(self, *, work_id: uuid.UUID, remote_type: str) -> Remote:
-        log = logger.bind(remote_type=remote_type, work_id=work_id)
+    def _get_remote_from_db(self, *, remote_type: str, remote_id: str) -> Remote:
+        log = logger.bind(remote_type=remote_type, remote_id=remote_id)
         remote = db.one_or_404(
-            select(Remote).filter(Remote.work_id == work_id, Remote.type == remote_type),
+            select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id),
             description="Remote not found",
         )
-        log.debug("Fetched remote from database by work.id+remote.type", id=remote.id)
+        log.debug("Fetched remote from database", id=remote.id)
         return remote
 
-    def _get_remote_by_id(self, remote_type, remote_id):
+    def _get_remote(self, *, remote_type: str, remote_id: str) -> Remote:
         log = logger.bind(remote_type=remote_type, remote_id=remote_id)
 
         if remote := db.session.execute(
             select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
         ).scalar_one_or_none():
-            log.debug("Fetched remote from database by remote.type+remote.id")
+            log.debug("Fetched remote from database")
             return remote
 
         remote = self[remote_type].fetch(remote_id)
@@ -83,11 +83,11 @@ class RemotesController:
 
         return db.paginate(query)
 
-    def refresh(self, work_id: uuid.UUID, remote_type: str) -> Remote:
-        old_remote = self._get_remote_by_work(work_id=work_id, remote_type=remote_type)
+    def refresh(self, remote_type: str, remote_id: str) -> Remote:
+        old_remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
 
         new_remote = self[old_remote.type].fetch(old_remote.id)
-        new_remote.work_id = work_id
+        new_remote.work_id = old_remote.work_id
 
         assert new_remote.id == old_remote.id, f"{new_remote.id!r} != {old_remote.id!r}"
 
@@ -95,22 +95,22 @@ class RemotesController:
         db.session.commit()
         return new_remote
 
-    def delete(self, *, work_id: uuid.UUID, remote_type: str) -> Remote:
-        remote = self._get_remote_by_work(work_id=work_id, remote_type=remote_type)
+    def delete(self, *, remote_type: str, remote_id: str) -> Remote:
+        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
         remote.time_deleted = sqlalchemy.func.now()
         db.session.add(remote)
         db.session.commit()
         return remote
 
-    def restore(self, *, work_id: uuid.UUID, remote_type: str) -> Remote:
-        remote = self._get_remote_by_work(work_id=work_id, remote_type=remote_type)
+    def restore(self, *, remote_type: str, remote_id: str) -> Remote:
+        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
         remote.time_deleted = None
         db.session.add(remote)
         db.session.commit()
         return remote
 
-    def permanently_delete(self, *, work_id: uuid.UUID, remote_type: str) -> None:
-        remote = self._get_remote_by_work(work_id=work_id, remote_type=remote_type)
+    def permanently_delete(self, *, remote_type: str, remote_id: str) -> None:
+        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
         db.session.delete(remote)
         db.session.commit()
         return None
@@ -166,7 +166,7 @@ class RemotesController:
         return self.render_template("search.html", remote_type=remote_type, work=work, query=query, items=items)
 
     def render_detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> str:
-        remote = self._get_remote_by_id(remote_type=remote_type, remote_id=remote_id)
+        remote = self._get_remote(remote_type=remote_type, remote_id=remote_id)
         work = self._get_work_by_id(work_id) if work_id else None
         context = self.managers[remote_type].context_detail(remote)
         return self.render_template("detail.html", remote_type=remote_type, remote=remote, work=work, **context)

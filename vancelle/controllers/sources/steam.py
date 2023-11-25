@@ -25,7 +25,7 @@ class SteamApplicationManager(Manager):
         appdetails = apis.steam_store_api.appdetails(remote_id)
 
         if appdetails is None:
-            return SteamApplication(id=remote_id)
+            return SteamApplication(id=remote_id, data={})
 
         release_date = apis.steam_store_api.parse_release_date(appdetails["release_date"])
         vertical_capsule = apis.steam_store_api.vertical_capsule(appdetails, check=True)

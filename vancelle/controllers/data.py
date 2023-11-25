@@ -37,6 +37,16 @@ class WorkModel(DataModel):
     time_updated: Optional[datetime]
     time_deleted: Optional[datetime]
 
+    title: Optional[str]
+    author: Optional[str]
+    description: Optional[str]
+    release_date: Optional[date]
+    cover: Optional[str]
+    background: Optional[str]
+    shelf: Optional[Shelf]
+    tags: Optional[set[str]]
+    data: Optional[pydantic.JsonValue]
+
 
 class RemoteModel(DataModel):
     work_id: uuid.UUID

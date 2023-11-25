@@ -1,11 +1,17 @@
+- .env
+- .envrc
 - .git/
 - .gitattributes
 - .gitignore
+- .idea/
 - .justfile
 - .local/
+- .pytest_cache/
 - .rsync-filter
 - .run/
+- .sass-cache/
 - .venv/
+- .vscode/
 - __pycache__/
 - docs/
 - LICENSE

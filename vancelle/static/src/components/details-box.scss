@@ -16,7 +16,7 @@ $spacing: calc($box-padding / 2);
   }
 }
 
-.panel.x-details {
+.x-details {
   display: grid;
   grid-template-rows: calc(55px - $spacing) min-content;
   grid-template-columns: max-content 1fr;
@@ -41,6 +41,8 @@ $spacing: calc($box-padding / 2);
     aspect-ratio: 2/3;
 
     img {
+      object-fit: cover;
+      height: 100%;
       width: 100%;
     }
   }

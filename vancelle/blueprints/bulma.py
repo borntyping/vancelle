@@ -42,6 +42,8 @@ def bulma_field_params(
             class_ = join(class_, "textarea")
         case wtforms.SelectField:
             class_ = join(class_, "select")
+        case wtforms.BooleanField:
+            raise NotImplementedError
         case _:
             class_ = join(class_, "input")
 

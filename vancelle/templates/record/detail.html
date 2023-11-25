@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% from 'components/layout.html' import section %}
-{% from 'components/forms.html' import bulma_form_field %}
+{% from 'components/forms.html' import bulma_form_field, bulma_checkbox %}
 
 {% set details = record.work.resolve_details() %}
 {% set subtitle %}
@@ -18,6 +18,7 @@
         class="block">
         {{ bulma_form_field(form.date_started) }}
         {{ bulma_form_field(form.date_stopped) }}
+        {{ bulma_checkbox(form.date_sync) }}
         {{ bulma_form_field(form.notes, rows=5, cols=20, autocomplete='off', autocorrect='on', maxlength=256) }}
         {{ form.csrf_token }}
       </form>

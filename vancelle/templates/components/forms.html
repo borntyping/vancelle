@@ -14,3 +14,11 @@
     {% endfor %}
   </div>
 {% endmacro %}
+
+{% macro bulma_checkbox(field) %}
+  <div class="field">
+    <div class="control">
+      <label class="checkbox">{{ field() }} {{ field.label.text }}</label>
+    </div>
+  </div>
+{% endmacro %}

@@ -50,7 +50,7 @@ def detail(work_id: uuid.UUID, record_id: uuid.UUID):
         form.populate_obj(record)
         db.session.add(record)
         db.session.commit()
-        return flask.redirect(flask.url_for("work.detail", work_id=record.work_id))
+        return htmx.refresh()
 
     if htmx and form.errors:
         raise BadRequest()

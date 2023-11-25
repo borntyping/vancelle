@@ -26,19 +26,20 @@ class TmdbMovieManager(Manager[TmdbMovie]):
 
     def search(self, query: str) -> ItemsPagination[TmdbMovie]:
         page = flask.request.args.get("page", 1, type=int)
-        data = apis.tmdb.search_movies(query, page=page)
+        search = apis.tmdb.search_movies(query, page=page)
 
         items = [
             TmdbMovie(
-                id=result["id"],
-                title=result["title"],
-                description=result["overview"],
-                cover=apis.tmdb.poster_url(result["poster_path"]),
+                id=data["id"],
+                title=data["title"],
+                description=data["overview"],
+                cover=apis.tmdb.poster_url(data["poster_path"]),
+                release_date=apis.tmdb.release_date(data["release_date"]),
             )
-            for result in data["results"]
+            for data in search["results"]
         ]
 
-        return ItemsPagination(page=page, per_page=20, items=items, total=data["total_results"])
+        return ItemsPagination(page=page, per_page=20, items=items, total=search["total_results"])
 
 
 class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
@@ -59,16 +60,17 @@ class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
 
     def search(self, query: str) -> Pagination[TmdbTvSeries]:
         page = flask.request.args.get("page", 1, type=int)
-        data = apis.tmdb.search_tv(query, page=page)
+        search = apis.tmdb.search_tv(query, page=page)
 
         items = [
             TmdbTvSeries(
-                id=result["id"],
-                title=result["name"],
-                description=result["overview"],
-                cover=apis.tmdb.poster_url(result["poster_path"]),
+                id=data["id"],
+                title=data["name"],
+                description=data["overview"],
+                cover=apis.tmdb.poster_url(data["poster_path"]),
+                release_date=apis.tmdb.release_date(data["first_air_date"]),
             )
-            for result in data["results"]
+            for data in search["results"]
         ]
 
-        return ItemsPagination(page=page, per_page=20, items=items, total=data["total_results"])
+        return ItemsPagination(page=page, per_page=20, items=items, total=search["total_results"])

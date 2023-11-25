@@ -231,5 +231,8 @@ class TmdbAPI:
         base_url = self.configuration["images"]["base_url"]
         return base_url + file_size + file_path
 
-    def release_date(self, release_date: str) -> datetime.date:
+    def release_date(self, release_date: str) -> datetime.date | None:
+        if not release_date:
+            return None
+
         return datetime.datetime.strptime(release_date, "%Y-%m-%d").date()

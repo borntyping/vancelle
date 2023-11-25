@@ -23,7 +23,7 @@ class RecordController:
             .options(joinedload(Record.work))
         )
 
-    def create(self, work_id: uuid.UUID, started_today: bool, stopped_today: bool) -> (Work, Record):
+    def create(self, work_id: uuid.UUID, started_today: bool, stopped_today: bool) -> Record:
         work = db.get_or_404(Work, work_id)
         record = Record(id=uuid.uuid4(), work=work)
 
@@ -35,7 +35,7 @@ class RecordController:
 
         db.session.add(record)
         db.session.commit()
-        return work, record
+        return record
 
     def start_today(self, work_id: uuid.UUID, record_id: uuid.UUID) -> Record:
         record = self.get_or_404(work_id=work_id, record_id=record_id, user_id=flask_login.current_user.id)

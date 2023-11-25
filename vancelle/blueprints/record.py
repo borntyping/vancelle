@@ -32,8 +32,8 @@ class RecordForm(FlaskForm):
 def create(work_id: uuid.UUID):
     started_today = flask.request.args.get("started_today", default=False, type=bool)
     stopped_today = flask.request.args.get("stopped_today", default=False, type=bool)
-    controller.create(work_id, started_today=started_today, stopped_today=stopped_today)
-    return htmx.refresh()
+    record = controller.create(work_id, started_today=started_today, stopped_today=stopped_today)
+    return htmx.redirect(record.url_for())
 
 
 @bp.route("/<uuid:record_id>/", methods={"GET", "POST"})

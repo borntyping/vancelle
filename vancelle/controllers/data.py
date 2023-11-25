@@ -45,7 +45,6 @@ class WorkModel(DataModel):
     background: Optional[str]
     shelf: Optional[Shelf]
     tags: Optional[set[str]]
-    data: Optional[pydantic.JsonValue]
 
 
 class RemoteModel(DataModel):

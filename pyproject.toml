@@ -18,7 +18,7 @@ flask-wtf = "^1.2.1"
 humanize = "^4.9.0"
 inflect = "^7.0.0"
 platformdirs = "^4.0.0"
-psycopg = {extras = ["binary"], version = "^3.1.13"}
+psycopg = {version = "^3.1.13"}
 pydantic = "^2.5.2"
 python-dotenv = "^1.0.0"
 requests = "^2.31.0"

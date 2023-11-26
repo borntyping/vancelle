@@ -47,7 +47,7 @@ class Toggle:
         else:
             value = default
 
-        if default is "":
+        if default == "":
             mapping = {"": "All", **mapping}
 
         return cls(mapping=mapping, key=key, value=value, default=default, args=kwargs)

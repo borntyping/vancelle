@@ -26,7 +26,7 @@ FROM base as final
 WORKDIR /opt/app
 ENTRYPOINT ["poetry", "run"]
 ENV FLASK_APP="vancelle.app:create_personal_app()"
-CMD ["gunicorn", "vancelle.app:create_personal_app()"]
+CMD ["gunicorn", "vancelle.app:create_personal_app()", "--access-logfile=-"]
 EXPOSE 5000
 COPY --from=build /opt/app/.venv /opt/app/.venv
 COPY ["poetry.lock", "pyproject.toml", "./"]

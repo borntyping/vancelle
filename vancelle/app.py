@@ -4,13 +4,14 @@ import typing
 import flask
 
 from .blueprints.admin import bp as bp_admin
+from .blueprints.bulma import bp as bp_bulma
 from .blueprints.data import bp as bp_io
 from .blueprints.errors import bp as bp_errors
+from .blueprints.health import bp as bp_health
 from .blueprints.record import bp as bp_record
 from .blueprints.remote import bp as bp_remote
 from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
-from .blueprints.bulma import bp as bp_bulma
 from .ext.structlog import configure_logging
 from .extensions import apis, cors, db, html, htmx, login_manager
 from .types import Shelf
@@ -34,10 +35,11 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     htmx.init_app(app)
 
     app.register_blueprint(bp_admin)
-    app.register_blueprint(bp_errors)
-    app.register_blueprint(bp_user)
-    app.register_blueprint(bp_io)
     app.register_blueprint(bp_bulma)
+    app.register_blueprint(bp_errors)
+    app.register_blueprint(bp_health)
+    app.register_blueprint(bp_io)
+    app.register_blueprint(bp_user)
 
     app.register_blueprint(bp_works)
     app.register_blueprint(bp_record)

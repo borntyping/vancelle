@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "dokku": {
+      "postdeploy": "flask admin create-database"
+    }
+  },
+  "healthchecks": {
+    "web": [
+      {
+        "type": "startup",
+        "name": "web check",
+        "description": "Checking if the app responds to the /health/ready endpoint",
+        "path": "/health/ready",
+        "attempts": 3
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+.env
+.envrc
+.git/
+.gitattributes
+.gitignore
+.justfile
+.local/
+.run/
+docs/
+package-lock.json
+package.json
+vancelle-backup.json

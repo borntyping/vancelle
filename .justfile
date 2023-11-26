@@ -6,3 +6,9 @@ sass:
 
 test:
   pytest
+
+docker-build:
+  docker build -t vancelle .
+
+docker-run: docker-build
+  docker run vancelle flask

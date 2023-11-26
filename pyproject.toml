@@ -7,7 +7,7 @@ license = "Mozilla Public License Version 2.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 beautifulsoup4 = "^4.12.2"
 Flask = "^3.0.0"
 flask-cors = "^4.0.0"
@@ -31,7 +31,7 @@ black = "^23.9.1"
 djhtml = "^3.0.6"
 pytest = "^7.4.2"
 
-[tool.poetry.group.production.dependencies]
+[tool.poetry.group.server.dependencies]
 gunicorn = "^21.2.0"
 
 [tool.black]

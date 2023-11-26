@@ -1,3 +1,4 @@
+import os
 import typing
 
 import flask
@@ -17,7 +18,7 @@ from .types import Shelf
 configure_logging()
 
 
-def create_app(config: typing.Mapping[str, typing.Any]) -> flask.Flask:
+def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app = flask.Flask(__name__)
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -46,17 +47,20 @@ def create_app(config: typing.Mapping[str, typing.Any]) -> flask.Flask:
 
 
 def create_personal_app() -> flask.Flask:
-    return create_app(
-        config={
-            "GOODREADS_SHELF_MAPPING": {
-                "currently-reading": Shelf.PLAYING,
-                "gave-up-on": Shelf.ABANDONED,
-                "non-fiction": Shelf.PAUSED,
-                "read": Shelf.COMPLETED,
-                "to-read": Shelf.UPCOMING,
-                "to-read-maybe": Shelf.UNDECIDED,
-                "to-read-non-fiction": Shelf.SHELVED,
-                "to-read-sequels": Shelf.UPCOMING,
-            }
+    config = {
+        "GOODREADS_SHELF_MAPPING": {
+            "currently-reading": Shelf.PLAYING,
+            "gave-up-on": Shelf.ABANDONED,
+            "non-fiction": Shelf.PAUSED,
+            "read": Shelf.COMPLETED,
+            "to-read": Shelf.UPCOMING,
+            "to-read-maybe": Shelf.UNDECIDED,
+            "to-read-non-fiction": Shelf.SHELVED,
+            "to-read-sequels": Shelf.UPCOMING,
         }
-    )
+    }
+
+    if database_url := os.environ.get("DATABASE_URL"):
+        config["SQLALCHEMY_DATABASE_URI"] = database_url
+
+    return create_app(config)

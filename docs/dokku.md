@@ -24,15 +24,16 @@ Set secrets:
  dokku config:set --no-restart vancelle VANCELLE_TMDB_READ_ACCESS_TOKEN=...
 ```
 
-Configure HTTPS (optional):
+Configure HTTPS (optional). Make sure the files created by `tailscale cert` can be read by the `dokku` user.
 
 ```shell
-tailscale cert cheri.bunny-moth.ts.net
+tailscale cert <hostname>
+dokku certs:add vancelle <hostname>.crt <hostname>.key
 dokku proxy:set vancelle nginx
 dokku ports:add vancelle http:80:5000
 ```
 
-Create a user:
+Create a user. Skip this if you plan to import a `vancelle-backup.json` file.
 
 ```shell
 dokku run vancelle flask user create
@@ -44,11 +45,11 @@ Managing data
 Export to your local machine:
 
 ```shell
-ssh <dokku-host> -- dokku run vancelle flask data export - > vancelle-backup.json
+ssh <dokku-host> -- docker exec -i vancelle.web.1 poetry run flask data export - > vancelle-backup.json
 ```
 
 Import from a file on your local machine:
 
 ```shell
-ssh <dokku-host> -- dokku run vancelle flask data import - < vancelle-backup.json
+ssh <dokku-host> -- docker exec -i vancelle.web.1 poetry run flask data import - --dry-run < vancelle-backup.json
 ```

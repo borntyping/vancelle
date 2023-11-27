@@ -7,6 +7,4 @@
 .local/
 .run/
 docs/
-package-lock.json
-package.json
 vancelle-backup.json

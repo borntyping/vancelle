@@ -1,4 +1,5 @@
 import pathlib
+import typing
 
 import click
 import flask
@@ -25,19 +26,24 @@ def before_request():
 
 @bp.cli.command("export")
 @click.argument(
-    "path",
-    type=click.Path(exists=False, file_okay=True, dir_okay=False, path_type=pathlib.Path),
+    "file",
+    type=click.File(mode="w", encoding="utf-8"),
     default=pathlib.Path("vancelle-backup.json"),
 )
-def cli_export_data(path: pathlib.Path) -> None:
-    path.write_text(controller.export_json())
+def cli_export_data(file: typing.TextIO) -> None:
+    file.write(controller.export_json())
 
 
 @bp.cli.command("import")
 @click.argument(
-    "path",
-    type=click.Path(exists=True, file_okay=True, dir_okay=False, path_type=pathlib.Path),
+    "file",
+    type=click.File(mode="r", encoding="utf-8"),
     default=pathlib.Path("vancelle-backup.json"),
 )
-def cli_import_data(path: pathlib.Path) -> None:
-    controller.import_json(json_data=path.read_text(), filename=path.name)
+@click.option(
+    "--dry-run/--no-dry-run",
+    type=click.BOOL,
+    default=False,
+)
+def cli_import_data(file: typing.TextIO, dry_run: bool) -> None:
+    controller.import_json(json_data=file.read(), filename=file.name, dry_run=dry_run)

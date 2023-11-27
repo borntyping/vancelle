@@ -112,7 +112,7 @@ class DataController:
         items = db.session.execute(sqlalchemy.select(orm_model).options(sqlalchemy.orm.raiseload("*"))).scalars().all()
         return pydantic.TypeAdapter(list[pydantic_model]).validate_python(items, from_attributes=True)
 
-    def import_json(self, json_data: str, filename: str):
+    def import_json(self, json_data: str, filename: str, dry_run: bool = True):
         data = ExportModel.model_validate_json(json_data=json_data)
 
         users = self._import_model(User, data.users)
@@ -120,11 +120,12 @@ class DataController:
         records = self._import_model(Record, data.records)
         remotes = self._import_model(Remote, data.remotes)
 
-        db.session.add_all(users)
-        db.session.add_all(works)
-        db.session.add_all(records)
-        db.session.add_all(remotes)
-        db.session.commit()
+        if not dry_run:
+            db.session.add_all(users)
+            db.session.add_all(works)
+            db.session.add_all(records)
+            db.session.add_all(remotes)
+            db.session.commit()
 
         logger.warning(
             "Imported",

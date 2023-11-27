@@ -1,8 +1,8 @@
-Deployment
-==========
-
 Dokku
------
+=====
+
+Deployment
+----------
 
 Create and configure the [Dokku](https://dokku.com/) application:
 
@@ -36,4 +36,19 @@ Create a user:
 
 ```shell
 dokku run vancelle flask user create
+```
+
+Managing data
+-------------
+
+Export to your local machine:
+
+```shell
+ssh <dokku-host> -- dokku run vancelle flask data export - > vancelle-backup.json
+```
+
+Import from a file on your local machine:
+
+```shell
+ssh <dokku-host> -- dokku run vancelle flask data import - < vancelle-backup.json
 ```

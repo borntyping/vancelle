@@ -8,11 +8,13 @@ Features
 - Light/dark themes and toggle: https://www.petemillspaugh.com/edison-bulb
 - TVDB source: https://thetvdb.com/api-information#attribution
 - Import/export user scoped-data in-app.
+- Calendar view.
 
 Bugs
 ----
 
 * Goodreads books should not be searchable.
+* Steam search results do not paginate correctly.
 * Add Ao3 search/fetch.
 * 401 page should show login form.
 * Tiny card does not use latest record

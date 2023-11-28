@@ -12,6 +12,8 @@ Features
 Bugs
 ----
 
+* Goodreads books should not be searchable.
+* Add Ao3 search/fetch.
 * 401 page should show login form.
 * Tiny card does not use latest record
 * Add [+] button to [n items] tags on board columns

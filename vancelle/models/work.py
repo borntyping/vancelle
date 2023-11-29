@@ -1,5 +1,6 @@
 import dataclasses
 import datetime
+import math
 import typing
 import uuid
 
@@ -22,11 +23,13 @@ class WorkInfo:
     noun: str
     title: str
     plural: str
+    priority: int
 
-    def __init__(self, noun: str, *, title: str = None, plural: str = None) -> None:
+    def __init__(self, noun: str, *, title: str = None, plural: str = None, priority: int = math.inf) -> None:
         self.noun = noun
         self.title = title or noun
         self.plural = plural or p.plural(noun)
+        self.priority = priority
 
 
 class Work(Base, IntoDetails):
@@ -99,8 +102,9 @@ class Work(Base, IntoDetails):
             tags=self.tags,
         )
 
-    def _resolve_details(self, *chain: IntoDetails) -> Details:
-        chain = [item.into_details() for item in chain]
+    def resolve_details(self) -> Details:
+        """Collapse the chain into a single Details instance, including details from the work."""
+        chain = [item.into_details() for item in (self, *self.iter_active_remotes())]
         return Details(
             title=next((d.title for d in chain if d.title), None),
             author=next((d.author for d in chain if d.author), None),
@@ -112,56 +116,45 @@ class Work(Base, IntoDetails):
             shelf=next((d.shelf for d in chain if d.shelf), Shelf.UNSORTED),
         )
 
-    def resolve_remote_details(self) -> Details:
-        """
-        Collapse the chain into a single Details instance, only using remote details.
-        The only appropriate place to use this is the update form.
-        """
-        return self._resolve_details(*self.iter_active_remotes())
-
-    def resolve_details(self) -> Details:
-        """Collapse the chain into a single Details instance, including details from the work."""
-        return self._resolve_details(self, *self.iter_active_remotes())
-
-    def linkable_remotes(self) -> typing.Mapping[str, typing.Type["Remote"]]:
-        present_remotes = {remote.type: remote for remote in self.remotes}
-        absent_remotes = {
-            remote_type: remote_cls
-            for remote_type, remote_cls in Remote.subclasses().items()
-            if remote_type not in present_remotes and remote_cls.info.can_link
-        }
-        return absent_remotes
+    @classmethod
+    def identity(cls) -> str:
+        return cls.__mapper__.polymorphic_identity
 
     @classmethod
-    def subclasses(cls) -> typing.Mapping[str, typing.Type["Work"]]:
-        return {identity: mapper.class_ for identity, mapper in cls.__mapper__.polymorphic_map.items()}
+    def iter_subclasses(cls) -> typing.Sequence[typing.Type["Work"]]:
+        return list(
+            sorted(
+                (mapper.class_ for mapper in cls.__mapper__.polymorphic_map.values()),
+                key=lambda c: c.info.priority,
+            )
+        )
 
 
 class Book(Work):
     __mapper_args__ = {"polymorphic_identity": "book"}
-    info = WorkInfo(noun="book")
+    info = WorkInfo(noun="book", priority=1)
 
 
 class Game(Work):
     __mapper_args__ = {"polymorphic_identity": "game"}
-    info = WorkInfo(noun="game")
+    info = WorkInfo(noun="game", priority=2)
 
 
 class Film(Work):
     __mapper_args__ = {"polymorphic_identity": "film"}
-    info = WorkInfo(noun="film")
+    info = WorkInfo(noun="film", priority=3)
 
 
 class Show(Work):
     __mapper_args__ = {"polymorphic_identity": "show"}
-    info = WorkInfo(noun="show")
+    info = WorkInfo(noun="show", priority=4)
 
 
 class Music(Work):
     __mapper_args__ = {"polymorphic_identity": "music"}
-    info = WorkInfo(noun="music", plural="music")
+    info = WorkInfo(noun="music", plural="music", priority=5)
 
 
 class BoardGame(Work):
     __mapper_args__ = {"polymorphic_identity": "boardgame"}
-    info = WorkInfo(noun="board game")
+    info = WorkInfo(noun="board game", priority=6)

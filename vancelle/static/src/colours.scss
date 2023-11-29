@@ -1,6 +1,8 @@
 @import "bulma/sass/utilities/functions";
 @import "bulma/sass/utilities/initial-variables";
 
+$primary: darken($blue, 25%);
+
 // https://partner.steamgames.com/doc/marketing/branding
 $steam-dark: rgb(0, 0, 0);
 $steam-light: rgb(255, 255, 255);

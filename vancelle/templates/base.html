@@ -11,15 +11,15 @@
     <meta name="htmx-config" content='{"requestClass": "is-loading"}'>
   </head>
   <body hx-ext="loading-states">
-    <nav class="navbar is-link">
+    <nav class="navbar is-primary">
       <div class="container">
         <div class="navbar-brand">
           <a href="{{ url_for('work.home') }}" class="navbar-item has-text-weight-bold">Vancelle</a>
         </div>
         <div class="navbar-menu">
           <div class="navbar-start">
-            {{ navbar_item('work.index', 'Works') }}
-            {{ navbar_item('work.create', 'Add work') }}
+            {{ navbar_item('work.index', 'Index') }}
+            {{ navbar_item('work.create', 'New') }}
           </div>
           <div class="navbar-end">
             {% if current_user.is_authenticated %}

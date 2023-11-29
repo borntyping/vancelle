@@ -22,7 +22,7 @@ def before_request():
 
 @bp.route("/remotes/")
 def index():
-    remote_type = Toggle.from_request({k: v.info.noun_full for k, v in Remote.subclasses().items()}, "remote_type")
+    remote_type = Toggle.from_request({cls.identity(): cls.info.noun_full for cls in Remote.iter_subclasses()}, "remote_type")
 
     remotes = controller.index(remote_type=remote_type.value)
     return flask.render_template("remote/index.html", remotes=remotes, remote_type=remote_type)

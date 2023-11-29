@@ -27,7 +27,7 @@ bp = flask.Blueprint("work", __name__, url_prefix="")
 class WorkForm(flask_wtf.FlaskForm):
     type = wtforms.SelectField(
         "Type",
-        choices=[(i, cls.info.title) for i, cls in Work.subclasses().items()],
+        choices=[(cls.identity(), cls.info.title) for cls in Work.iter_subclasses()],
         widget=BulmaSelect(),
     )
     title = wtforms.StringField("Title", validators=[Optional()])
@@ -63,7 +63,7 @@ def before_request():
 def home():
     return flask.render_template(
         "home.html",
-        categories=[cls.info.plural for cls in Work.subclasses().values()],
+        categories=[cls.info.plural for cls in Work.iter_subclasses()],
         works_count=controller.count(Work),
         remotes_count=controller.count(Remote),
         users_count=controller.count(User),
@@ -89,8 +89,8 @@ def create():
 @bp.route("/works/")
 def index():
     layout = Toggle.from_request({"board": "Board", "table": "Table"}, "layout", default="board")
-    work_type = Toggle.from_request({i: cls.info.title for i, cls in Work.subclasses().items()}, "type")
-    remote_type = Toggle.from_request({i: cls.info.noun_full for i, cls in Remote.subclasses().items()}, "remote_type")
+    work_type = Toggle.from_request({cls.identity(): cls.info.title for cls in Work.iter_subclasses()}, "type")
+    remote_type = Toggle.from_request({cls.identity(): cls.info.noun_full for cls in Remote.iter_subclasses()}, "remote_type")
 
     statement = controller.select(user=flask_login.current_user, work_type=work_type.value, remote_type=remote_type.value)
     context = dict(layout=layout, work_type=work_type, remote_type=remote_type)

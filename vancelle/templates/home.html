@@ -10,11 +10,11 @@
 {% endmacro %}
 
 {% block before %}
-  <section class="hero is-medium is-info">
+  <section class="hero is-medium is-primary">
     <div class="hero-body has-text-centered">
       <h1 class="title is-2">Vancelle</h1>
       <p class="subtitle is-4">Track {{ p.join(categories) }}</p>
-      <a href="{{ url_for('work.create') }}" class="button is-large is-primary mr-3">Add work</a>
+      <a href="{{ url_for('work.create') }}" class="button is-large is-link mr-3">Add work</a>
       <a href="{{ url_for('work.index') }}" class="button is-large is-link">View works</a>
     </div>
   </section>
@@ -23,13 +23,13 @@
 {% block content %}
   <section class="block">
     <div class="columns is-centered">
-      <div class="column">{{ gauge(works_count, 'work', url_for('work.index', type='', remote_type=''), text="info") }}</div>
-      <div class="column">{{ gauge(remotes_count, 'remote', url_for('remote.index'), text="primary") }}</div>
+      <div class="column">{{ gauge(works_count, 'work', url_for('work.index', type='info', remote_type=''), text="link") }}</div>
+      <div class="column">{{ gauge(remotes_count, 'remote', url_for('remote.index'), text="info") }}</div>
       <div class="column">{{ gauge(users_count, 'user', url_for("user.index")) }}</div>
     </div>
     <div class="columns is-centered is-multiline">
       {% for type, count in works_count_by_type %}
-        <div class="column">{{ gauge(count, type, url_for('work.index', type=type, remote_type=''), background='white', text='info') }}</div>
+        <div class="column">{{ gauge(count, type, url_for('work.index', type=type, remote_type=''), background='white', text='link') }}</div>
       {% endfor %}
     </div>
     <div class="columns is-centered is-multiline">

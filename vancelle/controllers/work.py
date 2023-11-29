@@ -88,7 +88,7 @@ class WorkController:
         return counts
 
     def count_remotes_by_type(self) -> typing.Iterable[typing.Tuple[str, int, RemoteInfo]]:
-        subclasses = Remote.subclasses()
+        subclasses = {cls.identity(): cls for cls in Remote.iter_subclasses()}
         counts = db.session.execute(
             select(Remote.type, func.count()).select_from(Remote).order_by(Remote.type).group_by(Remote.type)
         )

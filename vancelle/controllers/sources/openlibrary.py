@@ -17,7 +17,7 @@ class OpenlibraryWorkManager(Manager):
     def search(self, query: str) -> Pagination[OpenlibraryWork]:
         return StaticPagination(items=apis.openlibrary.search(q=query))
 
-    def context_detail(self, remote: OpenlibraryWork) -> typing.Mapping[str, typing.Any]:
+    def context(self, remote: OpenlibraryWork) -> typing.Mapping[str, typing.Any]:
         return {"editions": apis.openlibrary.work_editions(remote.id)}
 
 

@@ -2,8 +2,7 @@ import abc
 import dataclasses
 import typing
 
-import flask
-from flask_sqlalchemy.pagination import Pagination
+import flask_sqlalchemy.pagination
 
 from vancelle.models import Work
 from vancelle.models.remote import Remote
@@ -16,17 +15,6 @@ class Manager(typing.Generic[R], abc.ABC):
     remote_type: typing.ClassVar[typing.Type[Remote]]
     work_type: typing.ClassVar[typing.Type[Work]]
 
-    def render_template(self, name: str, **context) -> str:
-        identity = self.remote_type.identity()
-        template_name = [f"remote/{identity}/{name}", f"remote/{name}"]
-        return flask.render_template(template_name, **context, **self.context())
-
-    def context(self) -> typing.Mapping[str, typing.Any]:
-        return {"source": self.remote_type.info}
-
-    def context_detail(self, remote: R) -> typing.Mapping[str, typing.Any]:
-        return {}
-
     @abc.abstractmethod
     def fetch(self, remote_id: str) -> R:
         """
@@ -37,6 +25,10 @@ class Manager(typing.Generic[R], abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def search(self, query: str) -> Pagination:
+    def search(self, query: str) -> flask_sqlalchemy.pagination.Pagination:
         """Return a flask_sqlalchemy.Pagination object containing Remotes."""
         raise NotImplementedError
+
+    def context(self, remote: R) -> typing.Mapping[str, typing.Any]:
+        """Context for detail pages."""
+        return {}

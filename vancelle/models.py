@@ -6,7 +6,7 @@ from uuid import UUID
 
 from flask import url_for
 from flask_login import UserMixin
-from sqlalchemy import ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -21,8 +21,9 @@ from vancelle.metadata import (
     Property,
     Source,
     UrlProperty,
+    WorkType,
 )
-from vancelle.types import WorkType, Shelf
+from vancelle.types import Shelf
 
 T = TypeVar("T")
 
@@ -50,12 +51,15 @@ class User(Base, UserMixin):
 
 class Work(Base, IntoDetails):
     __tablename__ = "work"
+    __mapper_args__ = {"polymorphic_on": "type"}
+
+    category: typing.ClassVar[WorkType]
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
     user: Mapped[User] = relationship(back_populates="works")
 
     id: Mapped[UUID] = mapped_column(primary_key=True)
-    type: Mapped[WorkType] = mapped_column(String)
+    type: Mapped[str] = mapped_column(String)
 
     time_created: Mapped[datetime] = mapped_column(default=func.now(), insert_default=func.now())
     time_updated: Mapped[Optional[datetime]] = mapped_column(default=None, onupdate=func.now())
@@ -67,7 +71,7 @@ class Work(Base, IntoDetails):
     release_date: Mapped[Optional[date]] = mapped_column(default=None)
     cover: Mapped[Optional[str]] = mapped_column(default=None)
     background: Mapped[Optional[str]] = mapped_column(default=None)
-    shelf: Mapped[Optional[Shelf]] = mapped_column(default=None)
+    shelf: Mapped[Optional[Shelf]] = mapped_column(Enum(Shelf, native_enum=False, validate_strings=True), default=None)
     tags: Mapped[Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
 
     records: Mapped[List["Record"]] = relationship(
@@ -143,10 +147,44 @@ class Work(Base, IntoDetails):
         present_remotes = {remote.type: remote for remote in self.remotes}
         absent_remotes = {
             remote_type: remote_cls
-            for remote_type, remote_cls in Remote.classes().items()
+            for remote_type, remote_cls in Remote.subclasses().items()
             if remote_type not in present_remotes and remote_cls.into_source().can_link
         }
         return absent_remotes
+
+    @classmethod
+    def subclasses(cls) -> Mapping[str, Type["Work"]]:
+        return {identity: mapper.class_ for identity, mapper in cls.__mapper__.polymorphic_map.items()}
+
+
+class Book(Work):
+    __mapper_args__ = {"polymorphic_identity": "book"}
+    category = WorkType(noun="book")
+
+
+class Game(Work):
+    __mapper_args__ = {"polymorphic_identity": "game"}
+    category = WorkType(noun="game")
+
+
+class Film(Work):
+    __mapper_args__ = {"polymorphic_identity": "film"}
+    category = WorkType(noun="film")
+
+
+class Show(Work):
+    __mapper_args__ = {"polymorphic_identity": "show"}
+    category = WorkType(noun="show")
+
+
+class Music(Work):
+    __mapper_args__ = {"polymorphic_identity": "music"}
+    category = WorkType(noun="music", plural="music")
+
+
+class BoardGame(Work):
+    __mapper_args__ = {"polymorphic_identity": "boardgame"}
+    category = WorkType(noun="board game")
 
 
 class Record(Base):
@@ -195,7 +233,7 @@ class Remote(Base, IntoSource, IntoDetails, IntoProperties):
     release_date: Mapped[Optional[date]] = mapped_column(default=None)
     cover: Mapped[Optional[str]] = mapped_column(default=None)
     background: Mapped[Optional[str]] = mapped_column(default=None)
-    shelf: Mapped[Optional[Shelf]] = mapped_column(default=None)
+    shelf: Mapped[Optional[Shelf]] = mapped_column(Enum(Shelf, native_enum=False, validate_strings=True), default=None)
     tags: Mapped[Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
     data: Mapped[Optional[T]] = mapped_column(JSONB, default=None)
 
@@ -240,7 +278,7 @@ class Remote(Base, IntoSource, IntoDetails, IntoProperties):
         return cls.__mapper__.polymorphic_identity
 
     @classmethod
-    def classes(cls) -> Mapping[str, Type["Remote"]]:
+    def subclasses(cls) -> Mapping[str, Type["Remote"]]:
         return {remote_type: mapper.class_ for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
 
     @classmethod
@@ -278,7 +316,7 @@ class GoodreadsBook(Remote):
 
     @classmethod
     def into_source(cls) -> Source:
-        return Source(name="Goodreads", noun="book", work_type=WorkType.BOOK)
+        return Source(name="Goodreads", noun="book")
 
     def external_url(self) -> str | None:
         return f"https://www.goodreads.com/book/show/{self.id}"
@@ -301,7 +339,7 @@ class OpenlibraryWork(Remote):
 
     @classmethod
     def into_source(cls) -> Source:
-        return Source(name="Open Library", noun="work", work_type=WorkType.BOOK, priority=1)
+        return Source(name="Open Library", noun="work", priority=1)
 
     def external_url(self) -> str:
         return f"https://openlibrary.org/works/{self.id}"
@@ -316,7 +354,7 @@ class OpenlibraryEdition(Remote):
 
     @classmethod
     def into_source(cls) -> Source:
-        return Source(name="Open Library", noun="edition", work_type=WorkType.BOOK, priority=2, can_search=False)
+        return Source(name="Open Library", noun="edition", priority=2, can_search=False)
 
     def external_url(self) -> str:
         return f"https://openlibrary.org/books/{self.id}"
@@ -342,7 +380,7 @@ class RoyalroadFiction(Remote):
 
     @classmethod
     def into_source(cls) -> Source:
-        return Source(name="Royal Road", noun="fiction", work_type=WorkType.BOOK, plural="fiction")
+        return Source(name="Royal Road", noun="fiction", plural="fiction")
 
 
 class SteamApplication(Remote):
@@ -350,7 +388,7 @@ class SteamApplication(Remote):
 
     @classmethod
     def into_source(cls) -> Source:
-        return Source(name="Steam", noun="application", work_type=WorkType.GAME)
+        return Source(name="Steam", noun="application")
 
     def external_url(self) -> str | None:
         return f"https://store.steampowered.com/app/{self.id}/"
@@ -375,7 +413,7 @@ class TmdbMovie(Remote):
 
     @classmethod
     def into_source(cls) -> Source:
-        return Source(name="TMDB", noun="movie", work_type=WorkType.FILM)
+        return Source(name="TMDB", noun="movie")
 
 
 class TmdbTvSeries(Remote):
@@ -383,4 +421,4 @@ class TmdbTvSeries(Remote):
 
     @classmethod
     def into_source(cls) -> Source:
-        return Source(name="TMDB", noun="series", work_type=WorkType.SHOW)
+        return Source(name="TMDB", noun="series")

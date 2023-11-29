@@ -3,7 +3,6 @@ import uuid
 import flask.sansio.blueprints
 import flask_login
 import flask_wtf
-import markupsafe
 import structlog
 import wtforms
 from werkzeug.exceptions import BadRequest
@@ -16,8 +15,6 @@ from vancelle.extensions.ext_html import Toggle
 from vancelle.models import Remote, User, Work
 from vancelle.types import Shelf
 
-from vancelle.types import WorkType
-
 logger = structlog.get_logger(logger_name=__name__)
 
 controller = WorkController()
@@ -28,7 +25,7 @@ bp = flask.Blueprint("work", __name__, url_prefix="")
 class WorkForm(flask_wtf.FlaskForm):
     type = wtforms.SelectField(
         "Type",
-        choices=[(t, t.title) for t in WorkType],
+        choices=[(i, cls.category.title) for i, cls in Work.subclasses().items()],
         widget=BulmaSelect(),
     )
     title = wtforms.StringField("Title", validators=[Optional()])
@@ -39,7 +36,7 @@ class WorkForm(flask_wtf.FlaskForm):
     background = wtforms.URLField("Background image", validators=[Optional()])
     shelf = wtforms.SelectField(
         "Shelf",
-        choices=[("", "")] + [(s, s.title) for s in Shelf],
+        choices=[("", "")] + [(s.value, s.title) for s in Shelf],
         coerce=lambda x: Shelf(x) if x else None,
         widget=BulmaSelect(),
         validators=[Optional()],
@@ -49,9 +46,9 @@ class WorkForm(flask_wtf.FlaskForm):
 
 @bp.record_once
 def setup(state: flask.sansio.blueprints.BlueprintSetupState):
-    state.app.jinja_env.globals["Shelf"] = Shelf
     state.app.jinja_env.globals["Remote"] = Remote
-    state.app.jinja_env.globals["WorkType"] = WorkType
+    state.app.jinja_env.globals["Shelf"] = Shelf
+    state.app.jinja_env.globals["Work"] = Work
 
 
 @bp.before_request
@@ -64,6 +61,7 @@ def before_request():
 def home():
     return flask.render_template(
         "home.html",
+        categories=[cls.category.plural for cls in Work.subclasses().values()],
         works_count=controller.count(Work),
         remotes_count=controller.count(Remote),
         users_count=controller.count(User),
@@ -89,8 +87,8 @@ def create():
 @bp.route("/works/")
 def index():
     layout = Toggle.from_request({"board": "Board", "table": "Table"}, "layout", default="board")
-    work_type = Toggle.from_request({t: t.title for t in WorkType}, "type")
-    remote_type = Toggle.from_request({k: v.full_noun for k, v in Remote.sources().items()}, "remote_type")
+    work_type = Toggle.from_request({i: cls.category.title for i, cls in Work.subclasses().items()}, "type")
+    remote_type = Toggle.from_request({i: v.into_source().full_noun for i, v in Remote.subclasses().items()}, "remote_type")
 
     statement = controller.select(user=flask_login.current_user, work_type=work_type.value, remote_type=remote_type.value)
     context = dict(layout=layout, work_type=work_type, remote_type=remote_type)

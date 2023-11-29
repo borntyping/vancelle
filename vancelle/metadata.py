@@ -7,9 +7,21 @@ import flask
 import structlog
 
 from vancelle.extensions.ext_html import p
-from vancelle.types import Shelf, WorkType
+from vancelle.types import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
+
+
+@dataclasses.dataclass()
+class WorkType:
+    noun: str
+    title: str
+    plural: str
+
+    def __init__(self, noun: str, *, title: str = None, plural: str = None) -> None:
+        self.noun = noun
+        self.title = title or noun
+        self.plural = plural or p.plural(noun)
 
 
 class BaseProperty:
@@ -106,7 +118,6 @@ class Source:
 
     priority: int = 0
 
-    work_type: WorkType = None
     can_search: bool = True
     can_link: bool = True
     can_refresh: bool = True
@@ -118,7 +129,6 @@ class Source:
         *,
         plural: str = None,
         priority: int = 0,
-        work_type: WorkType = None,
         can_search: bool = True,
         can_link: bool = True,
         can_refresh: bool = True,
@@ -127,7 +137,6 @@ class Source:
         self.noun = noun
         self.plural = plural if plural is not None else p.plural(noun)
         self.priority = priority
-        self.work_type = work_type
         self.can_search = can_search
         self.can_link = can_link
         self.can_refresh = can_refresh

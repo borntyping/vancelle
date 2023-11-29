@@ -1,93 +1,71 @@
 import enum
-from typing import Self
+import typing
 
 from vancelle.extensions.ext_html import p
 
 
 @enum.verify(enum.UNIQUE)
-class Shelf(enum.StrEnum):
+class Shelf(enum.Enum):
     """
-    >>> Shelf.UNRELEASED.value
-    'unreleased'
-    >>> Shelf.UNRELEASED.title
-    'Unreleased'
-    >>> Shelf.UNRELEASED.description
-    'Waiting for release'
+    >>> Shelf('unsorted')
+    <Shelf.UNSORTED: 'unsorted'>
+    >>> Shelf.UNSORTED.value
+    'unsorted'
+    >>> Shelf.UNSORTED.title
+    'Unsorted'
+    >>> Shelf.UNSORTED.description
+    'Not assigned to a shelf yet'
     """
 
-    UNSORTED = enum.member("unsorted")
-    UNRELEASED = enum.member("unreleased")
-    UNDECIDED = enum.member("undecided")
-    UPCOMING = enum.member("upcoming")
+    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet")
+    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release")
+    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future")
+    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next")
 
-    PLAYING = enum.member("playing")
-    INFINITE = enum.member("infinite")
-    PAUSED = enum.member("paused")
-    SHELVED = enum.member("shelved")
+    PLAYING = ("playing", "Playing", "Currently reading/playing/watching")
+    REPLAYING = ("replaying", "Replaying", "Returning to a completed work")
+    INFINITE = ("infinite", "Infinite", "An unending or long-term work")
+    PAUSED = ("paused", "Paused", "Might continue soon")
+    SHELVED = ("shelved", "Shelved", "Might continue one day")
 
-    COMPLETED = enum.member("completed")
-    ABANDONED = enum.member("abandoned")
+    COMPLETED = ("completed", "Completed", "Reached the end")
+    ABANDONED = ("abandoned", "Abandoned", "Gave up on")
 
-    titles: dict[Self, str] = enum.nonmember(
-        {
-            UNSORTED: "Unsorted",
-            UNRELEASED: "Unreleased",
-            UNDECIDED: "Undecided",
-            UPCOMING: "Upcoming",
-            PLAYING: "Playing",
-            INFINITE: "Infinite",
-            PAUSED: "Paused",
-            SHELVED: "Shelved",
-            COMPLETED: "Completed",
-            ABANDONED: "Abandoned",
-        }
-    )
-
-    descriptions: dict[Self, str] = enum.nonmember(
-        {
-            UNSORTED: "Not assigned to a shelf yet",
-            UNRELEASED: "Waiting for release",
-            UNDECIDED: "Might read/play/watch in the future",
-            UPCOMING: "Might read/play/watch next",
-            PLAYING: "Currently reading/playing/watching",
-            INFINITE: "Always reading/playing/watching",
-            PAUSED: "Might continue soon",
-            SHELVED: "Might continue one day",
-            COMPLETED: "Reached the end",
-            ABANDONED: "Gave up on",
-        }
-    )
-
-    @enum.property
-    def title(self) -> str:
-        return self.titles[self.value]
-
-    @enum.property
-    def description(self) -> str:
-        return self.descriptions[self.value]
+    def __new__(cls, value: str, title: str, description: str):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj.title = title
+        obj.description = description
+        return obj
 
 
-class WorkType(enum.StrEnum):
-    BOOK = "book"
-    GAME = "game"
-    FILM = "film"
-    SHOW = "show"
-
-    BOARDGAME = "boardgame"
-    MUSIC = "music"
-
-    nouns: dict[Self, str] = enum.nonmember({BOARDGAME: "Board game"})
-
-    @enum.property
-    def noun(self) -> str:
-        return self.nouns.get(self.value, self.value)
-
-    titles: dict[Self, str] = enum.nonmember({SHOW: "TV show"})
-
-    @enum.property
-    def title(self) -> str:
-        return self.titles.get(self.noun, self.noun.capitalize())
-
-    @enum.property
-    def plural(self) -> str:
-        return p.plural(self.noun)
+#
+#
+# @enum.verify(enum.UNIQUE)
+# class WorkType(enum.Enum):
+#     """
+#     >>> WorkType('game')
+#     <WorkType.GAME: 'game'>
+#     >>> WorkType.GAME.value
+#     'game'
+#     >>> WorkType.GAME.title
+#     'Game'
+#     >>> WorkType.GAME.plural
+#     'games'
+#     """
+#
+#     BOOK = ("book",)
+#     GAME = ("game",)
+#     FILM = ("film",)
+#     SHOW = ("show", None, "TV show")
+#
+#     BOARDGAME = ("boardgame", "board game")
+#     MUSIC = ("music",)
+#
+#     def __new__(cls, value: str, noun: str = None, title: str = None):
+#         obj = object.__new__(cls)
+#         obj._value_ = value
+#         obj.noun = noun or value
+#         obj.title = title or obj.noun.capitalize()
+#         obj.plural = p.plural(obj.noun)
+#         return obj

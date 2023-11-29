@@ -9,9 +9,9 @@ import structlog
 from sqlalchemy import select
 from sqlalchemy.orm.attributes import flag_modified
 
-from vancelle.models import GoodreadsBook, Record, User, Work
+from vancelle.models import Book, GoodreadsBook, Record, User
 from vancelle.extensions import db
-from vancelle.types import Shelf, WorkType
+from vancelle.types import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -30,13 +30,13 @@ class GoodreadsImporter:
 
         return self.shelf_mapping[exclusive_shelf]
 
-    def load_file(self, path: pathlib.Path) -> typing.Iterable[Work | GoodreadsBook]:
+    def load_file(self, path: pathlib.Path) -> typing.Iterable[Book | GoodreadsBook]:
         raise NotImplementedError
 
-    def load_stream(self, stream: typing.IO[bytes], *, filename: str) -> typing.Iterable[Work | GoodreadsBook]:
+    def load_stream(self, stream: typing.IO[bytes], *, filename: str) -> typing.Iterable[Book | GoodreadsBook]:
         raise NotImplementedError
 
-    def add_items(self, items: typing.Sequence[Work | GoodreadsBook]) -> None:
+    def add_items(self, items: typing.Sequence[Book | GoodreadsBook]) -> None:
         db.session.add_all(items)
         db.session.commit()
         logger.warning("Imported books from Goodreads", count=len(items))
@@ -94,7 +94,7 @@ class GoodreadsImporter:
 
         if not remote.work:
             work_id = self.reproducible_uuid(remote_id)
-            remote.work = Work(user_id=self.user.id, id=work_id, type=WorkType.BOOK)
+            remote.work = Book(user_id=self.user.id, id=work_id)
 
         if date_started or date_stopped:
             record_id = self.reproducible_uuid(remote_id)

@@ -55,6 +55,7 @@
       {{ board_category(shelves, Shelf.UNDECIDED, 'outer-left') }}
       {{ board_category(shelves, Shelf.UPCOMING, 'inner-left') }}
       {{ board_category(shelves, Shelf.PLAYING, 'center') }}
+      {{ board_category(shelves, Shelf.REPLAYING, 'center', show_if_empty=False) }}
       {{ board_category(shelves, Shelf.INFINITE, 'center', show_if_empty=False) }}
       {{ board_category(shelves, Shelf.PAUSED, 'inner-right', show_if_empty=False) }}
       {{ board_category(shelves, Shelf.SHELVED, 'inner-right') }}

@@ -8,12 +8,9 @@ import typing
 import bs4
 import bs4.element
 import structlog
-from sqlalchemy import select
 
 from .common import GoodreadsImporter
-from ...extensions import db
-from ...models import GoodreadsBook, GoodreadsBookData, Record, Remote, Work
-from ...types import Shelf, WorkType
+from ...models import GoodreadsBook
 
 logger = structlog.get_logger(logger_name=__name__)
 

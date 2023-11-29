@@ -1,26 +1,20 @@
 @import "bulma/sass/utilities/functions";
 @import "bulma/sass/utilities/initial-variables";
 
-$color-unsorted: $white-bis;
-$color-unreleased: $red;
-$color-undecided: $orange;
-$color-upcoming: $yellow;
-$color-playing: $green;
-$color-infinite: $turquoise;
-$color-paused: $cyan;
-$color-shelved: $blue;
-$color-completed: $purple;
-$color-abandoned: $white-bis;
-
 $custom-colors: (
-        "unsorted": ($color-unsorted, findColorInvert($color-unsorted)),
-        "unreleased": ($color-unreleased, findColorInvert($color-unreleased)),
-        "undecided": ($color-undecided, findColorInvert($color-undecided)),
-        "upcoming": ($color-upcoming, findColorInvert($color-upcoming)),
-        "playing": ($color-playing, findColorInvert($color-playing)),
-        "infinite": ($color-infinite, findColorInvert($color-infinite)),
-        "paused": ($color-paused, findColorInvert($color-paused)),
-        "shelved": ($color-shelved, findColorInvert($color-shelved)),
-        "completed": ($color-completed, findColorInvert($color-completed)),
-        "abandoned": ($color-abandoned, findColorInvert($color-abandoned)),
+        // Shelves
+        "unsorted": ($white-bis, findColorInvert($white-bis)),
+        "unreleased": ($red, findColorInvert($red)),
+        "undecided": ($orange, findColorInvert($orange)),
+        "upcoming": ($yellow, findColorInvert($yellow)),
+        "playing": ($green, findColorInvert($green)),
+        "replaying": ($turquoise, findColorInvert($turquoise)),
+        "infinite": ($turquoise, findColorInvert($turquoise)),
+        "paused": ($cyan, findColorInvert($cyan)),
+        "shelved": ($blue, findColorInvert($blue)),
+        "completed": ($purple, findColorInvert($purple)),
+        "abandoned": ($white-bis, findColorInvert($white-bis)),
+
+        // Remotes
+        "steam": ($black, findColorInvert($black)),
 );

@@ -13,7 +13,7 @@ from vancelle.models import Base, User
 from vancelle.models.remote import Remote, RemoteInfo
 from vancelle.models.record import Record
 from vancelle.models.work import Work
-from vancelle.types import Shelf
+from vancelle.shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 

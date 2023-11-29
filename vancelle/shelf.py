@@ -1,7 +1,4 @@
 import enum
-import typing
-
-from vancelle.inflect import p
 
 
 @enum.verify(enum.UNIQUE)
@@ -37,35 +34,3 @@ class Shelf(enum.Enum):
         obj.title = title
         obj.description = description
         return obj
-
-
-#
-#
-# @enum.verify(enum.UNIQUE)
-# class WorkType(enum.Enum):
-#     """
-#     >>> WorkType('game')
-#     <WorkType.GAME: 'game'>
-#     >>> WorkType.GAME.value
-#     'game'
-#     >>> WorkType.GAME.title
-#     'Game'
-#     >>> WorkType.GAME.plural
-#     'games'
-#     """
-#
-#     BOOK = ("book",)
-#     GAME = ("game",)
-#     FILM = ("film",)
-#     SHOW = ("show", None, "TV show")
-#
-#     BOARDGAME = ("boardgame", "board game")
-#     MUSIC = ("music",)
-#
-#     def __new__(cls, value: str, noun: str = None, title: str = None):
-#         obj = object.__new__(cls)
-#         obj._value_ = value
-#         obj.noun = noun or value
-#         obj.title = title or obj.noun.capitalize()
-#         obj.plural = p.plural(obj.noun)
-#         return obj

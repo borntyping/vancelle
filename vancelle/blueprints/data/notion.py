@@ -15,7 +15,7 @@ from vancelle.models import User
 from vancelle.models.remote import ImportedWork, Remote, SteamApplication
 from vancelle.models.record import Record
 from vancelle.models.work import Work
-from vancelle.types import Shelf
+from vancelle.shelf import Shelf
 from vancelle.ext.flask_login import get_user
 
 steam_url_regex = re.compile(r"https://store\.steampowered\.com/app/(\d+)/.+/")

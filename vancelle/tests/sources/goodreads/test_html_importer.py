@@ -7,7 +7,7 @@ import pytest
 from vancelle.models import User
 from vancelle.models.remote import GoodreadsBook
 from vancelle.models.record import Record
-from vancelle.types import Shelf
+from vancelle.shelf import Shelf
 from vancelle.clients.goodreads.html import GoodreadsHtmlImporter
 
 

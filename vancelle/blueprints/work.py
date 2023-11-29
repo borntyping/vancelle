@@ -15,7 +15,7 @@ from vancelle.extensions.ext_html import Toggle
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
-from vancelle.types import Shelf
+from vancelle.shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 

@@ -20,7 +20,7 @@ from .details import (
 )
 from ..clients.goodreads.types import GoodreadsCsvRow, GoodreadsHtmlRow
 from ..inflect import p
-from ..types import Shelf
+from ..shelf import Shelf
 
 if typing.TYPE_CHECKING:
     from .work import Work

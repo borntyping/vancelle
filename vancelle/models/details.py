@@ -6,7 +6,7 @@ import urllib.parse
 import flask
 import structlog
 
-from vancelle.types import Shelf
+from vancelle.shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 

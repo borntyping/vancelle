@@ -13,7 +13,7 @@ from vancelle.models import Base, User
 from ..models.remote import Remote
 from ..models.record import Record
 from ..models.work import Work
-from ..types import Shelf
+from ..shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 S = typing.TypeVar("S", bound=Base)

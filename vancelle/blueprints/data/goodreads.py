@@ -7,7 +7,7 @@ from vancelle.clients.goodreads.csv import GoodreadsCsvImporter
 from vancelle.clients.goodreads.html import GoodreadsHtmlImporter
 from vancelle.ext.flask_login import get_user
 from vancelle.extensions import db
-from vancelle.types import Shelf
+from vancelle.shelf import Shelf
 
 
 bp = flask.Blueprint("goodreads", __name__)

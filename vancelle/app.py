@@ -14,7 +14,7 @@ from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
 from .ext.structlog import configure_logging
 from .extensions import apis, cors, db, html, htmx, login_manager
-from .types import Shelf
+from .shelf import Shelf
 
 configure_logging()
 

@@ -15,7 +15,7 @@ from .record import Record
 from .remote import Remote
 from .user import User
 from ..inflect import p
-from ..types import Shelf
+from ..shelf import Shelf
 
 
 @dataclasses.dataclass()

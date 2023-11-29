@@ -14,7 +14,7 @@ from vancelle.models.remote import GoodreadsBook
 from vancelle.models.record import Record
 from vancelle.models.work import Book
 from vancelle.extensions import db
-from vancelle.types import Shelf
+from vancelle.shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 

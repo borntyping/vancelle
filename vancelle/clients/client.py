@@ -4,7 +4,6 @@ import typing
 import requests_cache
 import structlog
 
-P = typing.ParamSpec("P")
 logger = structlog.get_logger(logger_name=__name__)
 
 
@@ -12,7 +11,7 @@ logger = structlog.get_logger(logger_name=__name__)
 class RequestsClient:
     session: requests_cache.CachedSession
 
-    def get(self, url: str, **kwargs: P.kwargs) -> requests_cache.CachedResponse:
+    def get(self, url: str, **kwargs: typing.Any) -> requests_cache.AnyResponse:
         response = self.session.get(url, **kwargs)
         response.raise_for_status()
         logger.info(

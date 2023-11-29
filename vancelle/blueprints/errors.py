@@ -36,7 +36,7 @@ def application_error_handler(notification: ApplicationError):
 
 def http_error_handler(exception: werkzeug.exceptions.HTTPException):
     response = exception.get_response()
-    response.data = flask.render_template("http_error.html", exception=exception)
+    response.data = flask.render_template("http_error.html", exception=exception)  # type: ignore
     return response
 
 

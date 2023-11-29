@@ -11,12 +11,12 @@ import structlog
 
 from .common import GoodreadsImporter
 from ...models.remote import GoodreadsBook
+from ...types import Sentinel, sentinel
 
 logger = structlog.get_logger(logger_name=__name__)
 
-
 T = typing.TypeVar("T")
-_unset = object()
+
 
 whitespace = re.compile(r"\s+")
 separator = re.compile(r",\s+")
@@ -91,7 +91,7 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         with self.field(element, "num_pages") as tag:
             num_pages: int | None = None
             if nobr := tag.find("nobr"):
-                num_pages = self.parse_string(nobr, into=self.parse_int, default=None)
+                num_pages = self.parse_int(self.parse_string(nobr, default=None))
 
         with self.field(element, "avg_rating") as tag:
             avg_rating: str | None = self.parse_string(tag)
@@ -100,11 +100,11 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
 
         with self.field(element, "date_pub") as tag:
             date_pub_str: str | None = self.parse_string(tag, default=None)
-            date_pub: datetime.date = self.parse_date(date_pub_str)
+            date_pub: datetime.date | None = self.parse_date(date_pub_str)
 
         with self.field(element, "date_pub_edition") as tag:
             date_pub_edition_str: str | None = self.parse_string(tag, default=None)
-            date_pub_edition: datetime.date = self.parse_date(date_pub_edition_str)
+            date_pub_edition: datetime.date | None = self.parse_date(date_pub_edition_str)
 
         with self.field(element, "rating") as tag:
             stars = tag.find("div", {"class": "stars"})
@@ -121,7 +121,7 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         # votes
 
         with self.field(element, "read_count") as tag:
-            read_count: int = self.parse_string(tag, into=self.parse_int, default=0)
+            read_count: int = self.parse_int(self.parse_string(tag, default="0"))
 
         with self.field(element, "date_started") as tag:
             date_started_str: str | None = None
@@ -139,10 +139,10 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
 
         with self.field(element, "date_added") as tag:
             date_added_str = self.parse_string(tag.find("span"))
-            date_added: datetime.date = self.parse_date(date_added_str)
+            date_added: datetime.date | None = self.parse_date(date_added_str)
 
         with self.field(element, "owned") as tag:
-            owned: int = self.parse_string(tag, into=self.parse_int, default=0)
+            owned: int = self.parse_int(self.parse_string(tag, default="0"))
 
         with self.field(element, "format") as tag:
             binding: str | None = self.parse_string(tag, default=None)
@@ -157,7 +157,7 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
             release_date=release_date,
             cover=cover,
             shelf=shelf,
-            tags=shelves,
+            tags=set(shelves),
             isbn13=isbn13,
             date_started=date_started,
             date_stopped=date_read,
@@ -206,19 +206,24 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
             raise Exception(f"Missing ID: {value!r}")
         return value
 
-    @staticmethod
-    def parse_string(
-        element: bs4.element.Tag | None,
-        *,
-        default: T = _unset,
-        into: typing.Type[T] | typing.Callable[[str], T] = str,
-        collapse_whitespace: bool = True,
-    ) -> T | None:
+    @typing.overload
+    def parse_string(self, element: bs4.element.Tag | None) -> str:
+        ...
+
+    @typing.overload
+    def parse_string(self, element: bs4.element.Tag | None, default: str) -> str:
+        ...
+
+    @typing.overload
+    def parse_string(self, element: bs4.element.Tag | None, default: None) -> str | None:
+        ...
+
+    def parse_string(self, element: bs4.element.Tag | None, default: str | None | Sentinel = sentinel) -> str | None:
         if element is None:
             raise AttributeError("Element is None")
 
         if not element.contents:
-            if default is not _unset:
+            if not isinstance(default, Sentinel):
                 return default
 
             raise AttributeError(f"Element is empty: {element}")
@@ -231,15 +236,12 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         string = child.strip()
 
         if string == "":
-            if default is not _unset:
+            if not isinstance(default, Sentinel):
                 return default
 
             raise AttributeError(f"Element contains an empty string")
 
-        if collapse_whitespace:
-            string = whitespace.sub(" ", string)
-
-        return into(string)
+        return whitespace.sub(" ", string)
 
     @staticmethod
     def parse_date(value: str | None) -> datetime.date | None:
@@ -255,11 +257,23 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         logger.warning("Could not parse date", value=repr(value))
         return None
 
-    @staticmethod
-    def parse_int(value: str) -> int:
+    @typing.overload
+    def parse_int(self, value: str) -> int:
+        ...
+
+    @typing.overload
+    def parse_int(self, value: str | None) -> int | None:
+        ...
+
+    def parse_int(self, value):
+        if value is None:
+            return None
+
         integer = int(value.replace(",", ""))
 
-        assert integer >= 0, f"Expected integer to be positive, got {integer}"
+        if not integer >= 0:
+            raise ValueError(f"Expected integer to be positive, got {integer}")
+
         return integer
 
     @staticmethod

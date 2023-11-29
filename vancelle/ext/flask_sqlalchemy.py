@@ -34,7 +34,7 @@ class ItemsPagination(Pagination[T]):
         error_out: bool = True,
         count: bool = True,
         items: typing.Sequence[T],
-        total: int = None,
+        total: int | None = None,
     ) -> None:
         """
         >>> ItemsPagination(items=[1, 2, 3]).items
@@ -75,7 +75,7 @@ class SelectPagination(flask_sqlalchemy.pagination.SelectPagination, typing.Gene
         max_per_page: int | None = 100,
         error_out: bool = True,
         count: bool = True,
-        select: sqlalchemy.Select[T],
+        select: sqlalchemy.Select[tuple[T]],
         session: Session,
         **kwargs: typing.Any,
     ) -> None:
@@ -106,7 +106,7 @@ class SelectAndTransformPagination(SelectPagination[T], typing.Generic[T, U]):
         max_per_page: int | None = 100,
         error_out: bool = True,
         count: bool = True,
-        select: sqlalchemy.Select[U],
+        select: sqlalchemy.Select[tuple[U]],
         session: Session,
         transform: typing.Callable[[U], T],
     ) -> None:

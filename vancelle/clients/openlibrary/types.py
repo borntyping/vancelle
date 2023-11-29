@@ -1,4 +1,3 @@
-import dataclasses
 import typing
 
 Size = typing.Literal["S", "M", "L"]
@@ -146,43 +145,6 @@ class WorkEditions(typing.TypedDict):
     links: dict  # { self: str, work: str = '/works/{id}' }
     size: int
     entries: list[Edition]
-
-
-@dataclasses.dataclass(kw_only=True)
-class Result:
-    id: str
-
-    key: str
-    type: str
-    title: str
-
-    cover_edition_key: str | None
-    cover_i: int | None
-    first_sentence: list[str]
-    author_key: list[str]
-    author_name: list[str]
-
-    def cover(self, size: Size = "L"):
-        if self.cover_edition_key:
-            return cover_url("OLID", self.cover_edition_key, size)
-
-        if self.cover_i:
-            return cover_url("ID", self.cover_i, size)
-
-        return None
-
-    @property
-    def url(self) -> str:
-        return f"https://openlibrary.org{self.key}"
-
-    # def into_details(self) -> Details:
-    #     return Details(
-    #         title=self.title,
-    #         author=", ".join(self.author_name),
-    #         description=" ".join(self.first_sentence),
-    #         cover=self.cover(),
-    #         url=f"https://openlibrary.org{self.key}",
-    #     )
 
 
 class AuthorLink(typing.TypedDict):

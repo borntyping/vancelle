@@ -10,16 +10,18 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .details import (
-    CollectionProperty,
+    Property,
+    IterableProperty,
     Details,
     IntoDetails,
     IntoProperties,
     JsonProperty,
-    Property,
+    StringProperty,
     UrlProperty,
 )
 from .types import ShelfEnum
 from ..clients.goodreads.types import GoodreadsCsvRow, GoodreadsHtmlRow
+from ..clients.steam.client_store_api import AppDetails
 from ..inflect import p
 from ..shelf import Shelf
 
@@ -49,8 +51,8 @@ class RemoteInfo:
         noun: str,
         *,
         color: str,
-        noun_plural: str = None,
-        noun_full: str = None,
+        noun_plural: str | None = None,
+        noun_full: str | None = None,
         priority: int = 0,
         can_search: bool = True,
         can_link: bool = True,
@@ -87,7 +89,7 @@ class Remote(Base, IntoDetails, IntoProperties):
     time_updated: Mapped[typing.Optional[datetime.datetime]] = mapped_column(default=None, onupdate=func.now())
     time_deleted: Mapped[typing.Optional[datetime.datetime]] = mapped_column(default=None)
 
-    id: Mapped[typing.Optional[str]] = mapped_column(default=None, primary_key=True)
+    id: Mapped[str] = mapped_column(default=None, primary_key=True)
     title: Mapped[typing.Optional[str]] = mapped_column(default=None)
     author: Mapped[typing.Optional[str]] = mapped_column(default=None)
     description: Mapped[typing.Optional[str]] = mapped_column(default=None)
@@ -96,11 +98,11 @@ class Remote(Base, IntoDetails, IntoProperties):
     background: Mapped[typing.Optional[str]] = mapped_column(default=None)
     shelf: Mapped[typing.Optional[Shelf]] = mapped_column(ShelfEnum, default=None)
     tags: Mapped[typing.Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
-    data: Mapped[typing.Optional[T]] = mapped_column(JSONB, default=None)
+    data: Mapped[typing.Optional[typing.Any]] = mapped_column(JSONB, default=None)
 
     work: Mapped["Work"] = relationship(back_populates="remotes", lazy="selectin")
 
-    def url_for(self, work: "Work" = None) -> str:
+    def url_for(self, work: typing.Optional["Work"] = None) -> str:
         return url_for("remote.detail", remote_type=self.type, remote_id=self.id, work_id=work.id if work else None)
 
     @property
@@ -124,7 +126,7 @@ class Remote(Base, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield Property("ID", self.id)
+        yield StringProperty("ID", self.id)
         yield UrlProperty("URL", self.external_url())
 
     def more_properties(self) -> typing.Iterable[Property]:
@@ -132,6 +134,7 @@ class Remote(Base, IntoDetails, IntoProperties):
 
     @classmethod
     def identity(cls) -> str:
+        assert cls.__mapper__.polymorphic_identity is not None
         return cls.__mapper__.polymorphic_identity
 
     @classmethod
@@ -165,10 +168,10 @@ class ImportedWork(Remote):
         can_refresh=False,
     )
 
-    def more_properties(self) -> typing.Iterable[Property]:
-        yield Property("Imported from", self.data.get("imported_from"))
-        yield Property("Imported from path", self.data.get("filename"))
-        yield Property("External URL", self.data.get("url"))
+    def more_properties(self) -> typing.Iterable[StringProperty]:
+        yield StringProperty("Imported from", self.data.get("imported_from"))
+        yield StringProperty("Imported from path", self.data.get("filename"))
+        yield StringProperty("External URL", self.data.get("url"))
 
 
 class GoodreadsBookData(typing.TypedDict, GoodreadsCsvRow, GoodreadsHtmlRow):
@@ -189,17 +192,17 @@ class GoodreadsBook(Remote):
     def external_url(self) -> str | None:
         return f"https://www.goodreads.com/book/show/{self.id}"
 
-    def into_properties(self) -> typing.Iterable[Property]:
+    def into_properties(self) -> typing.Iterable[StringProperty]:
         yield from super().into_properties()
-        yield Property(
+        yield StringProperty(
             "Shelf",
             self.data.get("csv", {}).get("Exclusive Shelf", None)
             or self.data.get("html", {}).get("exclusive_shelf", None)
             or None,
         )
 
-    def more_properties(self) -> typing.Iterable[Property]:
-        yield Property("ASIN", self.data.get("asin"))
+    def more_properties(self) -> typing.Iterable[StringProperty]:
+        yield StringProperty("ASIN", self.data.get("asin"))
 
 
 class OpenlibraryWork(Remote):
@@ -214,7 +217,7 @@ class OpenlibraryWork(Remote):
     def external_url(self) -> str:
         return f"https://openlibrary.org/works/{self.id}"
 
-    def more_properties(self) -> typing.Iterable[Property]:
+    def more_properties(self) -> typing.Iterable[StringProperty]:
         yield UrlProperty("API", self.data.get("url"))
         yield JsonProperty("Work", self.data.get("work"))
 
@@ -232,11 +235,11 @@ class OpenlibraryEdition(Remote):
     def external_url(self) -> str:
         return f"https://openlibrary.org/books/{self.id}"
 
-    def into_properties(self) -> typing.Iterable[Property]:
+    def into_properties(self) -> typing.Iterable[StringProperty]:
         yield from super().into_properties()
-        yield Property("ISBN", self.data.get("isbn13"))
+        yield StringProperty("ISBN", self.data.get("isbn13"))
 
-    def more_properties(self) -> typing.Iterable[Property]:
+    def more_properties(self) -> typing.Iterable[StringProperty]:
         yield UrlProperty("URL", self.external_url())
         yield UrlProperty("API", self.data.get("url"))
         yield JsonProperty("Edition", self.data.get("edition"))
@@ -255,7 +258,7 @@ class RoyalroadFiction(Remote):
     def external_url(self) -> str:
         return f"https://www.royalroad.com/fiction/{self.id}"
 
-    def into_properties(self) -> typing.Iterable[Property]:
+    def into_properties(self) -> typing.Iterable[StringProperty]:
         yield UrlProperty("URL", self.external_url())
 
 
@@ -274,11 +277,11 @@ class SteamApplication(Remote):
     def into_properties(self) -> typing.Iterable[Property]:
         yield from super().into_properties()
         yield UrlProperty("Website", self.data.get("website"))
-        yield CollectionProperty("Developers", [d for d in self.data.get("developers", []) if d])
-        yield CollectionProperty("Publishers", [p for p in self.data.get("publishers", []) if p])
+        yield IterableProperty("Developers", [d for d in self.data.get("developers", []) if d])
+        yield IterableProperty("Publishers", [p for p in self.data.get("publishers", []) if p])
 
     def more_properties(self) -> typing.Iterable[Property]:
-        yield Property("Type", self.data.get("type"))
+        yield StringProperty("Type", self.data.get("type"))
         yield UrlProperty("Background", self.data.get("background"))
         yield UrlProperty("Background (raw)", self.data.get("background_raw"))
         yield UrlProperty("Capsule image", self.data.get("capsule_image"))

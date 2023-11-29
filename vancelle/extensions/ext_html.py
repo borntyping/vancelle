@@ -12,9 +12,9 @@ import wtforms.widgets
 from ..inflect import p
 
 
-def url_with(endpoint: str = None, **kwargs):
+def url_with(endpoint: str | None = None, **kwargs):
     endpoint = endpoint if endpoint else flask.request.endpoint
-    values = flask.request.view_args | flask.request.args | kwargs
+    values = flask.request.view_args | flask.request.args | kwargs  # type: ignore
 
     assert endpoint is not None
     return flask.url_for(endpoint=endpoint, **values)

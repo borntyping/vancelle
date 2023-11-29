@@ -17,6 +17,7 @@ from vancelle.models.record import Record
 from vancelle.models.work import Work
 from vancelle.shelf import Shelf
 from vancelle.ext.flask_login import get_user
+from vancelle.types import Sentinel, sentinel
 
 steam_url_regex = re.compile(r"https://store\.steampowered\.com/app/(\d+)/.+/")
 
@@ -24,8 +25,6 @@ bp = flask.Blueprint("notion", __name__, url_prefix="/notion")
 bp.cli.short_help = "Import from a CSV export of Sam's personal Notion database."
 
 logger = structlog.get_logger(logger_name=__name__)
-
-_unset = object()
 
 
 @bp.cli.command("import")
@@ -71,20 +70,20 @@ class NotionLoader:
         "Webcomic": "default",
     }
 
-    shelves_to_tags: dict[str, str] = {
+    shelves_to_tags: dict[str, set[str]] = {
         "Anime": {"anime"},
         "Board game": {"board-game"},
         "Comicbook": {"comic"},
         "Fiction (written unpublished)": {"unpublished"},
-        "Fiction (written)": {},
-        "Film": {},
+        "Fiction (written)": set(),
+        "Film": set(),
         "Music": {"music"},
         "Non-fiction (written)": {"non-fiction"},
         "Role playing games": {"rpg"},
         "Television (D&D)": {"rpg"},
         "Television (non-fiction)": {"non-fiction"},
-        "Television": {},
-        "Video games": {},
+        "Television": set(),
+        "Video games": set(),
         "Webcomic": {"webcomic"},
     }
 
@@ -131,9 +130,9 @@ class NotionLoader:
         """
         return self._parse_time(value, self.time_formats)
 
-    def parse_str(self, value: str, default: str | None = _unset) -> str | None:
+    def parse_str(self, value: str, default: str | None | Sentinel = sentinel) -> str | None:
         if not value:
-            if default is not _unset:
+            if not isinstance(default, Sentinel):
                 return default
 
             return None
@@ -163,7 +162,7 @@ class NotionLoader:
         title = self.parse_str(row["Name"])
         release_date = self.parse_date(row["Release date"])
         shelf = self.shelves[row["Shelf"]]
-        tags = self.shelves_to_tags.get(row["Shelf"], set())
+        tags: set[str] = self.shelves_to_tags.get(row["Shelf"], set())
         link = self.parse_str(row["Link"], None)
 
         if link and work_type == "game" and (match := steam_url_regex.match(link)):

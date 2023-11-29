@@ -48,6 +48,7 @@ class AppDetails(typing.TypedDict):
     publishers: list[str]
 
     fullgame: typing.NotRequired[AppDetailsFullGame]
+    short_description: str
 
 
 class AppDetailsWrapper(typing.TypedDict):
@@ -55,7 +56,7 @@ class AppDetailsWrapper(typing.TypedDict):
     data: AppDetails
 
 
-AppDetailsContainer = typing.NewType("AppDetailsContainer", dict[int, AppDetailsWrapper])
+AppDetailsContainer = typing.NewType("AppDetailsContainer", dict[str, AppDetailsWrapper])
 
 
 @dataclasses.dataclass()
@@ -91,7 +92,7 @@ class SteamStoreAPI:
         if "fullgame" in app:
             appid = app["fullgame"]["appid"]
         else:
-            appid = app["steam_appid"]
+            appid = str(app["steam_appid"])
 
         url = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/library_600x900_2x.jpg"
 

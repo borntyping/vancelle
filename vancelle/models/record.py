@@ -6,7 +6,7 @@ from flask import url_for
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .details import Property
+from .details import StringProperty
 from .base import Base
 
 if typing.TYPE_CHECKING:
@@ -37,5 +37,5 @@ class Record(Base):
         return url_for("records.detail", work_id=self.work_id, record_id=self.id)
 
     def entry_properties(self):
-        yield Property("Started", self.date_started)
-        yield Property("Stopped", self.date_stopped)
+        yield StringProperty("Started", self.date_started)
+        yield StringProperty("Stopped", self.date_stopped)

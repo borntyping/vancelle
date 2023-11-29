@@ -9,10 +9,10 @@ import structlog
 from .common import GoodreadsImporter
 from .types import GoodreadsCsvRow
 from ...models.remote import GoodreadsBook
+from ...types import Sentinel, sentinel
 
 logger = structlog.get_logger(logger_name=__name__)
 
-_unset = object()
 
 T = typing.TypeVar("T")
 
@@ -20,12 +20,12 @@ T = typing.TypeVar("T")
 class GoodreadsCsvImporter(GoodreadsImporter):
     def load_file(self, path: pathlib.Path) -> list[GoodreadsBook]:
         with path.open("r") as f:
-            rows: typing.Iterator[GoodreadsCsvRow] = csv.DictReader(f)
-            return [self.parse_row(row, filename=path.name) for row in rows]
+            rows = csv.DictReader(f)
+            return [self.parse_row(typing.cast(GoodreadsCsvRow, row), filename=path.name) for row in rows]
 
     def load_stream(self, stream: typing.IO[bytes], filename: str) -> list[GoodreadsBook]:
-        rows: typing.Iterator[GoodreadsCsvRow] = csv.DictReader((line.decode("utf-8") for line in stream))
-        return [self.parse_row(row, filename=filename) for row in rows]
+        rows = csv.DictReader((line.decode("utf-8") for line in stream))
+        return [self.parse_row(typing.cast(GoodreadsCsvRow, row), filename=filename) for row in rows]
 
     def parse_row(self, row: GoodreadsCsvRow, *, filename: str) -> GoodreadsBook:
         id = self.parse_string(row["Book Id"])
@@ -49,7 +49,7 @@ class GoodreadsCsvImporter(GoodreadsImporter):
             release_date=release_date,
             cover=None,
             shelf=shelf,
-            tags=bookshelves,
+            tags=set(bookshelves),
             date_started=None,
             date_stopped=date_read,
             isbn13=isbn13,
@@ -136,7 +136,7 @@ class GoodreadsCsvImporter(GoodreadsImporter):
         return dict(cls.parse_bookshelf(s.strip()) for s in value.split(","))
 
     @staticmethod
-    def parse_bookshelf(value: str) -> (str, int):
+    def parse_bookshelf(value: str) -> typing.Tuple[str, int]:
         if match := re.match(r"([\w-]+) \(#(\d+)\)", value):
             name = match.group(1)
             rank = match.group(2)
@@ -145,9 +145,9 @@ class GoodreadsCsvImporter(GoodreadsImporter):
         raise ValueError(f"Could not parse bookshelf {value!r}")
 
     @staticmethod
-    def parse_string(value: str, default: T = _unset) -> str | T:
+    def parse_string(value: str, default: T | Sentinel = sentinel) -> str | T:
         if not value:
-            if default is not _unset:
+            if not isinstance(default, Sentinel):
                 return default
             raise ValueError("Empty string")
         return value

@@ -34,6 +34,7 @@ class TestGoodreadsCsvImporter:
         assert books[0].cover is None
         assert books[0].work.records[0].date_started is None
         assert books[0].work.records[0].date_stopped == datetime.date(2023, 10, 22)
-        assert books[0].tags == ["read"]
+        assert books[0].tags == {"read"}
         assert books[0].shelf == Shelf.COMPLETED
+        assert books[0].data
         assert books[0].data["csv_filename"] == path.name

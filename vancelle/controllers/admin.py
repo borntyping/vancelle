@@ -9,7 +9,7 @@ logger = structlog.get_logger(logger_name=__name__)
 
 
 class AdminController:
-    def create_database(self):
+    def create_database(self) -> None:
         logger.info("Creating database")
         db.session.execute(sqlalchemy.sql.text("CREATE EXTENSION IF NOT EXISTS isn;"))
         db.session.execute(sqlalchemy.sql.text("CREATE EXTENSION IF NOT EXISTS hstore;"))
@@ -17,12 +17,12 @@ class AdminController:
         db.create_all()
         logger.info("Created database")
 
-    def drop_database(self):
+    def drop_database(self) -> None:
         logger.critical("Dropping database")
         db.drop_all()
         logger.critical("Dropped database")
 
-    def clear_request_cache():
+    def clear_request_cache(self) -> None:
         session = requests.Session()
         if isinstance(session, requests_cache.CachedSession):
             logger.warning("Clearing requests cache")

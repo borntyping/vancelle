@@ -63,8 +63,8 @@ def bulma_field_params(
 @bp.app_template_global()
 def bulma_control_params(
     field: wtforms.FormField,
-    icon_left: str = None,
-    icon_right: str = None,
+    icon_left: str | None = None,
+    icon_right: str | None = None,
     **kwargs,
 ) -> typing.Mapping[str, typing.Any]:
     classes = ["control"]

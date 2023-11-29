@@ -11,7 +11,7 @@ from vancelle.models.work import Work
 
 
 class RecordController:
-    def get_or_404(self, *, user_id: uuid.UUID = None, work_id: uuid.UUID, record_id: uuid.UUID) -> Record:
+    def get_or_404(self, *, user_id: uuid.UUID | None = None, work_id: uuid.UUID, record_id: uuid.UUID) -> Record:
         user_id = user_id or flask_login.current_user.id
         return db.one_or_404(
             db.select(Record)
@@ -32,7 +32,7 @@ class RecordController:
             record.date_started = datetime.date.today()
 
         if stopped_today:
-            record.finished = datetime.date.today()
+            record.date_stopped = datetime.date.today()
 
         db.session.add(record)
         db.session.commit()
@@ -56,7 +56,7 @@ class RecordController:
 
     def delete(self, work_id: uuid.UUID, record_id: uuid.UUID) -> Record:
         record = self.get_or_404(work_id=work_id, record_id=record_id)
-        record.time_deleted = datetime.date.today()
+        record.time_deleted = datetime.datetime.now()
         db.session.commit()
         return record
 

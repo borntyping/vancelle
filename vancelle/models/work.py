@@ -26,7 +26,7 @@ class WorkInfo:
     plural: str
     priority: int
 
-    def __init__(self, noun: str, *, title: str = None, plural: str = None, priority: int = math.inf) -> None:
+    def __init__(self, noun: str, *, title: str | None = None, plural: str | None = None, priority: int) -> None:
         self.noun = noun
         self.title = title or noun.title()
         self.plural = plural or p.plural(noun)
@@ -101,24 +101,28 @@ class Work(Base, IntoDetails):
             background=self.background,
             shelf=self.shelf,
             tags=self.tags,
+            external_url=None,
         )
 
     def resolve_details(self) -> Details:
         """Collapse the chain into a single Details instance, including details from the work."""
-        chain = [item.into_details() for item in (self, *self.iter_active_remotes())]
+        items: list[IntoDetails] = [self, *self.iter_active_remotes()]
+        details = [item.into_details() for item in items]
         return Details(
-            title=next((d.title for d in chain if d.title), None),
-            author=next((d.author for d in chain if d.author), None),
-            description=next((d.description for d in chain if d.description), None),
-            release_date=next((d.release_date for d in chain if d.release_date), None),
-            cover=next((d.cover for d in chain if d.cover), None),
-            background=next((d.background for d in chain if d.background), None),
-            tags=next((d.tags for d in chain if d.tags), {}),
-            shelf=next((d.shelf for d in chain if d.shelf), Shelf.UNSORTED),
+            title=next((d.title for d in details if d.title), None),
+            author=next((d.author for d in details if d.author), None),
+            description=next((d.description for d in details if d.description), None),
+            release_date=next((d.release_date for d in details if d.release_date), None),
+            cover=next((d.cover for d in details if d.cover), None),
+            background=next((d.background for d in details if d.background), None),
+            tags=next((d.tags for d in details if d.tags), set()),
+            shelf=next((d.shelf for d in details if d.shelf), Shelf.UNSORTED),
+            external_url=None,
         )
 
     @classmethod
     def identity(cls) -> str:
+        assert cls.__mapper__.polymorphic_identity is not None
         return cls.__mapper__.polymorphic_identity
 
     @classmethod

@@ -30,6 +30,8 @@ structlog = "^23.2.0"
 black = "^23.9.1"
 djhtml = "^3.0.6"
 pytest = "^7.4.2"
+mypy = "^1.7.1"
+types-requests = "^2.31.0.10"
 
 [tool.poetry.group.server.dependencies]
 gunicorn = "^21.2.0"
@@ -46,6 +48,7 @@ max_attribute_length=120
 
 [tool.mypy]
 namespace_packages = true
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules"

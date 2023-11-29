@@ -49,7 +49,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
 
 
 def create_personal_app() -> flask.Flask:
-    config = {
+    config: dict[str, typing.Any] = {
         "GOODREADS_SHELF_MAPPING": {
             "currently-reading": Shelf.PLAYING,
             "gave-up-on": Shelf.ABANDONED,

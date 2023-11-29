@@ -30,6 +30,11 @@ class Shelf(enum.Enum):
     COMPLETED = ("completed", "Completed", "A completed work - well done!", "outer-right")
     ABANDONED = ("abandoned", "Abandoned", "Gave up on", "outer-right")
 
+    title: str
+    description: str
+    column: str
+    show_if_empty: bool
+
     def __new__(
         cls,
         value: str,

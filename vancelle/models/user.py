@@ -6,6 +6,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
+if typing.TYPE_CHECKING:
+    from .work import Work
+
 
 class User(Base, UserMixin):
     __tablename__ = "user"

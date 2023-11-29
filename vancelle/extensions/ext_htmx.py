@@ -1,6 +1,7 @@
 import dataclasses
 
 import flask
+import werkzeug.wrappers.response
 
 
 @dataclasses.dataclass()
@@ -33,7 +34,7 @@ class HtmxExtension:
         "HX-Trigger-After-Swap",
     ]
 
-    def __init__(self, app: flask.Flask = None) -> None:
+    def __init__(self, app: flask.Flask | None = None) -> None:
         if app:
             self.init_app(app)
 
@@ -42,7 +43,7 @@ class HtmxExtension:
         app.config.setdefault("CORS_EXPOSE_HEADERS", [])
         app.config["CORS_ALLOW_HEADERS"].extend(self.CORS_ALLOW_HEADERS)
         app.config["CORS_EXPOSE_HEADERS"].extend(self.CORS_EXPOSE_HEADERS)
-        app.add_template_global(self, "htmx")
+        app.jinja_env.globals["htmx"] = self
 
     def __bool__(self):
         return self.hx_request and not self.hx_boosted
@@ -67,7 +68,7 @@ class HtmxExtension:
     def hx_trigger_name(self) -> str | None:
         return flask.request.headers.get("HX-Trigger-Name")
 
-    def refresh(self) -> flask.Response:
+    def refresh(self) -> flask.Response | werkzeug.wrappers.response.Response:
         """
         Refresh the page that initiated the request, either via
         HX-Refresh or redirecting to the request's Referer.
@@ -77,7 +78,7 @@ class HtmxExtension:
 
         return flask.Response(status=204, headers={"HX-Refresh": "true"})
 
-    def redirect(self, url: str) -> flask.Response:
+    def redirect(self, url: str) -> flask.Response | werkzeug.wrappers.response.Response:
         """
         Redirect to a page via HX-Redirect or a normal Location header.
         """

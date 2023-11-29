@@ -47,10 +47,12 @@ def test_html_import_tr(fixtures: pathlib.Path):
     assert books[0].title == "Centers of Gravity"
     assert books[0].author == "Marko Kloos"
     assert books[0].release_date == datetime.date(2022, 8, 30)
+    assert books[0].cover
     assert books[0].cover.startswith("https://i.gr-assets.com")
     assert books[0].work.records[0].date_started == datetime.date(2023, 10, 18)
     assert books[0].work.records[0].date_stopped == datetime.date(2023, 10, 22)
-    assert books[0].tags == ["read"]
+    assert books[0].tags == {"read"}
     assert books[0].shelf == Shelf.COMPLETED
+    assert books[0].data
     assert books[0].data["asin"] == "B099RVRQJ1"
     assert books[0].data["html_filename"] == path.name

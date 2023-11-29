@@ -14,8 +14,6 @@ from ..models.work import Work
 from ..shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
-S = typing.TypeVar("S", bound=Base)
-P = typing.TypeVar("P", bound="DataModel")
 
 
 class RemoteModel(pydantic.BaseModel):
@@ -85,9 +83,10 @@ class UserController:
             .all()
         )
 
-        works = pydantic.TypeAdapter(list[WorkModel]).validate_python(works, from_attributes=True)
-
-        backup = BackupModel(version=2, works=works)
+        backup = BackupModel(
+            version=2,
+            works=pydantic.TypeAdapter(list[WorkModel]).validate_python(works, from_attributes=True),
+        )
 
         logger.warning("Exported", user=user.id, works=len(backup.works))
         return backup.model_dump_json(indent=2)

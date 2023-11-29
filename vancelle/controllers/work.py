@@ -26,7 +26,7 @@ class WorkController:
         user: User = flask_login.current_user,
         work_type: str,
         remote_type: str,
-    ) -> Select[(Work,)]:
+    ) -> Select[tuple[Work]]:
         statement = (
             select(Work)
             .filter_by(user_id=user.id)
@@ -47,14 +47,16 @@ class WorkController:
 
         return statement
 
-    def table(self, statement: Select[Work]) -> flask_sqlalchemy.pagination.Pagination:
+    def table(self, statement: Select[tuple[Work]]) -> flask_sqlalchemy.pagination.Pagination:
         return db.paginate(statement)
 
-    def shelves(self, statement: Select[Work]) -> typing.Mapping[Shelf, list[Work]]:
-        works: list[Work] = db.session.execute(statement).unique().scalars().all()
-        groups = {shelf: [] for shelf in Shelf}
+    def shelves(self, statement: Select[tuple[Work]]) -> typing.Mapping[Shelf, list[Work]]:
+        works: typing.Iterable[Work] = db.session.execute(statement).unique().scalars().all()
+        groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in Shelf}
         for work in works:
             details = work.resolve_details()
+            if details.shelf is None:
+                raise ValueError("Work details do not include shelf")
             groups[details.shelf].append(work)
         return groups
 
@@ -83,11 +85,11 @@ class WorkController:
     def count(self, table: typing.Type[Base], **kwargs: typing.Any) -> int:
         return db.session.execute(select(func.count()).select_from(table).filter_by(**kwargs)).scalar_one()
 
-    def count_works_by_type(self) -> list[(str, int)]:
-        counts = db.session.execute(select(Work.type, func.count()).select_from(Work).order_by(Work.type).group_by(Work.type))
-        return counts
+    def count_works_by_type(self) -> list[tuple[str, int]]:
+        stmt = select(Work.type, func.count()).select_from(Work).order_by(Work.type).group_by(Work.type)
+        return [(t, c) for t, c in db.session.execute(stmt)]
 
-    def count_remotes_by_type(self) -> typing.Iterable[typing.Tuple[str, int, RemoteInfo]]:
+    def count_remotes_by_type(self) -> list[tuple[str, int, RemoteInfo]]:
         subclasses = {cls.identity(): cls for cls in Remote.iter_subclasses()}
         counts = db.session.execute(
             select(Remote.type, func.count()).select_from(Remote).order_by(Remote.type).group_by(Remote.type)

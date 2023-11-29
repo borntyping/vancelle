@@ -69,7 +69,7 @@ class SteamApplicationManager(Manager):
         return SelectAndTransformPagination(
             select=stmt,
             session=db.session(),
-            transform=lambda a: SteamApplication(id=a.appid, title=a.name),
+            transform=lambda a: SteamApplication(id=a.appid, title=a.name),  # type: ignore
         )
 
     def ensure_appid_cache(self) -> None:

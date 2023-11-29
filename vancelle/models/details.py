@@ -11,7 +11,7 @@ from vancelle.shelf import Shelf
 logger = structlog.get_logger(logger_name=__name__)
 
 
-class BaseProperty:
+class Property:
     name: str
 
     def __bool__(self) -> bool:
@@ -25,7 +25,7 @@ class BaseProperty:
 
 
 @dataclasses.dataclass()
-class Property(BaseProperty):
+class StringProperty(Property):
     name: str
     value: str | typing.Any
 
@@ -37,10 +37,10 @@ class Property(BaseProperty):
 
 
 @dataclasses.dataclass()
-class UrlProperty(BaseProperty):
+class UrlProperty(Property):
     name: str
-    link: str = None
-    text: str = None
+    link: str | None
+    text: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
@@ -55,9 +55,9 @@ class UrlProperty(BaseProperty):
 
 
 @dataclasses.dataclass()
-class CollectionProperty(BaseProperty):
+class IterableProperty(Property):
     name: str
-    items: typing.Collection[typing.Any] = None
+    items: typing.Iterable[typing.Any] = ()
     sorted: bool = False
 
     def __bool__(self) -> bool:
@@ -72,7 +72,7 @@ class CollectionProperty(BaseProperty):
 
 
 @dataclasses.dataclass()
-class JsonProperty(BaseProperty):
+class JsonProperty(Property):
     name: str
     value: typing.Any
 
@@ -101,15 +101,15 @@ class IntoProperties:
 class Details(IntoProperties):
     """Details describe static information about a work."""
 
-    title: str = None
-    author: str = None
-    description: str = None
-    release_date: datetime.date = None
-    cover: str = None
-    background: str = None
-    shelf: Shelf = None
-    tags: typing.Set[str] = dataclasses.field(default_factory=set)
-    external_url: str = None
+    title: str | None
+    author: str | None
+    description: str | None
+    release_date: datetime.date | None
+    cover: str | None
+    background: str | None
+    shelf: Shelf | None
+    tags: typing.Set[str] | None = dataclasses.field(default_factory=set)
+    external_url: str | None
 
     def __str__(self) -> str:
         d = f"{self.title}"
@@ -123,11 +123,11 @@ class Details(IntoProperties):
         return d
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield Property("Title", self.title)
-        yield Property("Author", self.author)
-        yield Property("Release date", self.release_date)
-        yield Property("Shelf", self.shelf.title if self.shelf else None)
-        yield CollectionProperty("Tags", self.tags)
+        yield StringProperty("Title", self.title)
+        yield StringProperty("Author", self.author)
+        yield StringProperty("Release date", self.release_date)
+        yield StringProperty("Shelf", self.shelf.title if self.shelf else None)
+        yield IterableProperty("Tags", list(self.tags) if self.tags else ())
 
     def more_properties(self) -> typing.Iterable[Property]:
         yield UrlProperty("Cover", self.cover)

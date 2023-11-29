@@ -39,7 +39,7 @@ class WorkForm(flask_wtf.FlaskForm):
     shelf = wtforms.SelectField(
         "Shelf",
         choices=[(s.value, s.title) for s in Shelf] + [("", "")],
-        coerce=lambda x: Shelf(x) if x else None,
+        coerce=lambda x: Shelf(x) if x else None,  # type: ignore
         widget=BulmaSelect(),
         validators=[Optional()],
     )

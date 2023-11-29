@@ -27,7 +27,10 @@ class GoodreadsImporter:
     def reproducible_uuid(self, value: str) -> uuid.UUID:
         return uuid.UUID(hashlib.md5(value.encode("utf-8")).hexdigest())
 
-    def parse_shelf(self, exclusive_shelf: str, date_published: datetime.date) -> Shelf:
+    def parse_shelf(self, exclusive_shelf: str | None, date_published: datetime.date | None) -> Shelf:
+        if not exclusive_shelf:
+            raise ValueError("Missing shelf")
+
         if date_published and date_published > datetime.date.today():
             return Shelf.UNRELEASED
 
@@ -56,13 +59,13 @@ class GoodreadsImporter:
         remote_id: str,
         title: str,
         author: str,
-        release_date: datetime.date,
-        cover: str = None,
+        release_date: datetime.date | None,
+        cover: str | None,
         shelf: Shelf,
-        tags: list[str] = None,
-        date_started: datetime.date = None,
-        date_stopped: datetime.date,
-        isbn13: str,
+        tags: set[str],
+        date_started: datetime.date | None,
+        date_stopped: datetime.date | None,
+        isbn13: str | None,
         data: typing.Mapping[str, typing.Any],
     ):
         log = logger.bind(remote_id=remote_id, title=title, author=author)
@@ -88,11 +91,11 @@ class GoodreadsImporter:
         if remote.data is None:
             remote.data = {}
 
-        remote.data.update(data)
+        remote.data.update(data)  # type: ignore
         flag_modified(remote, "data")
 
         if isbn13:
-            remote.data["isbn13"] = isbn13
+            remote.data["isbn13"] = isbn13  # type: ignore
             flag_modified(remote, "data")
 
         if not remote.work:

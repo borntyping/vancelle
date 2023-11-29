@@ -32,6 +32,7 @@ def upsert(
     statement = statement.on_conflict_do_update(index_elements=mapper.primary_key, set_=set_)
 
     if instances:
+        values: list[dict[typing.Any, typing.Any]] | dict[typing.Any, typing.Any]
         if isinstance(instances, typing.Sequence):
             values = [instance_to_dict(instance) for instance in instances]
         else:

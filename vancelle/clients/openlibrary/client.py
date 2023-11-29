@@ -1,6 +1,5 @@
 import dataclasses
 import datetime
-import typing
 
 import flask
 import structlog
@@ -11,14 +10,11 @@ from vancelle.clients.openlibrary.types import (
     Edition,
     KeyType,
     Reference,
-    Result,
     Search,
     Size,
     Work,
-    AuthorReference,
     WorkEditions,
 )
-
 from vancelle.models.remote import OpenlibraryEdition, OpenlibraryWork
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -110,7 +106,7 @@ class OpenLibraryAPI(RequestsClient):
         logger.info("Fetched edition from Open Library", url=response.request.url)
         return self._edition(edition, url=response.url)
 
-    def _edition(self, edition: Edition, *, url: str = None) -> OpenlibraryEdition:
+    def _edition(self, edition: Edition, *, url: str | None = None) -> OpenlibraryEdition:
         if len(edition["works"]) != 1:
             raise Exception(f"Unexpected number of works connected to this edition: {edition['works']}")
 
@@ -195,7 +191,7 @@ class OpenLibraryAPI(RequestsClient):
 
 @dataclasses.dataclass()
 class CachedOpenLibraryClient(OpenLibraryAPI):
-    def author(self, id: str) -> str:
+    def author(self, id: str) -> Author:
         log = logger.bind(id=id)
         flask.g.setdefault("openlibrary_authors", {})
 

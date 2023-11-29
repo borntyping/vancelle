@@ -3,6 +3,7 @@ import typing
 import uuid
 
 import flask
+import jinja2
 import sqlalchemy
 import structlog
 from flask_sqlalchemy.pagination import Pagination
@@ -48,8 +49,7 @@ class RemotesController:
                 raise NotImplementedError(f"No manager registered for {cls.identity()} ({cls.info=})")
 
     def _render_template(self, name: str, remote_type: str, **context: typing.Any) -> str:
-        template_name = [f"remote/{remote_type}/{name}", f"remote/{name}"]
-        return flask.render_template(template_name, remote_type=remote_type, **context)
+        return flask.render_template([f"remote/{remote_type}/{name}", f"remote/{name}"], remote_type=remote_type, **context)
 
     def _get_work_by_id(self, work_id: uuid.UUID) -> Work:
         return db.get_or_404(Work, work_id, description="Work not found")
@@ -66,11 +66,11 @@ class RemotesController:
     def _get_remote(self, *, remote_type: str, remote_id: str) -> Remote:
         log = logger.bind(remote_type=remote_type, remote_id=remote_id)
 
-        if remote := db.session.execute(
+        if db_remote := db.session.execute(
             select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
         ).scalar_one_or_none():
             log.debug("Fetched remote from database")
-            return remote
+            return db_remote
 
         remote = self.managers[remote_type].fetch(remote_id)
         log.debug("Fetched remote from source")
@@ -148,9 +148,8 @@ class RemotesController:
         db.session.commit()
         return work
 
-    def render_search(self, *, work_id: uuid.UUID | None, remote_type: str, query: str) -> str:
+    def render_search(self, *, work_id: uuid.UUID | None, remote_type: str, query: str | None) -> str:
         work: Work | None
-        query: str
         items: Pagination
 
         if work_id:

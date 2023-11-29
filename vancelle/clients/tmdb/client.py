@@ -75,7 +75,7 @@ class MovieDetails(typing.TypedDict):
     vote_count: int
 
 
-class SearchMovieResult:
+class SearchMovieResult(typing.TypedDict):
     adult: bool
     backdrop_path: str
     id: int
@@ -91,9 +91,11 @@ class SearchMovieResult:
     vote_count: int
 
 
-class SearchMovieResults:
+class SearchMovieResults(typing.TypedDict):
     page: int
     results: typing.Sequence[SearchMovieResult]
+    total_pages: int
+    total_results: int
 
 
 class TvDetails(typing.TypedDict):
@@ -132,7 +134,7 @@ class TvDetails(typing.TypedDict):
     vote_count: int
 
 
-class SearchTvResult:
+class SearchTvResult(typing.TypedDict):
     """https://developer.themoviedb.org/reference/search-tv"""
 
     adult: bool
@@ -150,11 +152,13 @@ class SearchTvResult:
     vote_count: int
 
 
-class SearchTvResults:
+class SearchTvResults(typing.TypedDict):
     """https://developer.themoviedb.org/reference/search-tv"""
 
     page: int
     results: typing.Sequence[SearchTvResult]
+    total_pages: int
+    total_results: int
 
 
 @dataclasses.dataclass(frozen=True)
@@ -177,17 +181,12 @@ class TmdbAPI:
         """https://developer.themoviedb.org/reference/search-movie"""
         response = self.session.get(
             "https://api.themoviedb.org/3/search/movie",
-            params={
-                "query": query,
-                "include_adult": False,
-                "language": "en-GB",
-                "page": page,
-            },
+            params={"query": query, "include_adult": "false", "language": "en-GB", "page": str(page)},
         )
         response.raise_for_status()
         return response.json()
 
-    def movie(self, movie_id: int) -> MovieDetails:
+    def movie(self, movie_id: str) -> MovieDetails:
         """https://developer.themoviedb.org/reference/movie-details"""
         response = self.session.get(f"https://api.themoviedb.org/3/movie/{movie_id}")
         response.raise_for_status()
@@ -197,17 +196,12 @@ class TmdbAPI:
         """https://developer.themoviedb.org/reference/search-tv"""
         response = self.session.get(
             "https://api.themoviedb.org/3/search/tv",
-            params={
-                "query": query,
-                "include_adult": False,
-                "language": "en-GB",
-                "page": page,
-            },
+            params={"query": query, "include_adult": "false", "language": "en-GB", "page": str(page)},
         )
         response.raise_for_status()
         return response.json()
 
-    def tv(self, tv_id: int) -> ...:
+    def tv(self, tv_id: str) -> TvDetails:
         """https://developer.themoviedb.org/reference/tv-series-details"""
         response = self.session.get(f"https://api.themoviedb.org/3/tv/{tv_id}")
         response.raise_for_status()

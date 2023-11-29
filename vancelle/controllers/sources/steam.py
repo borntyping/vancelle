@@ -1,10 +1,11 @@
 import structlog
+from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import desc, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Manager
-from ...ext.flask_sqlalchemy import Pagination, EmptyPagination, SelectAndTransformPagination
+from ...ext.flask_sqlalchemy import EmptyPagination, SelectAndTransformPagination
 from ...extensions import apis, db
 from ...inflect import p
 from ...models import Base
@@ -44,7 +45,7 @@ class SteamApplicationManager(Manager):
             data=appdetails,
         )
 
-    def search(self, query: str) -> Pagination[SteamApplication]:
+    def search(self, query: str) -> Pagination:
         log = logger.bind(query=query)
         log.info("Searching Steam apps")
 

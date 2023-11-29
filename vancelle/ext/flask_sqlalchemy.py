@@ -106,9 +106,9 @@ class SelectAndTransformPagination(SelectPagination[T], typing.Generic[T, U]):
         max_per_page: int | None = 100,
         error_out: bool = True,
         count: bool = True,
-        select: sqlalchemy.Select[T],
+        select: sqlalchemy.Select[U],
         session: Session,
-        transform: typing.Callable[[T], U],
+        transform: typing.Callable[[U], T],
     ) -> None:
         self.__transform = transform
         super().__init__(
@@ -121,6 +121,6 @@ class SelectAndTransformPagination(SelectPagination[T], typing.Generic[T, U]):
             session=session,
         )
 
-    def _query_items(self) -> list[U]:
+    def _query_items(self) -> list[T]:
         items = super()._query_items()
         return [self.__transform(item) for item in items]

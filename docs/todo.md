@@ -4,7 +4,6 @@ Todo
 Features
 --------
 
-- Replaying category.
 - Drag and drop between board columns: https://interactjs.io/
 - Light/dark themes and toggle: https://www.petemillspaugh.com/edison-bulb
 - TVDB source: https://thetvdb.com/api-information#attribution
@@ -14,7 +13,6 @@ Features
 Bugs
 ----
 
-* Steam search results do not paginate correctly.
 * Add Ao3 search/fetch.
 * 401 page should show login form.
 * Tiny card does not use latest record

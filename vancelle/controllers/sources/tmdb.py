@@ -1,17 +1,16 @@
-import typing
-
 import flask
 
-from vancelle.controllers.sources.base import Manager, R
-from vancelle.ext.flask_sqlalchemy import Pagination, ItemsPagination
+from vancelle.controllers.sources.base import Manager
+from vancelle.ext.flask_sqlalchemy import ItemsPagination, Pagination
 from vancelle.extensions import apis
 from vancelle.inflect import p
 from vancelle.models.remote import TmdbMovie, TmdbTvSeries
-from vancelle.models.work import Work
+from vancelle.models.work import Film, Show
 
 
 class TmdbMovieManager(Manager[TmdbMovie]):
     remote_type = TmdbMovie
+    work_type = Film
 
     def fetch(self, remote_id: str) -> TmdbMovie:
         data = apis.tmdb.movie(remote_id)
@@ -46,6 +45,7 @@ class TmdbMovieManager(Manager[TmdbMovie]):
 
 class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
     remote_type = TmdbTvSeries
+    work_type = Show
 
     def fetch(self, remote_id: str) -> TmdbTvSeries:
         data = apis.tmdb.tv(remote_id)

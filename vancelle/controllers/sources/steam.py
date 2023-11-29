@@ -10,6 +10,7 @@ from ...extensions import apis, db
 from ...inflect import p
 from ...models import Base
 from ...models.remote import SteamApplication
+from ...models.work import Game
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -23,6 +24,7 @@ class SteamAppID(Base):
 
 class SteamApplicationManager(Manager):
     remote_type = SteamApplication
+    work_type = Game
 
     def fetch(self, remote_id: str) -> SteamApplication:
         appdetails = apis.steam_store_api.appdetails(remote_id)

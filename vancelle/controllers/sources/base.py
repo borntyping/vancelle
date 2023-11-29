@@ -5,14 +5,16 @@ import typing
 import flask
 from flask_sqlalchemy.pagination import Pagination
 
+from vancelle.models import Work
 from vancelle.models.remote import Remote
 
-R = typing.TypeVar("R", bound=Remote, contravariant=True)
+R = typing.TypeVar("R", bound=Remote)
 
 
 @dataclasses.dataclass()
 class Manager(typing.Generic[R], abc.ABC):
     remote_type: typing.ClassVar[typing.Type[Remote]]
+    work_type: typing.ClassVar[typing.Type[Work]]
 
     def render_template(self, name: str, **context) -> str:
         identity = self.remote_type.identity()

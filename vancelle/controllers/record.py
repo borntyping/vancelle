@@ -6,7 +6,8 @@ import werkzeug.exceptions
 from sqlalchemy.orm import joinedload
 
 from vancelle.extensions import db
-from vancelle.models import Record, Work
+from vancelle.models.record import Record
+from vancelle.models.work import Work
 
 
 class RecordController:

@@ -3,7 +3,8 @@ import flask_login
 import flask_sqlalchemy
 
 from .ext_apis import ApisExtension
-from .ext_html import HtmlExtension, p
+from .ext_html import HtmlExtension
+from ..inflect import p
 from .ext_htmx import HtmxExtension
 from ..models import Base
 

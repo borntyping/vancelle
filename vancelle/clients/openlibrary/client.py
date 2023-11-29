@@ -19,8 +19,7 @@ from vancelle.clients.openlibrary.types import (
     WorkEditions,
 )
 
-from vancelle.models import OpenlibraryEdition, OpenlibraryWork
-
+from vancelle.models.remote import OpenlibraryEdition, OpenlibraryWork
 
 logger = structlog.get_logger(logger_name=__name__)
 

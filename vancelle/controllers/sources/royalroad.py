@@ -1,7 +1,7 @@
 from .base import Manager
 from ...ext.flask_sqlalchemy import Pagination, ItemsPagination
 from ...extensions import apis
-from ...models import RoyalroadFiction
+from ...models.remote import RoyalroadFiction
 
 
 class RoyalroadFictionManager(Manager):

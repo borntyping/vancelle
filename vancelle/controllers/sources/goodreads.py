@@ -2,7 +2,7 @@ import typing
 
 from .base import Manager
 from ...ext.flask_sqlalchemy import Pagination
-from ...models import GoodreadsBook
+from ...models.remote import GoodreadsBook
 
 
 class GoodreadsBookManager(Manager):

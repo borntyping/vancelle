@@ -3,7 +3,7 @@ import typing
 from .base import Manager
 from ...ext.flask_sqlalchemy import Pagination, ItemsPagination, StaticPagination
 from ...extensions import apis
-from ...models import OpenlibraryEdition, OpenlibraryWork
+from ...models.remote import OpenlibraryEdition, OpenlibraryWork
 
 
 class OpenlibraryWorkManager(Manager):

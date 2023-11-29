@@ -4,8 +4,10 @@ import flask
 
 from vancelle.controllers.sources.base import Manager, R
 from vancelle.ext.flask_sqlalchemy import Pagination, ItemsPagination
-from vancelle.extensions import apis, p
-from vancelle.models import TmdbMovie, TmdbTvSeries, Work
+from vancelle.extensions import apis
+from vancelle.inflect import p
+from vancelle.models.remote import TmdbMovie, TmdbTvSeries
+from vancelle.models.work import Work
 
 
 class TmdbMovieManager(Manager[TmdbMovie]):

@@ -6,22 +6,10 @@ import urllib.parse
 import flask
 import structlog
 
-from vancelle.extensions.ext_html import p
+from vancelle.inflect import p
 from vancelle.types import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
-
-
-@dataclasses.dataclass()
-class WorkType:
-    noun: str
-    title: str
-    plural: str
-
-    def __init__(self, noun: str, *, title: str = None, plural: str = None) -> None:
-        self.noun = noun
-        self.title = title or noun
-        self.plural = plural or p.plural(noun)
 
 
 class BaseProperty:

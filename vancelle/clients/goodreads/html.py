@@ -10,7 +10,7 @@ import bs4.element
 import structlog
 
 from .common import GoodreadsImporter
-from ...models import GoodreadsBook
+from ...models.remote import GoodreadsBook
 
 logger = structlog.get_logger(logger_name=__name__)
 

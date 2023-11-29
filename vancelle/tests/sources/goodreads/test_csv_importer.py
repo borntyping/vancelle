@@ -2,7 +2,9 @@ import datetime
 import pathlib
 import uuid
 
-from vancelle.models import GoodreadsBook, Record, User
+from vancelle.models import User
+from vancelle.models.remote import GoodreadsBook
+from vancelle.models.record import Record
 from vancelle.types import Shelf
 from vancelle.clients.goodreads.csv import GoodreadsCsvImporter
 

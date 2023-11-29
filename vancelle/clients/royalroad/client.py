@@ -5,7 +5,7 @@ import bs4
 import structlog
 
 from vancelle.clients.client import RequestsClient
-from vancelle.models import RoyalroadFiction
+from vancelle.models.remote import RoyalroadFiction
 
 logger = structlog.get_logger(logger_name=__name__)
 

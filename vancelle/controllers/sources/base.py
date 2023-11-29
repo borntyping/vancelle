@@ -5,7 +5,7 @@ import typing
 import flask
 from flask_sqlalchemy.pagination import Pagination
 
-from vancelle.models import Remote
+from vancelle.models.remote import Remote
 
 R = typing.TypeVar("R", bound=Remote, contravariant=True)
 

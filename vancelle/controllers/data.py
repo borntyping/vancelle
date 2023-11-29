@@ -9,8 +9,10 @@ import sqlalchemy
 import structlog
 
 from vancelle.extensions import db
-from vancelle.models import Record, Remote, User, Work
-from ..models import Base
+from vancelle.models import Base, User
+from ..models.remote import Remote
+from ..models.record import Record
+from ..models.work import Work
 from ..types import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)

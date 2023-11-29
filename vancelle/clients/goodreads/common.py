@@ -9,7 +9,10 @@ import structlog
 from sqlalchemy import select
 from sqlalchemy.orm.attributes import flag_modified
 
-from vancelle.models import Book, GoodreadsBook, Record, User
+from vancelle.models import User
+from vancelle.models.remote import GoodreadsBook
+from vancelle.models.record import Record
+from vancelle.models.work import Book
 from vancelle.extensions import db
 from vancelle.types import Shelf
 

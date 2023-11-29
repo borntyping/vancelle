@@ -12,7 +12,9 @@ from vancelle.blueprints.bulma import BulmaSelect
 from vancelle.controllers.work import WorkController
 from vancelle.extensions import db, htmx
 from vancelle.extensions.ext_html import Toggle
-from vancelle.models import Remote, User, Work
+from vancelle.models import User
+from vancelle.models.remote import Remote
+from vancelle.models.work import Work
 from vancelle.types import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -25,7 +27,7 @@ bp = flask.Blueprint("work", __name__, url_prefix="")
 class WorkForm(flask_wtf.FlaskForm):
     type = wtforms.SelectField(
         "Type",
-        choices=[(i, cls.category.title) for i, cls in Work.subclasses().items()],
+        choices=[(i, cls.info.title) for i, cls in Work.subclasses().items()],
         widget=BulmaSelect(),
     )
     title = wtforms.StringField("Title", validators=[Optional()])
@@ -61,7 +63,7 @@ def before_request():
 def home():
     return flask.render_template(
         "home.html",
-        categories=[cls.category.plural for cls in Work.subclasses().values()],
+        categories=[cls.info.plural for cls in Work.subclasses().values()],
         works_count=controller.count(Work),
         remotes_count=controller.count(Remote),
         users_count=controller.count(User),
@@ -87,7 +89,7 @@ def create():
 @bp.route("/works/")
 def index():
     layout = Toggle.from_request({"board": "Board", "table": "Table"}, "layout", default="board")
-    work_type = Toggle.from_request({i: cls.category.title for i, cls in Work.subclasses().items()}, "type")
+    work_type = Toggle.from_request({i: cls.info.title for i, cls in Work.subclasses().items()}, "type")
     remote_type = Toggle.from_request({i: v.into_source().full_noun for i, v in Remote.subclasses().items()}, "remote_type")
 
     statement = controller.select(user=flask_login.current_user, work_type=work_type.value, remote_type=remote_type.value)

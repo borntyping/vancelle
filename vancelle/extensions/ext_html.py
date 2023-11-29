@@ -9,7 +9,7 @@ import jinja2
 import markupsafe
 import wtforms.widgets
 
-p = inflect.engine()
+from ..inflect import p
 
 
 def url_with(endpoint: str = None, **kwargs):

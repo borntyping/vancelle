@@ -6,7 +6,7 @@ import flask_login
 from ..controllers.remote import RemotesController
 from ..extensions import htmx
 from ..extensions.ext_html import Toggle
-from ..models import Remote
+from ..models.remote import Remote
 
 controller = RemotesController()
 

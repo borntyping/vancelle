@@ -5,8 +5,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Manager
 from ...ext.flask_sqlalchemy import Pagination, EmptyPagination, SelectAndTransformPagination
-from ...extensions import apis, db, p
-from ...models import Base, SteamApplication
+from ...extensions import apis, db
+from ...inflect import p
+from ...models import Base
+from ...models.remote import SteamApplication
 
 logger = structlog.get_logger(logger_name=__name__)
 

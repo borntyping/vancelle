@@ -8,7 +8,7 @@ import structlog
 
 from .common import GoodreadsImporter
 from .types import GoodreadsCsvRow
-from ...models import GoodreadsBook
+from ...models.remote import GoodreadsBook
 
 logger = structlog.get_logger(logger_name=__name__)
 

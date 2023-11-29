@@ -16,7 +16,9 @@ from vancelle.controllers.sources.steam import SteamApplicationManager
 from vancelle.controllers.sources.tmdb import TmdbMovieManager, TmdbTvSeriesManager
 from vancelle.ext.flask_sqlalchemy import EmptyPagination
 from vancelle.extensions import db
-from vancelle.models import Remote, User, Work
+from vancelle.models import User
+from vancelle.models.remote import Remote
+from vancelle.models.work import Work
 
 logger = structlog.get_logger(logger_name=__name__)
 

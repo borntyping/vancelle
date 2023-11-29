@@ -1,7 +1,7 @@
 import enum
 import typing
 
-from vancelle.extensions.ext_html import p
+from vancelle.inflect import p
 
 
 @enum.verify(enum.UNIQUE)

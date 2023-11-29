@@ -8,7 +8,7 @@
 {%- endmacro -%}
 
 {% macro steam_capsule_imagev5(steam_application, href) %}
-  <a href="{{ href }}" class="is-block x-is-container" title="{{ steam_application.name }}"><img src="{{ steam_application.capsule_imagev5 or '' }}" alt="{{ steam_application.name }}" loading="lazy" width="184px" height="69px"></a>
+  <a href="{{ href }}" class="is-block x-is-container" title="{{ steam_application.name }}"><img src="{{ steam_application.capsule_imagev5 or '' }}" alt="{{ steam_application.name }}" loading="lazy" referrerpolicy="no-referrer" width="184px" height="69px"></a>
 {% endmacro %}
 
 {% macro steam_appdetails_item(app) %}

@@ -3,7 +3,7 @@
     <div class="card-image">
       <figure class="image is-2by3 has-background-info-light" title="{{ details.title }}, {{ details.author|absent }}">
         {% if details.cover %}
-          <a href="{{ href }}" title="{{ details.title }}"><img src="{{ details.cover }}" alt="" loading="lazy"></a>
+          <a href="{{ href }}" title="{{ details.title }}"><img src="{{ details.cover }}" alt="" loading="lazy" referrerpolicy="no-referrer"></a>
         {% endif %}
       </figure>
     </div>

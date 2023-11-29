@@ -23,3 +23,4 @@ Bugs
 * Present dates where the start and end date are the same better
 * External links for TMDB remotes are missing
 * Change "{author}, {year}" to "{year}, {author}"
+* Properties "table" still renders one property oddly.

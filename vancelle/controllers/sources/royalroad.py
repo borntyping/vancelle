@@ -12,4 +12,4 @@ class RoyalroadFictionManager(Manager):
 
     def search(self, query: str) -> Pagination[RoyalroadFiction]:
         items = apis.royalroad.search_fictions(title=query)
-        return ItemsPagination(page=1, per_page=len(items), items=items, total=len(items))
+        return ItemsPagination(page=1, per_page=len(items), items=items, total=len(items), error_out=False)

@@ -14,8 +14,8 @@
     <div class="hero-body has-text-centered">
       <h1 class="title is-2">Vancelle</h1>
       <p class="subtitle is-4">Track {{ p.join(categories) }}</p>
-      <a href="{{ url_for('work.create') }}" class="button is-large is-link mr-3">Add work</a>
-      <a href="{{ url_for('work.index') }}" class="button is-large is-link">View works</a>
+      <a href="{{ url_for('work.index') }}" class="button is-large is-link mr-3">View works</a>
+      <a href="{{ url_for('work.create') }}" class="button is-large is-link">Add work</a>
     </div>
   </section>
 {% endblock %}

@@ -23,13 +23,13 @@
   </div>
 {% endmacro %}
 
-{% macro board_category(groups, shelf, column, show_if_empty = True) %}
+{% macro board_category(groups, shelf) %}
   {% set class_box_background = "has-background-{}-light".format(shelf.value) %}
   {% set class_figure_background = "has-background-{}".format(shelf.value) %}
-  {% set class_column = "x-board-{}".format(column) %}
+  {% set class_column = "x-board-{}".format(shelf.column) %}
   {% set items = groups[shelf] %}
 
-  {% if items or show_if_empty %}
+  {% if shelf.show_if_empty or items %}
     <div class="x-board-header {{class_column}} is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered">
       <h3 class="title is-4">{{ shelf.title }}</h3>
       <p class="subtitle is-7">{{ shelf.description }}</p>
@@ -49,17 +49,9 @@
 {% macro board(shelves) %}
   <section class="block">
     <div class="x-board">
-      {{ board_category(shelves, Shelf.UNSORTED, 'outer-left', show_if_empty=False) }}
-      {{ board_category(shelves, Shelf.UNRELEASED, 'outer-left') }}
-      {{ board_category(shelves, Shelf.UNDECIDED, 'outer-left') }}
-      {{ board_category(shelves, Shelf.UPCOMING, 'inner-left') }}
-      {{ board_category(shelves, Shelf.PLAYING, 'center') }}
-      {{ board_category(shelves, Shelf.REPLAYING, 'center', show_if_empty=False) }}
-      {{ board_category(shelves, Shelf.INFINITE, 'center', show_if_empty=False) }}
-      {{ board_category(shelves, Shelf.PAUSED, 'inner-right', show_if_empty=False) }}
-      {{ board_category(shelves, Shelf.SHELVED, 'inner-right') }}
-      {{ board_category(shelves, Shelf.COMPLETED, 'outer-right') }}
-      {{ board_category(shelves, Shelf.ABANDONED, 'outer-right') }}
+      {% for shelf in Shelf %}
+        {{ board_category(shelves, shelf) }}
+      {% endfor %}
     </div>
   </section>
 {% endmacro %}

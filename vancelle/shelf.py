@@ -14,23 +14,34 @@ class Shelf(enum.Enum):
     'Not assigned to a shelf yet'
     """
 
-    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet")
-    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release")
-    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future")
-    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next")
+    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", "outer-left", False)
+    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", "outer-left")
+    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", "outer-left")
+    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", "inner-left")
 
-    PLAYING = ("playing", "Playing", "Currently reading/playing/watching")
-    REPLAYING = ("replaying", "Replaying", "Returning to a completed work")
-    INFINITE = ("infinite", "Infinite", "An unending or long-term work")
-    PAUSED = ("paused", "Paused", "Might continue soon")
-    SHELVED = ("shelved", "Shelved", "Might continue one day")
+    PLAYING = ("playing", "Playing", "Currently reading/playing/watching", "center")
+    REPLAYING = ("replaying", "Replaying", "Returning to a completed work", "center", False)
+    INFINITE = ("infinite", "Infinite", "An unending or long-term work", "center", False)
 
-    COMPLETED = ("completed", "Completed", "Reached the end")
-    ABANDONED = ("abandoned", "Abandoned", "Gave up on")
+    PAUSED = ("paused", "Paused", "Might continue soon", "inner-right", False)
+    SHELVED = ("shelved", "Shelved", "Might continue one day", "inner-right")
+    REFERENCE = ("reference", "Reference", "Reference material with no status", "inner-right")
 
-    def __new__(cls, value: str, title: str, description: str):
+    COMPLETED = ("completed", "Completed", "A completed work - well done!", "outer-right")
+    ABANDONED = ("abandoned", "Abandoned", "Gave up on", "outer-right")
+
+    def __new__(
+        cls,
+        value: str,
+        title: str,
+        description: str,
+        column: str,
+        show_if_empty: bool = True,
+    ):
         obj = object.__new__(cls)
         obj._value_ = value
         obj.title = title
         obj.description = description
+        obj.column = column
+        obj.show_if_empty = show_if_empty
         return obj

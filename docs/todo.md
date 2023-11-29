@@ -16,7 +16,6 @@ Bugs
 * Add Ao3 search/fetch.
 * 401 page should show login form.
 * Add [+] button to [n items] tags on board columns
-* Add reference section for non-fiction books
 * Lazy image loading and noreferrer
 * Add tooltips for dates, specifically release year
 * Add "view works" button to homepage hero

@@ -13,6 +13,7 @@ from .base import Base
 from .details import Details, IntoDetails
 from .record import Record
 from .remote import Remote
+from .types import ShelfEnum
 from .user import User
 from ..inflect import p
 from ..shelf import Shelf
@@ -54,7 +55,7 @@ class Work(Base, IntoDetails):
     release_date: Mapped[typing.Optional[datetime.date]] = mapped_column(default=None)
     cover: Mapped[typing.Optional[str]] = mapped_column(default=None)
     background: Mapped[typing.Optional[str]] = mapped_column(default=None)
-    shelf: Mapped[typing.Optional[Shelf]] = mapped_column(Enum(Shelf, native_enum=False, validate_strings=True), default=None)
+    shelf: Mapped[typing.Optional[Shelf]] = mapped_column(ShelfEnum, default=None)
     tags: Mapped[typing.Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
 
     records: Mapped[typing.List["Record"]] = relationship(

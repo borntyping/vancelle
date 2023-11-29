@@ -75,7 +75,7 @@ class Work(Base, IntoDetails):
         return self.time_deleted is not None
 
     def get_record(self) -> typing.Optional["Record"]:
-        return next((r for r in self.records if not r.deleted), None)
+        return next((r for r in reversed(self.records) if not r.deleted), None)
 
     @property
     def record(self) -> typing.Optional["Record"]:

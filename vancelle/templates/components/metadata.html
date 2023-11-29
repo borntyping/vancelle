@@ -2,13 +2,13 @@
 {% from 'components/links.html' import external_link %}
 
 {% macro source_tag(remote) %}
-  <span class="tag is-info">{{ remote.info.name }}</span>
+  <span class="tag is-info">{{ remote.info.source }}</span>
 {% endmacro %}
 
 {# Display the source for one or more Details #}
 {%- macro sources_list(work) -%}
   {%- for remote in work.iter_remotes() -%}
-    {{ remote.info.name }}
+    {{ remote.info.source }}
     {%- if not loop.last %}, {% endif -%}
   {%- else -%}
     {{ absent }}
@@ -16,7 +16,7 @@
 {%- endmacro -%}
 
 {%- macro shelf_tag(shelf) -%}
-  {%- set class_background = "has-background-{}-light".format(shelf.value) -%}
+  {%- set class_background = "has-background-{}".format(shelf.value) -%}
   {%- set class_text = "has-text-{}-invert".format(shelf.value) -%}
   <span class="tag {{ class_background }} {{ class_text }}" title="{{ shelf.description }}">{{ shelf.title }}</span>
 {%- endmacro -%}
@@ -50,17 +50,17 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{% macro panel_details_partial(details, title) %}
-  <div class="panel is-info">
+{% macro panel_details_partial(details, title, color="primary") %}
+  <div class="panel is-{{ color }}">
     <div class="panel-heading x-background" {{ _style_background_image(details) }}>{{ title }}</div>
     <div>{{ caller() }}</div>
   </div>
 {% endmacro %}
 
-{% macro panel_details(details, href) %}
-  <div class="panel is-info x-details">
+{% macro panel_details(details, href, color="primary") %}
+  <div class="panel is-{{ color }} x-details">
     <div class="panel-heading x-background" {{ _style_background_image(details) }}></div>
-    <figure class="x-cover has-background-info-dark">
+    <figure class="x-cover has-background-{{ color }}-dark">
       {%- if details.cover -%}
         <img src="{{ details.cover }}" alt="" loading="lazy">
       {%- endif -%}
@@ -107,7 +107,7 @@
   {% set details = remote.into_details() %}
   {% set properties = remote.into_properties() %}
   {% set more_properties = remote.more_properties() %}
-  <div class="panel is-info x-properties">
+  <div class="panel is-{{ remote.info.color }} x-properties">
     <p class="panel-heading x-background" {{ _style_background_image(details) }}>Properties</p>
     <div class="x-properties-grid">
       {{ _properties(properties) }}

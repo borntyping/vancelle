@@ -102,5 +102,5 @@
 {% endmacro %}
 
 {% macro control_remote_priority(remote) %}
-  {{ _control_static_text(text=remote.info.priority, title="Priority for details from {}".format(remote.info.name)) }}
+  {{ _control_static_text(text=remote.info.priority, title="Priority for details from {}".format(remote.info.source)) }}
 {% endmacro %}

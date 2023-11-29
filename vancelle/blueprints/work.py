@@ -90,7 +90,7 @@ def create():
 def index():
     layout = Toggle.from_request({"board": "Board", "table": "Table"}, "layout", default="board")
     work_type = Toggle.from_request({i: cls.info.title for i, cls in Work.subclasses().items()}, "type")
-    remote_type = Toggle.from_request({i: cls.info.full_noun for i, cls in Remote.subclasses().items()}, "remote_type")
+    remote_type = Toggle.from_request({i: cls.info.noun_full for i, cls in Remote.subclasses().items()}, "remote_type")
 
     statement = controller.select(user=flask_login.current_user, work_type=work_type.value, remote_type=remote_type.value)
     context = dict(layout=layout, work_type=work_type, remote_type=remote_type)

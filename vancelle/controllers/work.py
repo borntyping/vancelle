@@ -88,8 +88,8 @@ class WorkController:
         return counts
 
     def count_remotes_by_type(self) -> typing.Iterable[typing.Tuple[str, int, RemoteInfo]]:
-        sources = Remote.sources()
+        subclasses = Remote.subclasses()
         counts = db.session.execute(
             select(Remote.type, func.count()).select_from(Remote).order_by(Remote.type).group_by(Remote.type)
         )
-        return [(t, count, sources[t]) for t, count in counts]
+        return list(sorted(((t, count, subclasses[t].info) for t, count in counts), key=lambda x: x[2].priority, reverse=True))

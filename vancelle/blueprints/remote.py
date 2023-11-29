@@ -1,3 +1,4 @@
+import typing
 import uuid
 
 import flask
@@ -21,7 +22,7 @@ def before_request():
 
 @bp.route("/remotes/")
 def index():
-    remote_type = Toggle.from_request({k: v.full_noun for k, v in Remote.sources().items()}, "remote_type")
+    remote_type = Toggle.from_request({k: v.info.noun_full for k, v in Remote.subclasses().items()}, "remote_type")
 
     remotes = controller.index(remote_type=remote_type.value)
     return flask.render_template("remote/index.html", remotes=remotes, remote_type=remote_type)
@@ -79,3 +80,8 @@ def link_work(work_id: uuid.UUID):
 
     work = controller.link_work(work_id=work_id, remote_type=remote_type, remote_id=remote_id)
     return htmx.redirect(work.url_for())
+
+
+@bp.app_template_global()
+def searchable_remotes() -> list[typing.Type[Remote]]:
+    return [cls for cls in Remote.iter_subclasses() if cls.info.can_search]

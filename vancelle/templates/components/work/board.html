@@ -1,11 +1,11 @@
 {% from 'components/work/small_card.html' import small_card %}
 
-{% macro board_card(class_box_background, class_text, work, class_figure_background) %}
+{% macro board_card(class_box_background, work, class_figure_background) %}
   {% set details = work.resolve_details() %}
   <div class="x-board-card {{class_box_background}}" title="{{ details }}">
     <div class="x-board-details p-3">
-      <p class="title is-7 {{class_text}}"><a href="{{ work.url_for() }}">{{ details.title|absent }}</a></p>
-      <p class="subtitle is-7 {{class_text}} mb-1">
+      <p class="title is-7"><a href="{{ work.url_for() }}">{{ details.title|absent }}</a></p>
+      <p class="subtitle is-7 mb-1">
         <span>{{ details.author|absent }}</span>
         {% if details.release_date %}
           <span>({{ details.release_date.year }})</span>
@@ -27,7 +27,6 @@
   {% set class_box_background = "has-background-{}-light".format(shelf.value) %}
   {% set class_figure_background = "has-background-{}".format(shelf.value) %}
   {% set class_column = "x-board-{}".format(column) %}
-  {% set class_text = "has-text-{}-invert".format(shelf.value) %}
   {% set items = groups[shelf] %}
 
   {% if items or show_if_empty %}
@@ -39,7 +38,7 @@
 
     {% for item in items %}
       <div class="x-board-item {{class_column}}">
-        {{ board_card(class_box_background, class_text, item, class_figure_background) }}
+        {{ board_card(class_box_background, item, class_figure_background) }}
       </div>
     {% else %}
       <div class="{{class_column}}"></div>

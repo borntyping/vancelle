@@ -30,10 +30,12 @@ T = typing.TypeVar("T")
 
 @dataclasses.dataclass(kw_only=True)
 class RemoteInfo:
-    name: str
-    noun: str
-    plural: str = None
+    source: str  # Name of the source these remotes come from
+    noun: str  # Noun for this type of remote
+    noun_plural: str
+    noun_full: str  # Source and noun combined
 
+    color: str  # Used in CSS
     priority: int = 0
 
     can_search: bool = True
@@ -42,36 +44,33 @@ class RemoteInfo:
 
     def __init__(
         self,
-        name: str,
+        source: str,
         noun: str,
         *,
-        plural: str = None,
+        color: str,
+        noun_plural: str = None,
+        noun_full: str = None,
         priority: int = 0,
         can_search: bool = True,
         can_link: bool = True,
         can_refresh: bool = True,
     ) -> None:
-        self.name = name
+        self.color = color
+        self.source = source
         self.noun = noun
-        self.plural = plural if plural is not None else p.plural(noun)
+        self.noun_plural = noun_plural if noun_plural is not None else p.plural(noun)
+        self.noun_full = noun_full or f"{self.source} {self.noun}"
         self.priority = priority
         self.can_search = can_search
         self.can_link = can_link
         self.can_refresh = can_refresh
 
-    def __hash__(self) -> int:
-        return hash(self.name)
-
     def __str__(self) -> str:
-        return self.full_noun
-
-    @property
-    def full_noun(self) -> str:
-        return f"{self.name} {self.noun}"
+        return self.noun_full
 
     @property
     def full_plural(self) -> str:
-        return f"{self.name} {self.plural or p.plural(self.noun)}"
+        return f"{self.source} {self.noun_plural or p.plural(self.noun)}"
 
 
 class Remote(Base, IntoDetails, IntoProperties):
@@ -139,12 +138,14 @@ class Remote(Base, IntoDetails, IntoProperties):
         return {remote_type: mapper.class_ for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
 
     @classmethod
-    def sources(cls) -> typing.Mapping[str, RemoteInfo]:
-        return {remote_type: mapper.class_.info for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
-
-    @classmethod
-    def searchable_sources(cls) -> typing.Mapping[str, RemoteInfo]:
-        return {remote_type: source for remote_type, source in cls.sources().items() if source.can_refresh}
+    def iter_subclasses(cls) -> typing.Sequence[typing.Type["Remote"]]:
+        return list(
+            sorted(
+                (subclass.class_ for subclass in cls.__mapper__.polymorphic_map.values()),
+                key=lambda subclass: subclass.info.priority,
+                reverse=True,
+            )
+        )
 
 
 class ImportedWorkAttributes(typing.TypedDict):
@@ -153,8 +154,15 @@ class ImportedWorkAttributes(typing.TypedDict):
 
 class ImportedWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "imported"}
-
-    info = RemoteInfo(name="Imported", noun="work", priority=-1, can_search=False, can_link=False, can_refresh=False)
+    info = RemoteInfo(
+        color="imported",
+        source="Imported",
+        noun="work",
+        priority=-1,
+        can_search=False,
+        can_link=False,
+        can_refresh=False,
+    )
 
     def more_properties(self) -> typing.Iterable[Property]:
         yield Property("Imported from", self.data.get("imported_from"))
@@ -168,7 +176,14 @@ class GoodreadsBookData(typing.TypedDict, GoodreadsCsvRow, GoodreadsHtmlRow):
 
 class GoodreadsBook(Remote):
     __mapper_args__ = {"polymorphic_identity": "goodreads.book"}
-    info = RemoteInfo(name="Goodreads", noun="book")
+    info = RemoteInfo(
+        color="goodreads",
+        source="Goodreads",
+        noun="book",
+        noun_full="Imported Goodreads book",
+        priority=10,
+        can_search=False,
+    )
 
     def external_url(self) -> str | None:
         return f"https://www.goodreads.com/book/show/{self.id}"
@@ -188,7 +203,12 @@ class GoodreadsBook(Remote):
 
 class OpenlibraryWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.work"}
-    info = RemoteInfo(name="Open Library", noun="work", priority=1)
+    info = RemoteInfo(
+        color="openlibrary",
+        source="Open Library",
+        noun="work",
+        priority=21,
+    )
 
     def external_url(self) -> str:
         return f"https://openlibrary.org/works/{self.id}"
@@ -200,7 +220,13 @@ class OpenlibraryWork(Remote):
 
 class OpenlibraryEdition(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.edition"}
-    info = RemoteInfo(name="Open Library", noun="edition", priority=2, can_search=False)
+    info = RemoteInfo(
+        color="openlibrary",
+        source="Open Library",
+        noun="edition",
+        priority=22,
+        can_search=False,
+    )
 
     def external_url(self) -> str:
         return f"https://openlibrary.org/books/{self.id}"
@@ -217,7 +243,13 @@ class OpenlibraryEdition(Remote):
 
 class RoyalroadFiction(Remote):
     __mapper_args__ = {"polymorphic_identity": "royalroad.fiction"}
-    info = RemoteInfo(name="Royal Road", noun="fiction", plural="fiction")
+    info = RemoteInfo(
+        color="royalroad",
+        source="Royal Road",
+        noun="fiction",
+        noun_plural="fiction",
+        priority=20,
+    )
 
     def external_url(self) -> str:
         return f"https://www.royalroad.com/fiction/{self.id}"
@@ -228,7 +260,12 @@ class RoyalroadFiction(Remote):
 
 class SteamApplication(Remote):
     __mapper_args__ = {"polymorphic_identity": "steam.application"}
-    info = RemoteInfo(name="Steam", noun="application")
+    info = RemoteInfo(
+        color="steam",
+        source="Steam",
+        noun="application",
+        priority=100,
+    )
 
     def external_url(self) -> str | None:
         return f"https://store.steampowered.com/app/{self.id}/"
@@ -250,9 +287,19 @@ class SteamApplication(Remote):
 
 class TmdbMovie(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.movie"}
-    info = RemoteInfo(name="TMDB", noun="movie")
+    info = RemoteInfo(
+        color="tmdb",
+        source="TMDB",
+        noun="movie",
+        priority=30,
+    )
 
 
 class TmdbTvSeries(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.tv"}
-    info = RemoteInfo(name="TMDB", noun="series")
+    info = RemoteInfo(
+        color="tmdb",
+        source="TMDB",
+        noun="series",
+        priority=31,
+    )

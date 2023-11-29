@@ -1,8 +1,17 @@
 @import "bulma/sass/utilities/functions";
 @import "bulma/sass/utilities/initial-variables";
 
+// https://partner.steamgames.com/doc/marketing/branding
+$steam-dark: rgb(0, 0, 0);
+$steam-light: rgb(255, 255, 255);
+
+// https://www.themoviedb.org/about/logos-attribution?language=en-GB
+$tmdb-primary: #0d253f;
+$tmdb-secondary: #01b4e4;
+$tmdb-tertiary: #90cea1;
+
 $custom-colors: (
-        // Shelves
+  // Shelves
         "unsorted": ($white-bis, findColorInvert($white-bis)),
         "unreleased": ($red, findColorInvert($red)),
         "undecided": ($orange, findColorInvert($orange)),
@@ -14,7 +23,18 @@ $custom-colors: (
         "shelved": ($blue, findColorInvert($blue)),
         "completed": ($purple, findColorInvert($purple)),
         "abandoned": ($white-bis, findColorInvert($white-bis)),
-
-        // Remotes
-        "steam": ($black, findColorInvert($black)),
+  // Remotes
+        "imported": ($grey-lighter, findColorInvert($grey-lighter)),
+        "steam": ($steam-dark, $steam-light),
+        "tmdb": ($tmdb-primary, $tmdb-secondary),
+        "royalroad": (#181818, #c2a970),
+        "openlibrary": (#e1dcc5, #02598b),
+        "goodreads": (#382110, #f4f1ea),
 );
+
+@each $name, $pair in $custom-colors {
+  $invert: nth($pair, 2);
+  .has-text-#{$name}-invert {
+    color: $invert !important;
+  }
+}

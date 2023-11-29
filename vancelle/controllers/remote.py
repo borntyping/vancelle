@@ -42,9 +42,9 @@ class RemotesController:
     def __init__(self, managers: typing.Iterable[Manager] = DEFAULT_MANAGERS) -> None:
         self.managers = {m.remote_type.identity(): m for m in managers}
 
-        for identity, source in Remote.sources().items():
+        for identity, cls in Remote.subclasses().items():
             if identity not in self.managers:
-                raise NotImplementedError(f"No manager registered for {identity} ({source=})")
+                raise NotImplementedError(f"No manager registered for {identity} ({cls.info=})")
 
     def __getitem__(self, item: str) -> Manager:
         return self.managers[item]

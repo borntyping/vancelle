@@ -14,7 +14,6 @@ Features
 Bugs
 ----
 
-* Goodreads books should not be searchable.
 * Steam search results do not paginate correctly.
 * Add Ao3 search/fetch.
 * 401 page should show login form.

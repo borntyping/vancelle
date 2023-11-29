@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% macro gauge(n, noun, url, box_classes) %}
+{% macro gauge(n, noun, url, background="white", text="dark") %}
   <a href="{{ url }}" class="is-block x-is-fullheight">
-    <div class="box has-text-centered x-is-fullheight {{ box_classes }}">
+    <div class="box has-text-centered x-is-fullheight has-background-{{ background }} has-text-{{ text }}">
       <p class="block is-size-1">{{ n }}</p>
       <p class="block">{{ p.plural(noun, n) }}</p>
     </div>
@@ -14,7 +14,8 @@
     <div class="hero-body has-text-centered">
       <h1 class="title is-2">Vancelle</h1>
       <p class="subtitle is-4">Track {{ p.join(categories) }}</p>
-      <a href="{{ url_for('work.create') }}" class="button is-large is-link">Add work</a>
+      <a href="{{ url_for('work.create') }}" class="button is-large is-primary mr-3">Add work</a>
+      <a href="{{ url_for('work.index') }}" class="button is-large is-link">View works</a>
     </div>
   </section>
 {% endblock %}
@@ -22,18 +23,18 @@
 {% block content %}
   <section class="block">
     <div class="columns is-centered">
-      <div class="column">{{ gauge(works_count, 'work', url_for('work.index'), "has-text-info") }}</div>
-      <div class="column">{{ gauge(remotes_count, 'remote', url_for('remote.index'), "has-text-primary") }}</div>
-      <div class="column">{{ gauge(users_count, 'user', url_for("user.index"), "") }}</div>
+      <div class="column">{{ gauge(works_count, 'work', url_for('work.index', type='', remote_type=''), text="info") }}</div>
+      <div class="column">{{ gauge(remotes_count, 'remote', url_for('remote.index'), text="primary") }}</div>
+      <div class="column">{{ gauge(users_count, 'user', url_for("user.index")) }}</div>
     </div>
     <div class="columns is-centered is-multiline">
       {% for type, count in works_count_by_type %}
-        <div class="column">{{ gauge(count, type, url_for('work.index', type=type), "has-text-info-dark") }}</div>
+        <div class="column">{{ gauge(count, type, url_for('work.index', type=type, remote_type=''), background='white', text='info') }}</div>
       {% endfor %}
     </div>
     <div class="columns is-centered is-multiline">
-      {% for type, count, source in remote_count_by_type %}
-        <div class="column">{{ gauge(count, source.full_noun, url_for('work.index', remote_type=type), "has-text-primary-dark") }}</div>
+      {% for remote_type, count, info in remote_count_by_type %}
+        <div class="column">{{ gauge(count, info.noun_full, url_for('work.index', type='', remote_type=remote_type), background=info.color, text='%s-invert' % info.color) }}</div>
       {% endfor %}
     </div>
   </section>

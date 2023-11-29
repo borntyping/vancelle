@@ -15,9 +15,7 @@ bp = flask.Blueprint("errors", __name__, url_prefix="/errors", template_folder="
 def once(state: flask.sansio.blueprints.BlueprintSetupState):
     state.app.register_error_handler(ApplicationError, application_error_handler)
     state.app.register_error_handler(werkzeug.exceptions.HTTPException, http_error_handler)
-
-    if not state.app.config["DEBUG"]:
-        state.app.register_error_handler(Exception, generic_error_handler)
+    state.app.register_error_handler(Exception, generic_error_handler)
 
 
 def application_error_handler(notification: ApplicationError):
@@ -62,5 +60,8 @@ def generic_error_handler(exception: Exception):
             ),
             headers={"HX-Reswap": "none"},
         )
+
+    if flask.current_app.config["DEBUG"]:
+        raise exception
 
     return flask.render_template("error.html", exception=exception)

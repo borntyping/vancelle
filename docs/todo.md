@@ -4,6 +4,7 @@ Todo
 Features
 --------
 
+- Replaying category.
 - Drag and drop between board columns: https://interactjs.io/
 - Light/dark themes and toggle: https://www.petemillspaugh.com/edison-bulb
 - TVDB source: https://thetvdb.com/api-information#attribution

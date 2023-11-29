@@ -20,7 +20,7 @@ class Manager(typing.Generic[R], abc.ABC):
         return flask.render_template(template_name, **context, **self.context())
 
     def context(self) -> typing.Mapping[str, typing.Any]:
-        return {"source": self.remote_type.into_source()}
+        return {"source": self.remote_type.info}
 
     def context_detail(self, remote: R) -> typing.Mapping[str, typing.Any]:
         return {}

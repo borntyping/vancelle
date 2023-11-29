@@ -120,7 +120,7 @@ class RemotesController:
     def create_work(self, *, remote_id: str, remote_type: str, user: User) -> Work:
         """Create a new remote and a new work."""
         remote = self[remote_type].fetch(remote_id)
-        source = remote.into_source()
+        source = remote.info
         work = Work(
             id=uuid.uuid4(),
             user=user,

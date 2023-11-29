@@ -9,7 +9,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .metadata import Details, IntoDetails
+from .details import Details, IntoDetails
 from .record import Record
 from .remote import Remote
 from .user import User
@@ -82,7 +82,7 @@ class Work(Base, IntoDetails):
         return url_for("work.detail", work_id=self.id)
 
     def iter_remotes(self) -> typing.Iterable["Remote"]:
-        return reversed(sorted(self.remotes, key=lambda remote: remote.into_source().priority))
+        return reversed(sorted(self.remotes, key=lambda remote: remote.info.priority))
 
     def iter_active_remotes(self) -> typing.Iterable["Remote"]:
         return (remote for remote in self.iter_remotes() if not remote.deleted)
@@ -128,7 +128,7 @@ class Work(Base, IntoDetails):
         absent_remotes = {
             remote_type: remote_cls
             for remote_type, remote_cls in Remote.subclasses().items()
-            if remote_type not in present_remotes and remote_cls.into_source().can_link
+            if remote_type not in present_remotes and remote_cls.info.can_link
         }
         return absent_remotes
 

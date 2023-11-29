@@ -6,7 +6,6 @@ import urllib.parse
 import flask
 import structlog
 
-from vancelle.inflect import p
 from vancelle.types import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -96,58 +95,6 @@ class IntoProperties:
 
     def more_properties(self) -> typing.Iterable[Property]:
         return ()
-
-
-@dataclasses.dataclass(kw_only=True)
-class Source:
-    name: str
-    noun: str
-    plural: str = None
-
-    priority: int = 0
-
-    can_search: bool = True
-    can_link: bool = True
-    can_refresh: bool = True
-
-    def __init__(
-        self,
-        name: str,
-        noun: str,
-        *,
-        plural: str = None,
-        priority: int = 0,
-        can_search: bool = True,
-        can_link: bool = True,
-        can_refresh: bool = True,
-    ) -> None:
-        self.name = name
-        self.noun = noun
-        self.plural = plural if plural is not None else p.plural(noun)
-        self.priority = priority
-        self.can_search = can_search
-        self.can_link = can_link
-        self.can_refresh = can_refresh
-
-    def __hash__(self) -> int:
-        return hash(self.name)
-
-    def __str__(self) -> str:
-        return self.full_noun
-
-    @property
-    def full_noun(self) -> str:
-        return f"{self.name} {self.noun}"
-
-    @property
-    def full_plural(self) -> str:
-        return f"{self.name} {self.plural or p.plural(self.noun)}"
-
-
-class IntoSource:
-    @classmethod
-    def into_source(self) -> Source:
-        raise NotImplementedError()
 
 
 @dataclasses.dataclass(kw_only=True)

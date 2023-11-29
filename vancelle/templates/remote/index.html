@@ -22,9 +22,8 @@
         <tbody>
           {% for remote in remotes %}
             {% set details = remote.into_details() %}
-            {% set source = remote.into_source() %}
             <tr>
-              <td class="has-text-centered">{{ source_tag(source) }}</td>
+              <td class="has-text-centered">{{ source_tag(remote=remote) }}</td>
               <td>{{ details_combined_title(details) }}</td>
               <td class="has-text-right">
                 <div class="field">

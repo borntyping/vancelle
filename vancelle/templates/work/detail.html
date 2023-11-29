@@ -62,31 +62,6 @@
   {% endcall %}
 {% endmacro %}
 
-{% macro _section_link(work) %}
-  {% call section("Available sources") %}
-    <div class="box">
-
-    </div>
-
-    <div class="columns x-has-fullheight-containers">
-      {% for remote_type, absent_remote in work.linkable_remotes().items() %}
-        {% set source = absent_remote.into_source() %}
-        <div class="column">
-          <div class="box is-flex has-text-centered is-flex-direction-column">
-            <div class="block is-flex-grow-1">
-              <h4 class="title is-5">{{ source.name }}</h4>
-              <p class="subtitle is-5">Link {{ source.noun }}</p>
-            </div>
-            <div class="block">
-              <a href="{{ url_for('remote.search_source', work_id=work.id, remote_type=remote_type, query=None) }}" class="button is-primary">Link</a>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% endcall %}
-{% endmacro %}
-
 {% block content %}
   {{ _section_work(work, details, form) }}
 

@@ -1,3 +1,4 @@
+import dataclasses
 import datetime
 import typing
 import uuid
@@ -8,26 +9,76 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .metadata import (
+from .details import (
     CollectionProperty,
     Details,
     IntoDetails,
     IntoProperties,
-    IntoSource,
     JsonProperty,
     Property,
-    Source,
     UrlProperty,
 )
 from ..clients.goodreads.types import GoodreadsCsvRow, GoodreadsHtmlRow
+from ..inflect import p
 from ..types import Shelf
+
+if typing.TYPE_CHECKING:
+    from .work import Work
 
 T = typing.TypeVar("T")
 
 
-class Remote(Base, IntoSource, IntoDetails, IntoProperties):
+@dataclasses.dataclass(kw_only=True)
+class RemoteInfo:
+    name: str
+    noun: str
+    plural: str = None
+
+    priority: int = 0
+
+    can_search: bool = True
+    can_link: bool = True
+    can_refresh: bool = True
+
+    def __init__(
+        self,
+        name: str,
+        noun: str,
+        *,
+        plural: str = None,
+        priority: int = 0,
+        can_search: bool = True,
+        can_link: bool = True,
+        can_refresh: bool = True,
+    ) -> None:
+        self.name = name
+        self.noun = noun
+        self.plural = plural if plural is not None else p.plural(noun)
+        self.priority = priority
+        self.can_search = can_search
+        self.can_link = can_link
+        self.can_refresh = can_refresh
+
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __str__(self) -> str:
+        return self.full_noun
+
+    @property
+    def full_noun(self) -> str:
+        return f"{self.name} {self.noun}"
+
+    @property
+    def full_plural(self) -> str:
+        return f"{self.name} {self.plural or p.plural(self.noun)}"
+
+
+class Remote(Base, IntoDetails, IntoProperties):
     __tablename__ = "remote"
     __mapper_args__ = {"polymorphic_on": "type"}
+
+    info: typing.ClassVar[RemoteInfo]
 
     work_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("work.id", ondelete="cascade"))
     type: Mapped[str] = mapped_column(primary_key=True)
@@ -51,10 +102,6 @@ class Remote(Base, IntoSource, IntoDetails, IntoProperties):
 
     def url_for(self, work: "Work" = None) -> str:
         return url_for("remote.detail", remote_type=self.type, remote_id=self.id, work_id=work.id if work else None)
-
-    @classmethod
-    def into_source(cls) -> Source:
-        raise NotImplementedError("Default remote type should not be instantiated")
 
     @property
     def deleted(self) -> bool:
@@ -92,11 +139,11 @@ class Remote(Base, IntoSource, IntoDetails, IntoProperties):
         return {remote_type: mapper.class_ for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
 
     @classmethod
-    def sources(cls) -> typing.Mapping[str, Source]:
-        return {remote_type: mapper.class_.into_source() for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
+    def sources(cls) -> typing.Mapping[str, RemoteInfo]:
+        return {remote_type: mapper.class_.info for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
 
     @classmethod
-    def searchable_sources(cls) -> typing.Mapping[str, Source]:
+    def searchable_sources(cls) -> typing.Mapping[str, RemoteInfo]:
         return {remote_type: source for remote_type, source in cls.sources().items() if source.can_refresh}
 
 
@@ -107,9 +154,7 @@ class ImportedWorkAttributes(typing.TypedDict):
 class ImportedWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "imported"}
 
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="Imported", noun="work", priority=-1, can_search=False, can_link=False, can_refresh=False)
+    info = RemoteInfo(name="Imported", noun="work", priority=-1, can_search=False, can_link=False, can_refresh=False)
 
     def more_properties(self) -> typing.Iterable[Property]:
         yield Property("Imported from", self.data.get("imported_from"))
@@ -123,10 +168,7 @@ class GoodreadsBookData(typing.TypedDict, GoodreadsCsvRow, GoodreadsHtmlRow):
 
 class GoodreadsBook(Remote):
     __mapper_args__ = {"polymorphic_identity": "goodreads.book"}
-
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="Goodreads", noun="book")
+    info = RemoteInfo(name="Goodreads", noun="book")
 
     def external_url(self) -> str | None:
         return f"https://www.goodreads.com/book/show/{self.id}"
@@ -146,10 +188,7 @@ class GoodreadsBook(Remote):
 
 class OpenlibraryWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.work"}
-
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="Open Library", noun="work", priority=1)
+    info = RemoteInfo(name="Open Library", noun="work", priority=1)
 
     def external_url(self) -> str:
         return f"https://openlibrary.org/works/{self.id}"
@@ -161,10 +200,7 @@ class OpenlibraryWork(Remote):
 
 class OpenlibraryEdition(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.edition"}
-
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="Open Library", noun="edition", priority=2, can_search=False)
+    info = RemoteInfo(name="Open Library", noun="edition", priority=2, can_search=False)
 
     def external_url(self) -> str:
         return f"https://openlibrary.org/books/{self.id}"
@@ -181,6 +217,7 @@ class OpenlibraryEdition(Remote):
 
 class RoyalroadFiction(Remote):
     __mapper_args__ = {"polymorphic_identity": "royalroad.fiction"}
+    info = RemoteInfo(name="Royal Road", noun="fiction", plural="fiction")
 
     def external_url(self) -> str:
         return f"https://www.royalroad.com/fiction/{self.id}"
@@ -188,17 +225,10 @@ class RoyalroadFiction(Remote):
     def into_properties(self) -> typing.Iterable[Property]:
         yield UrlProperty("URL", self.external_url())
 
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="Royal Road", noun="fiction", plural="fiction")
-
 
 class SteamApplication(Remote):
     __mapper_args__ = {"polymorphic_identity": "steam.application"}
-
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="Steam", noun="application")
+    info = RemoteInfo(name="Steam", noun="application")
 
     def external_url(self) -> str | None:
         return f"https://store.steampowered.com/app/{self.id}/"
@@ -220,15 +250,9 @@ class SteamApplication(Remote):
 
 class TmdbMovie(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.movie"}
-
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="TMDB", noun="movie")
+    info = RemoteInfo(name="TMDB", noun="movie")
 
 
 class TmdbTvSeries(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.tv"}
-
-    @classmethod
-    def into_source(cls) -> Source:
-        return Source(name="TMDB", noun="series")
+    info = RemoteInfo(name="TMDB", noun="series")

@@ -75,8 +75,8 @@
   {% endwith %}
 {% endmacro %}
 
-{%- macro control_remote_refresh(remote, source=None) -%}
-  {%- if (source or remote.into_source()).can_refresh and remote.work_id -%}
+{%- macro control_remote_refresh(remote) -%}
+  {%- if remote.info.can_refresh and remote.work_id -%}
     {% with url = url_for("remote.refresh", work_id=remote.work_id, remote_type=remote.type, remote_id=remote.id) %}
       {{ _control_post(url=url, text="Refresh", icon="refresh-outline", title="Update this remote data from it's source.", tabindex=1) }}
     {% endwith %}
@@ -101,6 +101,6 @@
   {% endif %}
 {% endmacro %}
 
-{% macro control_source_priority(source) %}
-  {{ _control_static_text(text=source.priority, title="Priority for details from {}".format(source.name)) }}
+{% macro control_remote_priority(remote) %}
+  {{ _control_static_text(text=remote.info.priority, title="Priority for details from {}".format(remote.info.name)) }}
 {% endmacro %}

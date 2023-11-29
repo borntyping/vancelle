@@ -6,8 +6,11 @@ from flask import url_for
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .metadata import Property
+from .details import Property
 from .base import Base
+
+if typing.TYPE_CHECKING:
+    from .work import Work
 
 
 class Record(Base):

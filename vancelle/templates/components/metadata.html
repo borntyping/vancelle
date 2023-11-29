@@ -1,15 +1,14 @@
 {% from 'components/layout.html' import section %}
 {% from 'components/links.html' import external_link %}
 
-{% macro source_tag(source) %}
-  <span class="tag is-info">{{ source.name }}</span>
+{% macro source_tag(remote) %}
+  <span class="tag is-info">{{ remote.info.name }}</span>
 {% endmacro %}
 
 {# Display the source for one or more Details #}
 {%- macro sources_list(work) -%}
   {%- for remote in work.iter_remotes() -%}
-    {%- set source = remote.into_source() -%}
-    {{ source.name }}
+    {{ remote.info.name }}
     {%- if not loop.last %}, {% endif -%}
   {%- else -%}
     {{ absent }}

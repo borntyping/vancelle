@@ -9,9 +9,8 @@ from sqlalchemy import func, select, nulls_last, Select, desc
 import structlog
 
 from vancelle.extensions import db
-from vancelle.models.metadata import Source
 from vancelle.models import Base, User
-from vancelle.models.remote import Remote
+from vancelle.models.remote import Remote, RemoteInfo
 from vancelle.models.record import Record
 from vancelle.models.work import Work
 from vancelle.types import Shelf
@@ -88,7 +87,7 @@ class WorkController:
         counts = db.session.execute(select(Work.type, func.count()).select_from(Work).order_by(Work.type).group_by(Work.type))
         return counts
 
-    def count_remotes_by_type(self) -> typing.Iterable[typing.Tuple[str, int, Source]]:
+    def count_remotes_by_type(self) -> typing.Iterable[typing.Tuple[str, int, RemoteInfo]]:
         sources = Remote.sources()
         counts = db.session.execute(
             select(Remote.type, func.count()).select_from(Remote).order_by(Remote.type).group_by(Remote.type)

@@ -27,7 +27,7 @@ $custom-colors: (
         "abandoned": ($white-bis, findColorInvert($white-bis)),
   // Remotes
         "imported": ($grey-lighter, findColorInvert($grey-lighter)),
-        "steam": ($steam-dark, $steam-light),
+        "steam": ($steam-dark, $steam-light, $steam-light, $steam-dark),
         "tmdb": ($tmdb-primary, $tmdb-secondary),
         "royalroad": (#181818, #c2a970),
         "openlibrary": (#e1dcc5, #02598b),

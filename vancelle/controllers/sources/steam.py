@@ -40,7 +40,7 @@ class SteamApplicationManager(Manager):
             author=author,
             description=appdetails["short_description"],
             release_date=release_date,
-            cover=vertical_capsule or appdetails["header_image"],
+            cover=vertical_capsule,
             background=appdetails["background"],
             data=appdetails,
         )

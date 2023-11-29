@@ -21,7 +21,7 @@
     {{ form.csrf_token }}
     <div class="field has-addons">
       <div class="control">
-        <div id="shelf-loading" class="button is-{{ details.shelf }}" data-loading-class="is-loading">
+        <div id="shelf-loading" class="button is-{{ details.shelf.value }}" data-loading-class="is-loading">
           <span class="icon"><ion-icon name="book-outline"></ion-icon></span>
         </div>
       </div>

@@ -26,6 +26,7 @@
               <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">{{ current_user.username }}</a>
                 <div class="navbar-dropdown is-right">
+                  {{ navbar_item("user.profile", "Import/export data") }}
                   {{ navbar_item('remote.index', 'Remote data') }}
                   {{ navbar_item("admin.index", "Admin") }}
                   {{ navbar_item("user.logout", "Logout") }}

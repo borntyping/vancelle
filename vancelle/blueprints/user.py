@@ -3,21 +3,24 @@ import uuid
 import click
 import flask
 import flask_login
-import flask_wtf
+import flask_wtf.file
 import sqlalchemy
 import sqlalchemy.exc
+import sqlalchemy.orm
 import structlog
-import wtforms
 import werkzeug.security
-from sqlalchemy import select
-from sqlalchemy.orm import load_only
+import wtforms
 
-from vancelle.models import User
+from vancelle.controllers.user import UserController
 from vancelle.extensions import db, login_manager
+from vancelle.models import User
 
 logger = structlog.get_logger(logger_name=__name__)
 
-bp = flask.Blueprint("user", __name__, url_prefix="/users")
+BACKUP_FILENAME = "vancelle-backup.json"
+
+controller = UserController()
+bp = flask.Blueprint("user", __name__)
 bp.cli.short_help = "Manage users."
 
 
@@ -26,7 +29,11 @@ class LoginForm(flask_wtf.FlaskForm):
     password = wtforms.PasswordField("Password")
 
 
-@bp.route("/login", methods={"get", "post"})
+class ImportForm(flask_wtf.FlaskForm):
+    backup = flask_wtf.file.FileField("Backup", validators=[flask_wtf.file.FileRequired()])
+
+
+@bp.route("/user/login", methods={"get", "post"})
 def login():
     form = LoginForm()
 
@@ -48,17 +55,46 @@ def login():
     return flask.redirect(flask.url_for("work.index"))
 
 
-@bp.route("/logout")
+@bp.route("/user/logout")
 @flask_login.login_required
 def logout():
     flask_login.logout_user()
     return flask.redirect(flask.url_for("work.index"))
 
 
-@bp.route("/")
+@bp.route("/user/profile")
+@bp.route("/user/import", methods={"post"}, endpoint="import")
+def profile():
+    form = ImportForm()
+
+    if form.validate_on_submit():
+        controller.import_json(form.backup.data.read(), user=flask_login.current_user)
+        return flask.redirect(flask.url_for("user.profile"))
+
+    work_count = flask_login.current_user.works.count()
+    return flask.render_template(
+        "user/profile.html",
+        form=form,
+        work_count=work_count,
+        filename=BACKUP_FILENAME,
+    )
+
+
+@bp.route("/user/export")
+def export():
+    return flask.Response(
+        controller.export_json(user=flask_login.current_user),
+        mimetype="application/json",
+        headers={"Content-Disposition": f'attachment; filename="{BACKUP_FILENAME}"'},
+    )
+
+
+@bp.route("/users/")
 @flask_login.login_required
 def index():
-    users = db.paginate(select(User).order_by(User.username).options(load_only(User.id, User.username)))
+    users = db.paginate(
+        sqlalchemy.select(User).order_by(User.username).options(sqlalchemy.orm.load_only(User.id, User.username))
+    )
     return flask.render_template("user/index.html", users=users)
 
 

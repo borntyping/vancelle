@@ -1,13 +1,8 @@
-{% macro bulma_form_field(field, icon_left=None) %}
+{% macro bulma_form_field(field) %}
   <div class="field">
     {{ field.label(class_="label") }}
-    <div {{ html_params(**bulma_control_params(field, **kwargs.pop('control', {}))) }}>
+    <div {{ html_params(**bulma_control_params(field)) }}>
       {{ field(**bulma_field_params(field, **kwargs)) }}
-      {% if icon_left %}
-        <span class="icon is-small is-left">
-          <ion-icon name="{{ icon_left }}"></ion-icon>
-        </span>
-      {% endif %}
     </div>
     {% for error in field.errors %}
       <p class="help is-danger">{{ error }}</p>

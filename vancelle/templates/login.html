@@ -5,8 +5,8 @@
   <div class="container is-max-desktop">
     <form method="post" class="box">
       {{ form.csrf_token }}
-      {{ bulma_form_field(form.username, placeholder='Username', icon_left='person-outline') }}
-      {{ bulma_form_field(form.password, placeholder='Password', icon_left='lock-closed-outline') }}
+      {{ bulma_form_field(form.username, placeholder='Username') }}
+      {{ bulma_form_field(form.password, placeholder='Password') }}
       <button class="button" type="submit">Login</button>
     </form>
   </div>

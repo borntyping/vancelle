@@ -5,11 +5,9 @@
 {% from "components/remote/sources.html" import section_sources %}
 
 {% block content %}
-  {{ section('Create new work', h1=True) }}
+  {{ section_sources(h1=True) }}
 
-  {{ section_sources() }}
-
-  {% call section('Manually enter metadata') %}
+  {% call section('Enter details manually', 'Create a new work using the provided details', h1=True) %}
     <div class="box">
       <form
         id="work"
@@ -18,14 +16,28 @@
         class="block">
         {{ form.csrf_token }}
         <div class="block">
-          {{ bulma_form_field(form.type) }}
+          <div class="columns mb-0">
+            <div class="column">
+              {{ bulma_form_field(form.type) }}
+            </div>
+            <div class="column">
+              {{ bulma_form_field(form.shelf) }}
+            </div>
+          </div>
+
           {{ bulma_form_field(form.title) }}
           {{ bulma_form_field(form.author) }}
-          {{ bulma_form_field(form.description) }}
           {{ bulma_form_field(form.release_date) }}
-          {{ bulma_form_field(form.cover) }}
-          {{ bulma_form_field(form.background) }}
-          {{ bulma_form_field(form.shelf) }}
+          {{ bulma_form_field(form.description) }}
+
+          <div class="columns mb-0">
+            <div class="column">
+              {{ bulma_form_field(form.cover) }}
+            </div>
+            <div class="column">
+              {{ bulma_form_field(form.background) }}
+            </div>
+          </div>
         </div>
         <div class="block">
           <div class="field has-text-centered">

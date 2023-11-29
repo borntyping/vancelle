@@ -32,13 +32,13 @@ class WorkForm(flask_wtf.FlaskForm):
     )
     title = wtforms.StringField("Title", validators=[Optional()])
     author = wtforms.StringField("Author", validators=[Optional()])
-    description = wtforms.StringField("Description", validators=[Optional()])
     release_date = wtforms.DateField("Release Date", validators=[Optional()])
+    description = wtforms.TextAreaField("Description", validators=[Optional()])
     cover = wtforms.URLField("Cover image", validators=[Optional()])
     background = wtforms.URLField("Background image", validators=[Optional()])
     shelf = wtforms.SelectField(
         "Shelf",
-        choices=[("", "")] + [(s.value, s.title) for s in Shelf],
+        choices=[(s.value, s.title) for s in Shelf] + [("", "")],
         coerce=lambda x: Shelf(x) if x else None,
         widget=BulmaSelect(),
         validators=[Optional()],

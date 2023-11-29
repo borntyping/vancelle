@@ -27,7 +27,7 @@ class WorkInfo:
 
     def __init__(self, noun: str, *, title: str = None, plural: str = None, priority: int = math.inf) -> None:
         self.noun = noun
-        self.title = title or noun
+        self.title = title or noun.title()
         self.plural = plural or p.plural(noun)
         self.priority = priority
 

@@ -1,12 +1,12 @@
 {% from "components/layout.html" import section %}
 
-{% macro section_sources(work_id=None) %}
+{% macro section_sources(work_id=None, h1=False) %}
   {% set subclasses = searchable_remotes() %}
-  {% call section('Search external sources for metadata', n('available source', subclasses|length)) %}
+  {% call section('Search external sources for metadata', n('available source', subclasses|length), h1=h1) %}
     <div class="box">
-      <div class="columns is-multiline">
+      <div class="columns is-multiline is-centered">
         {% for cls in subclasses %}
-          <div class="column is-3 has-text-centered">
+          <div class="column is-4 has-text-centered">
             <a href="{{ url_for('remote.search_source', remote_type=cls.identity(), work_id=work_id) }}" class="button is-{{ cls.info.color }} is-fullwidth">
               Search {{ cls.info.full_plural }}
             </a>

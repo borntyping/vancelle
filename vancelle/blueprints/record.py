@@ -6,10 +6,11 @@ import flask_login
 import structlog
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import BadRequest
-from wtforms import DateField, TextAreaField, BooleanField, StringField
+from wtforms import DateField, BooleanField, StringField
 from wtforms.validators import Length, Optional
 
 from vancelle.controllers.record import RecordController
+from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -27,7 +28,7 @@ class RecordForm(FlaskForm):
     date_started = DateField("Started", validators=[Optional()])
     date_stopped = DateField("Stopped", validators=[Optional()])
     date_sync = BooleanField("Use start date for end date", default=False)
-    notes = StringField("Bookmark", validators=[Optional(), Length(max=256)])
+    notes = StringField("Bookmark", validators=[Optional(), Length(max=256)], filters=[NullFilter()])
 
 
 @bp.route("/", methods=["POST"])

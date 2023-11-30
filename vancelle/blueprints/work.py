@@ -10,6 +10,7 @@ from wtforms.validators import Optional
 
 from vancelle.blueprints.bulma import BulmaSelect
 from vancelle.controllers.work import WorkController
+from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
 from vancelle.extensions.ext_html import Toggle
 from vancelle.models import User
@@ -30,12 +31,12 @@ class WorkForm(flask_wtf.FlaskForm):
         choices=[(cls.identity(), cls.info.title) for cls in Work.iter_subclasses()],
         widget=BulmaSelect(),
     )
-    title = wtforms.StringField("Title", validators=[Optional()])
-    author = wtforms.StringField("Author", validators=[Optional()])
+    title = wtforms.StringField("Title", validators=[Optional()], filters=[NullFilter()])
+    author = wtforms.StringField("Author", validators=[Optional()], filters=[NullFilter()])
     release_date = wtforms.DateField("Release Date", validators=[Optional()])
-    description = wtforms.TextAreaField("Description", validators=[Optional()])
-    cover = wtforms.URLField("Cover image", validators=[Optional()])
-    background = wtforms.URLField("Background image", validators=[Optional()])
+    description = wtforms.TextAreaField("Description", validators=[Optional()], filters=[NullFilter()])
+    cover = wtforms.URLField("Cover image", validators=[Optional()], filters=[NullFilter()])
+    background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
     shelf = wtforms.SelectField(
         "Shelf",
         choices=[(s.value, s.title) for s in Shelf] + [("", "")],

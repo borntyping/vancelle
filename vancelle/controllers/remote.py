@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import typing
 import uuid
 
@@ -21,6 +22,7 @@ from vancelle.extensions import db
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
+from vancelle.shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -114,18 +116,29 @@ class RemotesController:
         return None
 
     def create_work(self, *, remote_id: str, remote_type: str, user: User) -> Work:
-        """Create a new remote and a new work."""
+        """
+        Create a new remote and a new work.
+        """
         manager = self.managers[remote_type]
-
         remote = manager.fetch(remote_id)
         work = manager.work_type(
             id=uuid.uuid4(),
             user=user,
             remotes=[remote],
+            shelf=self._assign_shelf(remote),
         )
         db.session.add(work)
         db.session.commit()
         return work
+
+    def _assign_shelf(self, remote: Remote) -> Shelf:
+        if remote.shelf is not None:
+            return remote.shelf
+
+        if not remote.release_date or remote.release_date > datetime.date.today():
+            return Shelf.UNRELEASED
+
+        return Shelf.UNSORTED
 
     def link_work(self, *, remote_id: str, remote_type: str, work_id: uuid.UUID) -> Work:
         """Create a new remote, linked to an existing work."""

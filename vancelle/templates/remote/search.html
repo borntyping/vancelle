@@ -16,9 +16,9 @@
 
   {% set title %}
     {% if work %}
-      Link {{ p.a(source.noun_full) }}
+      Link {{ p.a(remote_info.noun_full) }}
     {% else %}
-      Add {{ p.a(source.noun) }} to your collection
+      Add {{ p.a(remote_info.noun) }} to your collection
     {% endif %}
   {% endset %}
 

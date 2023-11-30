@@ -48,9 +48,6 @@ class RemotesController:
             if cls.identity() not in self.managers:
                 raise NotImplementedError(f"No manager registered for {cls.identity()} ({cls.info=})")
 
-    def _render_template(self, name: str, remote_type: str, **context: typing.Any) -> str:
-        return flask.render_template([f"remote/{remote_type}/{name}", f"remote/{name}"], remote_type=remote_type, **context)
-
     def _get_work_by_id(self, work_id: uuid.UUID) -> Work:
         return db.get_or_404(Work, work_id, description="Work not found")
 
@@ -163,10 +160,23 @@ class RemotesController:
         else:
             items = EmptyPagination()
 
-        return self._render_template("search.html", remote_type=remote_type, work=work, query=query, items=items)
+        return flask.render_template(
+            [f"remote/{remote_type}/search.html", "remote/search.html"],
+            remote_type=remote_type,
+            remote_info=self.managers[remote_type].remote_type.info,
+            work=work,
+            query=query,
+            items=items,
+        )
 
     def render_detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> str:
         remote = self._get_remote(remote_type=remote_type, remote_id=remote_id)
         work = self._get_work_by_id(work_id) if work_id else None
         context = self.managers[remote_type].context(remote)
-        return self._render_template("detail.html", remote_type=remote_type, remote=remote, work=work, **context)
+        return flask.render_template(
+            [f"remote/{remote_type}/detail.html", "remote/detail.html"],
+            remote_type=remote_type,
+            remote=remote,
+            work=work,
+            **context,
+        )

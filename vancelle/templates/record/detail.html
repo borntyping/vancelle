@@ -16,10 +16,17 @@
         method="post"
         action="{{ url_for('record.detail', work_id=record.work_id, record_id=record.id) }}"
         class="block">
-        {{ bulma_form_field(form.date_started) }}
-        {{ bulma_form_field(form.date_stopped) }}
-        {{ bulma_checkbox(form.date_sync) }}
+        <div class="columns mb-0">
+          <div class="column">
+            {{ bulma_form_field(form.date_started) }}
+          </div>
+          <div class="column">
+            {{ bulma_form_field(form.date_stopped) }}
+          </div>
+        </div>
         {{ bulma_form_field(form.notes, rows=5, cols=20, autocomplete='off', autocorrect='on', maxlength=256) }}
+        {{ bulma_checkbox(form.date_sync) }}
+
         {{ form.csrf_token }}
       </form>
       <div class="field is-grouped">

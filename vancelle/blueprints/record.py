@@ -6,7 +6,7 @@ import flask_login
 import structlog
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import BadRequest
-from wtforms import DateField, TextAreaField, BooleanField
+from wtforms import DateField, TextAreaField, BooleanField, StringField
 from wtforms.validators import Length, Optional
 
 from vancelle.controllers.record import RecordController
@@ -27,7 +27,7 @@ class RecordForm(FlaskForm):
     date_started = DateField("Started", validators=[Optional()])
     date_stopped = DateField("Stopped", validators=[Optional()])
     date_sync = BooleanField("Use start date for end date", default=False)
-    notes = TextAreaField("Notes", validators=[Optional(), Length(max=256)])
+    notes = StringField("Bookmark", validators=[Optional(), Length(max=256)])
 
 
 @bp.route("/", methods=["POST"])
@@ -50,7 +50,7 @@ def detail(work_id: uuid.UUID, record_id: uuid.UUID):
         form.populate_obj(record)
         db.session.add(record)
         db.session.commit()
-        return htmx.refresh()
+        return htmx.redirect(flask.url_for("work.detail", work_id=record.work_id))
 
     if htmx and form.errors:
         raise BadRequest()

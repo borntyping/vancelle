@@ -7,6 +7,7 @@ import flask_login
 import flask_sqlalchemy.pagination
 from sqlalchemy import func, select, nulls_last, Select, desc
 import structlog
+from sqlalchemy.orm import aliased
 
 from vancelle.extensions import db
 from vancelle.models import Base, User
@@ -85,13 +86,14 @@ class WorkController:
     def count(self, table: typing.Type[Base], **kwargs: typing.Any) -> int:
         return db.session.execute(select(func.count()).select_from(table).filter_by(**kwargs)).scalar_one()
 
-    def count_works_by_type(self) -> list[tuple[str, int]]:
-        stmt = select(Work.type, func.count()).select_from(Work).order_by(Work.type).group_by(Work.type)
-        return [(t, c) for t, c in db.session.execute(stmt)]
+    def count_works_by_type(self) -> list[tuple[str, typing.Type[Work], int]]:
+        return self._count_by_type(Work)
 
-    def count_remotes_by_type(self) -> list[tuple[str, int, RemoteInfo]]:
-        subclasses = {cls.identity(): cls for cls in Remote.iter_subclasses()}
-        counts = db.session.execute(
-            select(Remote.type, func.count()).select_from(Remote).order_by(Remote.type).group_by(Remote.type)
-        )
-        return list(sorted(((t, count, subclasses[t].info) for t, count in counts), key=lambda x: x[2].priority, reverse=True))
+    def count_remotes_by_type(self) -> list[tuple[str, typing.Type[Remote], int]]:
+        return self._count_by_type(Remote)
+
+    def _count_by_type(self, cls: typing.Type[Work | Remote]) -> list[tuple[str, typing.Type[Work | Remote], int]]:
+        subclasses = {cls.identity(): cls for cls in cls.iter_subclasses()}
+        count = func.count().label("count")
+        stmt = select(cls.type, count).select_from(cls).order_by(count.desc()).group_by(cls.type)
+        return [(t, subclasses[t], c) for t, c in db.session.execute(stmt)]

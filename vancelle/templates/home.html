@@ -28,13 +28,13 @@
       <div class="column">{{ gauge(users_count, 'user', url_for("user.index")) }}</div>
     </div>
     <div class="columns is-centered is-multiline">
-      {% for type, count in works_count_by_type %}
-        <div class="column">{{ gauge(count, type, url_for('work.index', type=type, remote_type=''), background='white', text='link') }}</div>
+      {% for type, cls, count in works_count_by_type %}
+        <div class="column">{{ gauge(count, cls.info.title, url_for('work.index', type=type, remote_type=''), background='white', text='link') }}</div>
       {% endfor %}
     </div>
     <div class="columns is-centered is-multiline">
-      {% for remote_type, count, info in remote_count_by_type %}
-        <div class="column">{{ gauge(count, info.noun_full, url_for('work.index', type='', remote_type=remote_type), background=info.color, text='%s-invert' % info.color) }}</div>
+      {% for remote_type, cls, count in remote_count_by_type %}
+        <div class="column">{{ gauge(count, cls.info.noun_full, url_for('work.index', type='', remote_type=remote_type), background=cls.info.color, text='%s-invert' % cls.info.color) }}</div>
       {% endfor %}
     </div>
   </section>

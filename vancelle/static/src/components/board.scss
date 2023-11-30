@@ -1,8 +1,8 @@
 @import "bulma/sass/utilities/mixins";
 @import "bulma/sass/elements/box";
 
-$text: 3fr;
-$cover: 2fr;
+$x-board-card-text: 3fr;
+$x-board-card-cover: 2fr;
 
 .x-board-card {
   @extend .box;
@@ -10,7 +10,7 @@ $cover: 2fr;
   @extend .m-0;
 
   display: grid !important;
-  grid-template-columns: $text $cover;
+  grid-template-columns: $x-board-card-text $x-board-card-cover;
   overflow: hidden;
   height: 100%;
 
@@ -71,7 +71,7 @@ $cover: 2fr;
       }
 
       .x-board-card {
-        grid-template-columns: calc($text + $cover + $text) $cover;
+        grid-template-columns: calc($x-board-card-text + $x-board-card-cover + $x-board-card-text) $x-board-card-cover;
       }
     }
 

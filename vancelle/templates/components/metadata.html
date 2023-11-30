@@ -32,16 +32,14 @@
 {% macro details_combined_title(details, href = None) %}
   {{ _details_title(details, href=href) }}
   {% if details.author or details.release_date -%}
-    <span class="has-text-grey">({%- if details.author -%}{{ details.author|absent }}{%- endif -%}
-      {%- if details.author and details.release_date -%}, {% endif -%}
-      {%- if details.release_date -%}{{ details.release_date.year }}{%- endif -%})</span>
+    <span class="has-text-grey">({{ details_combined_authorship(details) }})</span>
   {%- endif -%}
 {% endmacro %}
 
 {%- macro details_combined_authorship(details) -%}
-  {%- if details.author %}{{ details.author }}{% endif -%}
-  {%- if details.author and details.release_date %}, {% endif -%}
   {%- if details.release_date %}{{ details.release_date.year }}{% endif -%}
+  {%- if details.author and details.release_date %}, {% endif -%}
+  {%- if details.author %}{{ details.author }}{% endif -%}
 {%- endmacro -%}
 
 {%- macro _style_background_image(details) -%}

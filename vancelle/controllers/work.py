@@ -5,13 +5,14 @@ import uuid
 
 import flask_login
 import flask_sqlalchemy.pagination
-from sqlalchemy import func, select, nulls_last, Select, desc
+from sqlalchemy import any_, asc, exists, func, select, nulls_last, Select, desc
 import structlog
 from sqlalchemy.orm import aliased
+from sqlalchemy.sql.functions import coalesce
 
 from vancelle.extensions import db
 from vancelle.models import Base, User
-from vancelle.models.remote import Remote, RemoteInfo
+from vancelle.models.remote import ImportedWork, Remote, RemoteInfo
 from vancelle.models.record import Record
 from vancelle.models.work import Work
 from vancelle.shelf import Shelf
@@ -27,15 +28,18 @@ class WorkController:
         user: User = flask_login.current_user,
         work_type: str,
         remote_type: str,
+        has_remote: typing.Literal["", "yes", "no"],
     ) -> Select[tuple[Work]]:
         statement = (
             select(Work)
             .filter_by(user_id=user.id)
             .filter_by(time_deleted=None)
             .join(Record, isouter=True)
+            .join(Remote, isouter=True)
             .order_by(
                 nulls_last(desc(Record.date_stopped)),
                 nulls_last(desc(Record.date_started)),
+                nulls_last(desc(coalesce(Work.release_date, Remote.release_date))),
                 desc(Work.time_created),
             )
         )
@@ -44,7 +48,15 @@ class WorkController:
             statement = statement.filter(Work.type == work_type)
 
         if remote_type:
-            statement = statement.join(Remote).filter(Remote.type == remote_type)
+            statement = statement.filter(Remote.type == remote_type)
+
+        imported = ImportedWork.__mapper__.polymorphic_identity
+        if has_remote == "yes":
+            statement = statement.filter(Work.remotes.any(Remote.type != imported))
+        elif has_remote == "imported":
+            statement = statement.filter(~Work.remotes.any(Remote.type != imported))
+        elif has_remote == "no":
+            statement = statement.filter(~Work.remotes.any())
 
         return statement
 

@@ -30,16 +30,22 @@ class ToggleItem:
 
 @dataclasses.dataclass()
 class Toggle:
-    mapping: typing.Mapping[str, str]
-
     key: str
     value: str | None
-    default: str | None
+    default: str | None = dataclasses.field(repr=False)
 
-    args: typing.Mapping[str, typing.Any]
+    mapping: typing.Mapping[str, str] = dataclasses.field(repr=False)
+    args: typing.Mapping[str, typing.Any] = dataclasses.field(repr=False)
 
     @classmethod
-    def from_request(cls, mapping: typing.Mapping[str, str], key: str, *, default: str = "", **kwargs):
+    def from_request(
+        cls,
+        key: str,
+        *,
+        mapping: typing.Mapping[str, str],
+        default: str = "",
+        args: typing.Mapping[str, str | None] = None,
+    ):
         if key in flask.request.args:
             value = flask.request.args[key]
         elif key in flask.request.cookies:
@@ -50,7 +56,10 @@ class Toggle:
         if default == "":
             mapping = {"": "All", **mapping}
 
-        return cls(mapping=mapping, key=key, value=value, default=default, args=kwargs)
+        if args is None:
+            args = {}
+
+        return cls(mapping=mapping, key=key, value=value, default=default, args=args)
 
     def __iter__(self) -> typing.Iterable[ToggleItem]:
         for value, title in self.mapping.items():

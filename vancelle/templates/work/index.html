@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
-{% set toggles %}
-  <div class="container is-flex is-flex-wrap-wrap is-align-content-flex-start x-gap-4">
-    {{ layout }}
-    {{ work_type }}
-    {{ remote_type }}
-  </div>
-{% endset %}
-
 {% block before %}
   <section class="has-background-white-bis py-4">
-    {{ toggles }}
+    <div class="container is-flex is-flex-wrap-wrap is-align-content-flex-start x-gap-4">
+      {{ layout }}
+      {{ work_type }}
+      {{ has_remote }}
+      {{ remote_type }}
+      <a href="{{ url_for('work.index') }}" class="tag is-rounded is-medium is-primary">
+        <span class="is-size-7">{{ n('result', total) }}</span>
+      </a>
+    </div>
   </section>
 {% endblock %}

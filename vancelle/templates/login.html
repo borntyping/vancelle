@@ -3,7 +3,7 @@
 
 {% block content %}
   <div class="container is-max-desktop">
-    <form action="{{ url_for('user.login'gs) }}" method="post" class="box">
+    <form action="{{ url_for('user.login') }}" method="post" class="box">
       {{ form.csrf_token }}
       {{ bulma_form_field(form.username, placeholder='Username') }}
       {{ bulma_form_field(form.password, placeholder='Password') }}

@@ -89,22 +89,50 @@ def create():
 
 @bp.route("/works/")
 def index():
-    layout = Toggle.from_request({"board": "Board", "table": "Table"}, "layout", default="board")
-    work_type = Toggle.from_request({cls.identity(): cls.info.title for cls in Work.iter_subclasses()}, "type")
-    remote_type = Toggle.from_request({cls.identity(): cls.info.noun_full for cls in Remote.iter_subclasses()}, "remote_type")
+    layout = Toggle.from_request("layout", mapping={"board": "Board", "table": "Table"}, default="board")
+    work_type = Toggle.from_request(
+        "type",
+        mapping={cls.identity(): cls.info.title for cls in Work.iter_subclasses()},
+        args=dict(remote_type=None),
+    )
+    remote_type = Toggle.from_request(
+        "remote_type",
+        mapping={cls.identity(): cls.info.noun_full for cls in Remote.iter_subclasses()},
+        args=dict(type=None),
+    )
+    has_remote = Toggle.from_request(
+        "has_remote",
+        mapping={
+            "": "All",
+            "yes": "Has remote data",
+            "imported": "Has only imported data",
+            "no": "No remote data",
+        },
+    )
 
-    statement = controller.select(user=flask_login.current_user, work_type=work_type.value, remote_type=remote_type.value)
-    context = dict(layout=layout, work_type=work_type, remote_type=remote_type)
+    statement = controller.select(
+        user=flask_login.current_user,
+        work_type=work_type.value,
+        remote_type=remote_type.value,
+        has_remote=has_remote.value,
+    )
+    context = dict(
+        layout=layout,
+        work_type=work_type,
+        remote_type=remote_type,
+        has_remote=has_remote,
+    )
 
-    logger.debug("Loaded toggles", layout=layout.value, work_type=work_type.value, remote_type=remote_type.value)
+    logger.debug("Loaded toggles", **context)
 
     match layout.value:
         case "board":
             shelves = controller.shelves(statement=statement)
-            page = flask.render_template("work/index_board.html", **context, shelves=shelves)
+            total = sum(len(v) for v in shelves.values())
+            page = flask.render_template("work/index_board.html", **context, shelves=shelves, total=total)
         case "table":
             works = controller.table(statement=statement)
-            page = flask.render_template("work/index_table.html", **context, works=works)
+            page = flask.render_template("work/index_table.html", **context, works=works, total=works.total)
         case _:
             raise BadRequest(f"Unknown layout {layout!r}")
 

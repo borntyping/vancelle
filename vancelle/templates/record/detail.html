@@ -14,7 +14,7 @@
       <form
         id="record"
         method="post"
-        action="{{ url_for('records.detail', work_id=record.work_id, record_id=record.id) }}"
+        action="{{ url_for('record.detail', work_id=record.work_id, record_id=record.id) }}"
         class="block">
         {{ bulma_form_field(form.date_started) }}
         {{ bulma_form_field(form.date_stopped) }}
@@ -28,7 +28,7 @@
             <button
               type="submit"
               formmethod="post"
-              formaction="{{ url_for('records.restore', work_id=record.work_id, record_id=record.id) }}"
+              formaction="{{ url_for('record.restore', work_id=record.work_id, record_id=record.id) }}"
               class="button is-light is-success app-ellipsis-indicator">Restore
             </button>
           </form>
@@ -36,7 +36,7 @@
             <button
               type="submit"
               formmethod="post"
-              formaction="{{ url_for('records.permanently_delete', work_id=record.work_id, record_id=record.id) }}"
+              formaction="{{ url_for('record.permanently_delete', work_id=record.work_id, record_id=record.id) }}"
               class="button is-light app-ellipsis-indicator">Delete permanently
             </button>
           </form>
@@ -45,7 +45,7 @@
             <button
               type="submit"
               formmethod="post"
-              formaction="{{ url_for('records.delete', work_id=record.work_id, record_id=record.id) }}"
+              formaction="{{ url_for('record.delete', work_id=record.work_id, record_id=record.id) }}"
               class="button is-danger is-light app-ellipsis-indicator">Delete
             </button>
           </form>

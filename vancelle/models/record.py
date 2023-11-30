@@ -34,7 +34,7 @@ class Record(Base):
         return self.time_deleted is not None
 
     def url_for(self) -> str:
-        return url_for("records.detail", work_id=self.work_id, record_id=self.id)
+        return url_for("record.detail", work_id=self.work_id, record_id=self.id)
 
     def entry_properties(self):
         yield StringProperty("Started", self.date_started)

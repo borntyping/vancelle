@@ -14,7 +14,7 @@ from vancelle.extensions import db, htmx
 
 logger = structlog.get_logger(logger_name=__name__)
 controller = RecordController()
-bp = flask.Blueprint("records", __name__, url_prefix="/<uuid:work_id>/records")
+bp = flask.Blueprint("record", __name__, url_prefix="/<uuid:work_id>/records")
 
 
 @bp.before_request
@@ -31,11 +31,11 @@ class RecordForm(FlaskForm):
 
 
 @bp.route("/", methods=["POST"])
-def create(work_id: uuid.UUID):
+def new(work_id: uuid.UUID):
     started_today = flask.request.args.get("started_today", default=False, type=bool)
     stopped_today = flask.request.args.get("stopped_today", default=False, type=bool)
-    record = controller.create(work_id, started_today=started_today, stopped_today=stopped_today)
-    return htmx.redirect(record.url_for())
+    controller.create(work_id, started_today=started_today, stopped_today=stopped_today)
+    return htmx.refresh()
 
 
 @bp.route("/<uuid:record_id>/", methods={"GET", "POST"})

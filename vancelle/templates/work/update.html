@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% from 'components/layout.html' import section %}
-{% from 'components/forms.html' import bulma_form_field %}
+{% from 'components/work/form.html' import block_edit_work %}
 {% from 'components/controls.html' import control_work_update, control_work_delete, control_work_restore, control_work_permanently_delete %}
 {% from 'components/metadata.html' import details_combined_title %}
 
@@ -16,14 +16,7 @@
         action="{{ url_for('work.update', work_id=work.id) }}"
         class="block">
         {{ form.csrf_token }}
-        {{ bulma_form_field(form.type) }}
-        {{ bulma_form_field(form.title, placeholder=details.title) }}
-        {{ bulma_form_field(form.author, placeholder=details.author) }}
-        {{ bulma_form_field(form.description, placeholder=details.description) }}
-        {{ bulma_form_field(form.release_date) }}
-        {{ bulma_form_field(form.cover, placeholder=details.cover) }}
-        {{ bulma_form_field(form.background, placeholder=details.background) }}
-        {{ bulma_form_field(form.shelf, placeholder=details.shelf) }}
+        {{ block_edit_work(form, details=details) }}
       </form>
       <div class="block">
         <div class="field is-grouped">

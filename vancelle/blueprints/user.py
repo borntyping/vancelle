@@ -9,6 +9,7 @@ import sqlalchemy.exc
 import sqlalchemy.orm
 import structlog
 import werkzeug.security
+import werkzeug.exceptions
 import wtforms
 
 from vancelle.controllers.user import UserController
@@ -33,22 +34,23 @@ class ImportForm(flask_wtf.FlaskForm):
     backup = flask_wtf.file.FileField("Backup", validators=[flask_wtf.file.FileRequired()])
 
 
+@bp.app_errorhandler(werkzeug.exceptions.Unauthorized)
 @bp.route("/user/login", methods={"get", "post"})
-def login():
+def login(exception: werkzeug.exceptions.Unauthorized | None = None):
     form = LoginForm()
 
     if not form.validate_on_submit():
-        return flask.render_template("login.html", form=form)
+        return flask.render_template("login.html", form=form, exception=exception)
 
     try:
         user = db.session.execute(sqlalchemy.select(User).filter_by(username=form.username.data)).scalar_one()
     except sqlalchemy.exc.NoResultFound:
         form.username.errors.append("Unknown username")
-        return flask.render_template("login.html", form=form)
+        return flask.render_template("login.html", form=form, exception=exception)
 
     if not werkzeug.security.check_password_hash(user.password, form.password.data):
         form.password.errors.append("Incorrect password")
-        return flask.render_template("login.html", form=form)
+        return flask.render_template("login.html", form=form, exception=exception)
 
     flask_login.login_user(user, remember=True)
     flask.flash(f"Logged in as {user.username}", "Logged in")

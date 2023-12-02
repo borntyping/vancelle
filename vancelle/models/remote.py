@@ -257,9 +257,6 @@ class RoyalroadFiction(Remote):
     def external_url(self) -> str:
         return f"https://www.royalroad.com/fiction/{self.id}"
 
-    def into_properties(self) -> typing.Iterable[StringProperty]:
-        yield UrlProperty("URL", self.external_url())
-
 
 class SteamApplication(Remote):
     __mapper_args__ = {"polymorphic_identity": "steam.application"}

@@ -3,5 +3,5 @@
 {% from "components/remote/section.html" import section_remote %}
 
 {% block content %}
-  {{ section_remote(remote, work=work, h1=True) }}
+  {{ section_remote(remote, show_attached_work=True, candidate_work=work, h1=True) }}
 {% endblock %}

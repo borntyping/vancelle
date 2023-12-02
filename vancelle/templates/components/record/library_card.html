@@ -78,7 +78,7 @@
         <tr>
           <td class="has-text-centered">
             <form>
-              {{ form_button(url_for('record.new', work_id=work.id), button_title='Create a new record, with a start date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Started today') }}
+              {{ form_button(url_for('record.new', work_id=work.id, started_today=True), button_title='Create a new record, with a start date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Started today') }}
             </form>
           </td>
           <td class="has-text-centered">

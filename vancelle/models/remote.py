@@ -126,11 +126,10 @@ class Remote(Base, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield StringProperty("ID", self.id)
-        yield UrlProperty("URL", self.external_url())
+        yield UrlProperty(self.info.source, self.external_url())
 
     def more_properties(self) -> typing.Iterable[Property]:
-        return []
+        yield StringProperty("ID", self.id)
 
     @classmethod
     def identity(cls) -> str:
@@ -298,6 +297,9 @@ class TmdbMovie(Remote):
         priority=30,
     )
 
+    def external_url(self) -> str | None:
+        return f"https://www.themoviedb.org/movie/{self.id}"
+
 
 class TmdbTvSeries(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.tv"}
@@ -307,3 +309,6 @@ class TmdbTvSeries(Remote):
         noun="series",
         priority=31,
     )
+
+    def external_url(self) -> str | None:
+        return f"https://www.themoviedb.org/tv/{self.id}"

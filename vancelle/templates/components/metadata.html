@@ -29,18 +29,17 @@
   {%- endif -%}
 {% endmacro %}
 
+{%- macro _details_date_and_author(details) -%}
+  <span title="{{ details.release_date|absent }}">{{ details.release_date.year if details.release_date else absent }}</span>,
+  <span title="{{ details.author|absent }}">{{ details.author|truncate(50) if details.author else absent }}</span>
+{%- endmacro -%}
+
 {% macro details_combined_title(details, href = None) %}
   {{ _details_title(details, href=href) }}
   {% if details.author or details.release_date -%}
-    <span class="has-text-grey">({{ details_combined_authorship(details) }})</span>
+    <span class="has-text-grey">({{ _details_date_and_author(details) }})</span>
   {%- endif -%}
 {% endmacro %}
-
-{%- macro details_combined_authorship(details) -%}
-  {%- if details.release_date %}{{ details.release_date.year }}{% endif -%}
-  {%- if details.author and details.release_date %}, {% endif -%}
-  {%- if details.author %}{{ details.author }}{% endif -%}
-{%- endmacro -%}
 
 {%- macro _style_background_image(details) -%}
   {%- if details.background -%}
@@ -65,7 +64,7 @@
     </figure>
     <div class="x-title">
       <h3 class="title is-4">{{ _details_title(details) }}</h3>
-      <p class="subtitle is-6">{{ details_combined_authorship(details) }}</p>
+      <p class="subtitle is-6">{{ _details_date_and_author(details) }}</p>
       {% if caller is defined %}
         {{ caller() }}
       {% else %}

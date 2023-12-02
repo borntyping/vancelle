@@ -26,5 +26,4 @@ Improvements
 Bugs
 ----
 
-* External links for TMDB remotes are missing.
 * Properties "table" still renders one property oddly.

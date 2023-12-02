@@ -99,13 +99,16 @@ class WorkController:
         return db.session.execute(select(func.count()).select_from(table).filter_by(**kwargs)).scalar_one()
 
     def count_works_by_type(self) -> list[tuple[str, typing.Type[Work], int]]:
-        return self._count_by_type(Work)
+        return self._count_by_type(Work, {cls.work_type(): cls for cls in Work.iter_subclasses()})
 
     def count_remotes_by_type(self) -> list[tuple[str, typing.Type[Remote], int]]:
-        return self._count_by_type(Remote)
+        return self._count_by_type(Remote, {cls.remote_type(): cls for cls in Remote.iter_subclasses()})
 
-    def _count_by_type(self, cls: typing.Type[Work | Remote]) -> list[tuple[str, typing.Type[Work | Remote], int]]:
-        subclasses = {cls.identity(): cls for cls in cls.iter_subclasses()}
+    def _count_by_type(
+        self,
+        cls: typing.Type[Work | Remote],
+        subclasses: typing.Mapping[str, typing.Type[Work | Remote]],
+    ) -> list[tuple[str, typing.Type[Work | Remote], int]]:
         count = func.count().label("count")
         stmt = select(cls.type, count).select_from(cls).order_by(count.desc()).group_by(cls.type)
         return [(t, subclasses[t], c) for t, c in db.session.execute(stmt)]

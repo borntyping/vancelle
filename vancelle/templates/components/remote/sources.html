@@ -7,7 +7,7 @@
       <div class="columns is-multiline is-centered">
         {% for cls in subclasses %}
           <div class="column is-4 has-text-centered">
-            <a href="{{ url_for('remote.search_source', remote_type=cls.identity(), work_id=work_id) }}" class="button is-{{ cls.info.color }} is-fullwidth">
+            <a href="{{ url_for('remote.search_source', remote_type=cls.remote_type(), work_id=work_id) }}" class="button is-{{ cls.info.color }} is-fullwidth">
               Search {{ cls.info.full_plural }}
             </a>
           </div>

@@ -28,7 +28,7 @@ bp = flask.Blueprint("work", __name__, url_prefix="")
 class WorkForm(flask_wtf.FlaskForm):
     type = wtforms.SelectField(
         "Type",
-        choices=[(cls.identity(), cls.info.title) for cls in Work.iter_subclasses()],
+        choices=[(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
         widget=BulmaSelect(),
     )
     title = wtforms.StringField("Title", validators=[Optional()], filters=[NullFilter()])
@@ -92,12 +92,12 @@ def index():
     layout = Toggle.from_request("layout", mapping={"board": "Board", "table": "Table"}, default="board")
     work_type = Toggle.from_request(
         "type",
-        mapping={cls.identity(): cls.info.title for cls in Work.iter_subclasses()},
+        mapping={cls.work_type(): cls.info.title for cls in Work.iter_subclasses()},
         args=dict(remote_type=None),
     )
     remote_type = Toggle.from_request(
         "remote_type",
-        mapping={cls.identity(): cls.info.noun_full for cls in Remote.iter_subclasses()},
+        mapping={cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()},
         args=dict(type=None),
     )
     has_remote = Toggle.from_request(

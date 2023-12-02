@@ -121,7 +121,7 @@ class Work(Base, IntoDetails):
         )
 
     @classmethod
-    def identity(cls) -> str:
+    def work_type(cls) -> str:
         assert cls.__mapper__.polymorphic_identity is not None
         return cls.__mapper__.polymorphic_identity
 

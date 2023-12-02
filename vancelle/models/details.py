@@ -41,6 +41,7 @@ class UrlProperty(Property):
     name: str
     link: str | None
     text: str | None = None
+    external: bool = True
 
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
@@ -50,8 +51,19 @@ class UrlProperty(Property):
             return self.absent()
 
         text = self.text or urllib.parse.urlparse(self.link).hostname
-        external_link = flask.get_template_attribute("components/links.html", "external_link")
-        return external_link(href=self.link, text=text)
+
+        if not self.external:
+            return self.internal_link(href=self.link, text=text)
+
+        return self.external_link(href=self.link, text=text)
+
+    def internal_link(self, *args, **kwargs) -> str:
+        macro = flask.get_template_attribute("components/links.html", "internal_link")
+        return macro(*args, **kwargs)
+
+    def external_link(self, *args, **kwargs) -> str:
+        macro = flask.get_template_attribute("components/links.html", "external_link")
+        return macro(*args, **kwargs)
 
 
 @dataclasses.dataclass()

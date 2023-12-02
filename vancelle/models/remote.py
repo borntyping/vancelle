@@ -132,7 +132,7 @@ class Remote(Base, IntoDetails, IntoProperties):
         yield StringProperty("ID", self.id)
 
     @classmethod
-    def identity(cls) -> str:
+    def remote_type(cls) -> str:
         assert cls.__mapper__.polymorphic_identity is not None
         return cls.__mapper__.polymorphic_identity
 
@@ -276,6 +276,16 @@ class SteamApplication(Remote):
     def into_properties(self) -> typing.Iterable[Property]:
         yield from super().into_properties()
         yield UrlProperty("Website", self.data.get("website"))
+
+        if fullgame := self.data.get("fullgame"):
+            url = url_for("remote.detail", remote_type=self.remote_type(), remote_id=fullgame["appid"])
+            yield UrlProperty("Full game", url, fullgame["name"], external=False)
+
+        if dlc := self.data.get("dlc"):
+            for appid in dlc:
+                url = url_for("remote.detail", remote_type=self.remote_type(), remote_id=appid)
+                yield UrlProperty("DLC", url, appid, external=False)
+
         yield IterableProperty("Developers", [d for d in self.data.get("developers", []) if d])
         yield IterableProperty("Publishers", [p for p in self.data.get("publishers", []) if p])
 

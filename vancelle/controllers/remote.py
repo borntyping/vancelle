@@ -44,11 +44,11 @@ class RemotesController:
     managers: typing.Mapping[str, Manager]
 
     def __init__(self, managers: typing.Iterable[Manager] = DEFAULT_MANAGERS) -> None:
-        self.managers = {m.remote_type.identity(): m for m in managers}
+        self.managers = {m.remote_type.remote_type(): m for m in managers}
 
         for cls in Remote.iter_subclasses():
-            if cls.identity() not in self.managers:
-                raise NotImplementedError(f"No manager registered for {cls.identity()} ({cls.info=})")
+            if cls.remote_type() not in self.managers:
+                raise NotImplementedError(f"No manager registered for {cls.remote_type()} ({cls.info=})")
 
     def _get_work_by_id(self, work_id: uuid.UUID) -> Work:
         return db.get_or_404(Work, work_id, description="Work not found")

@@ -64,7 +64,7 @@
       {%- endif -%}
     </figure>
     <div class="x-title">
-      <h3 class="title is-4">{{ _details_title(details, href=href) }}</h3>
+      <h3 class="title is-4">{{ _details_title(details) }}</h3>
       <p class="subtitle is-6">{{ details_combined_authorship(details) }}</p>
       {% if caller is defined %}
         {{ caller() }}

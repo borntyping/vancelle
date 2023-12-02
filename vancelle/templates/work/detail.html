@@ -53,7 +53,7 @@
   {% call section(title=work.type|capitalize, subtitle=work.id, controls=controls, h1=True) %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
-        {% call panel_details(details, href=work.url_for()) %}
+        {% call panel_details(details) %}
           {{ _form_change_shelf(work, details) }}
         {% endcall %}
       </div>

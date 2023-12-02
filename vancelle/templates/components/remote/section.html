@@ -20,7 +20,7 @@
   {% endset %}
   {%- call section(title=remote.info.noun_full, subtitle=remote.id, controls=controls, h1=h1) -%}
     <div class="columns x-has-fullheight-containers">
-      <div class="column">{{ panel_details(details=remote.into_details(), href=remote.url_for(work=work), color=remote.info.color) }}</div>
+      <div class="column">{{ panel_details(details=remote.into_details(), color=remote.info.color) }}</div>
       <div class="column">{{ panel_properties(remote=remote) }}</div>
     </div>
   {%- endcall -%}

@@ -15,20 +15,21 @@ class Shelf(enum.Enum):
     """
 
     UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", "outer-left", False)
-    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", "outer-left")
+    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", "outer-left", False)
     UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", "outer-left")
+
     UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", "inner-left")
 
     PLAYING = ("playing", "Playing", "Currently reading/playing/watching", "center")
     REPLAYING = ("replaying", "Replaying", "Returning to a completed work", "center", False)
     INFINITE = ("infinite", "Infinite", "An unending or long-term work", "center", False)
 
-    PAUSED = ("paused", "Paused", "Might continue soon", "inner-right", False)
-    SHELVED = ("shelved", "Shelved", "Might continue one day", "inner-right")
-    REFERENCE = ("reference", "Reference", "Reference material with no status", "inner-right")
+    PAUSED = ("paused", "Paused", "Might continue soon", "inner-right")
+    SHELVED = ("shelved", "Shelved", "Might continue one day", "inner-right", False)
+    REFERENCE = ("reference", "Reference", "Reference material with no status", "inner-right", False)
 
     COMPLETED = ("completed", "Completed", "A completed work - well done!", "outer-right")
-    ABANDONED = ("abandoned", "Abandoned", "Gave up on", "outer-right")
+    ABANDONED = ("abandoned", "Abandoned", "Gave up on", "outer-right", False)
 
     title: str
     description: str

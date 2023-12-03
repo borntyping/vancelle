@@ -20,6 +20,7 @@ $custom-colors: (
         "upcoming": ($yellow, findColorInvert($yellow)),
         "playing": ($green, findColorInvert($green)),
         "replaying": ($turquoise, findColorInvert($turquoise)),
+        "ongoing": ($turquoise, findColorInvert($turquoise)),
         "infinite": ($turquoise, findColorInvert($turquoise)),
         "paused": ($cyan, findColorInvert($cyan)),
         "shelved": ($blue, findColorInvert($blue)),

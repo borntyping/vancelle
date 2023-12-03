@@ -41,7 +41,8 @@ class Shelf(enum.Enum):
 
     PLAYING = ("playing", "Playing", "Currently reading/playing/watching", Shelves.PLAYING)
     REPLAYING = ("replaying", "Replaying", "Returning to a completed work", Shelves.PLAYING, False)
-    INFINITE = ("infinite", "Infinite", "An unending or long-term work", Shelves.PLAYING, False)
+    ONGOING = ("ongoing", "Ongoing", "A long-term or incomplete work", Shelves.PLAYING, False)
+    INFINITE = ("infinite", "Infinite", "A work that won't be completed", Shelves.PLAYING, False)
 
     PAUSED = ("paused", "Paused", "Might continue soon", Shelves.PAUSED)
     SHELVED = ("shelved", "Shelved", "Might continue one day", Shelves.PAUSED, False)

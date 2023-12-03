@@ -1,3 +1,4 @@
+import itertools
 import uuid
 
 import flask.sansio.blueprints
@@ -24,6 +25,10 @@ controller = WorkController()
 
 bp = flask.Blueprint("work", __name__, url_prefix="")
 
+SHELF_CHOICES = {
+    key: [(s.value, s.title) for s in group] for key, group in itertools.groupby(Shelf, key=lambda s: s.shelves.value)
+}
+
 
 class WorkForm(flask_wtf.FlaskForm):
     type = wtforms.SelectField(
@@ -39,7 +44,7 @@ class WorkForm(flask_wtf.FlaskForm):
     background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
     shelf = wtforms.SelectField(
         "Shelf",
-        choices=[(s.value, s.title) for s in Shelf] + [("", "")],
+        choices=SHELF_CHOICES | {"Other": [("", "Clear shelf")]},
         coerce=lambda x: Shelf(x) if x else None,  # type: ignore
         widget=BulmaSelect(),
         validators=[Optional()],

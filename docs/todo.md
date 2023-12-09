@@ -20,7 +20,6 @@ Improvements
 ------------
 
 * Add `[+]` button to `[n items]` tags on board columns.
-* Present dates where the start and end date are the same better.
 
 Bugs
 ----

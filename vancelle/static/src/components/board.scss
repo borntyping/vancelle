@@ -22,13 +22,6 @@ $x-board-card-cover: 2fr;
     overflow: hidden;
   }
 
-  & p {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
   & figure img {
     object-fit: cover;
     aspect-ratio: 2/3;

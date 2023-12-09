@@ -1,18 +1,38 @@
 {% extends 'work/index.html' %}
 
 {% from 'components/work/small_card.html' import small_card %}
+{% from 'components/work/work.html' import work_type_tag %}
+
+{% macro date_span(started, stopped) %}
+  {% if started == stopped and started and stopped %}
+    {{ started|date }}
+  {% else %}
+    {%- if started -%}
+      {{ started|date }}
+    {%- endif -%}
+    <span>&mdash;</span>
+    {%- if stopped -%}
+      {{ stopped|date }}
+    {%- endif -%}
+  {% endif %}
+{% endmacro %}
 
 {% macro board_card(work, details, colour) %}
   <div class="x-board-card has-background-{{ colour }}-light" title="{{ details }}">
-    <div class="x-board-details p-3">
-      <p class="title is-7"><a href="{{ work.url_for() }}">{{ details.title|absent }}</a></p>
-      <p class="subtitle is-7 mb-1">
-        <span title="{{ details.release_date|absent }}">{{ details.release_date.year if details.release_date else absent }}</span>,
-        <span>{{ details.author|absent }}</span>
-      </p>
-      {% set record = work.get_record() %}
-      <p class="is-size-7">{{ record.date_started|date if record else absent }}</p>
-      <p class="is-size-7">{{ record.date_stopped|date if record else absent }}</p>
+    <div class="x-board-details p-3 is-flex is-flex-direction-column is-justify-content-space-between">
+      <div>
+        <p class="title is-7"><a href="{{ work.url_for() }}">{{ details.title|absent }}</a></p>
+        <p class="subtitle is-7 mb-3">
+          <span title="{{ details.release_date|absent }}">{{ details.release_date.year if details.release_date else absent }}</span>,
+          <span>{{ details.author|absent }}</span>
+        </p>
+      </div>
+      <div>
+        {% set record = work.get_record() %}
+        {% if record %}
+          <p class="is-size-7">{{ date_span(record.date_started, record.date_stopped) }}</p>
+        {% endif %}
+      </div>
     </div>
     <figure class="has-background-{{ colour }}">
       {% if details.cover %}

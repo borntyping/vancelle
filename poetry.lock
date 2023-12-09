@@ -306,6 +306,25 @@ files = [
 Flask = ">=0.9"
 
 [[package]]
+name = "flask-debugtoolbar"
+version = "0.14.1"
+description = "A toolbar overlay for debugging Flask applications."
+optional = false
+python-versions = ">=2.7"
+files = [
+    {file = "Flask-DebugToolbar-0.14.1.tar.gz", hash = "sha256:ccd6a72119ea4f7c486823591b2b2f4a14dc7fb38d6bd495272e0ebdc08724cd"},
+    {file = "Flask_DebugToolbar-0.14.1-py3-none-any.whl", hash = "sha256:3b938b02c418ac86fc18431f484dcd459f24acf3d0c1e72131c06413863bcf04"},
+]
+
+[package.dependencies]
+Blinker = "*"
+Flask = ">=0.8"
+itsdangerous = "*"
+MarkupSafe = "*"
+packaging = "*"
+werkzeug = "*"
+
+[[package]]
 name = "flask-injector"
 version = "0.15.0"
 description = "Adds Injector, a Dependency Injection framework, support to Flask."
@@ -1054,6 +1073,22 @@ security = ["itsdangerous (>=2.0)"]
 yaml = ["pyyaml (>=5.4)"]
 
 [[package]]
+name = "setuptools"
+version = "69.0.2"
+description = "Easily download, build, install, upgrade, and uninstall Python packages"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "setuptools-69.0.2-py3-none-any.whl", hash = "sha256:1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2"},
+    {file = "setuptools-69.0.2.tar.gz", hash = "sha256:735896e78a4742605974de002ac60562d286fa8051a7e2299445e8e8fbb01aa6"},
+]
+
+[package.extras]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
+testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8-2020", "ini2toml[lite] (>=0.9)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pip (>=19.1)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-perf", "pytest-ruff", "pytest-timeout", "pytest-xdist", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
+testing-integration = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "packaging (>=23.1)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1282,4 +1317,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "43f0d3fc4f3af47db3eec4c66875aeedd4706c6be9a9c2b065deb70cb9a99c9b"
+content-hash = "1b61393cb7884948af13770b03083fb57ee83cf0c12bf8a60440a9c96a002eff"

@@ -13,7 +13,7 @@ from .blueprints.remote import bp as bp_remote
 from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
 from .ext.structlog import configure_logging
-from .extensions import apis, cors, db, html, htmx, login_manager
+from .extensions import apis, cors, db, debug_toolbar, html, htmx, login_manager
 from .shelf import Shelf
 
 configure_logging()
@@ -28,6 +28,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
 
     cors.init_app(app)
     db.init_app(app)
+    debug_toolbar.init_app(app)
     login_manager.init_app(app)
 
     apis.init_app(app)

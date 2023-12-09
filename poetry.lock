@@ -1089,6 +1089,7 @@ blinker = {version = ">=1.1", optional = true, markers = "extra == \"flask\""}
 certifi = "*"
 flask = {version = ">=0.11", optional = true, markers = "extra == \"flask\""}
 markupsafe = {version = "*", optional = true, markers = "extra == \"flask\""}
+sqlalchemy = {version = ">=1.2", optional = true, markers = "extra == \"sqlalchemy\""}
 urllib3 = {version = ">=1.26.11", markers = "python_version >= \"3.6\""}
 
 [package.extras]
@@ -1366,4 +1367,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "09f9c4c0b567056df47774e4347ab3f06e504361de75b5ca8960eced1cdb3e01"
+content-hash = "31f03c1c231438b212c7958fc677eb3eb392ca8b2ae86c34edcd9d49a201b37d"

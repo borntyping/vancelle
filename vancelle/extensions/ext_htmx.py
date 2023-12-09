@@ -39,10 +39,6 @@ class HtmxExtension:
             self.init_app(app)
 
     def init_app(self, app: flask.Flask):
-        app.config.setdefault("CORS_ALLOW_HEADERS", [])
-        app.config.setdefault("CORS_EXPOSE_HEADERS", [])
-        app.config["CORS_ALLOW_HEADERS"].extend(self.CORS_ALLOW_HEADERS)
-        app.config["CORS_EXPOSE_HEADERS"].extend(self.CORS_EXPOSE_HEADERS)
         app.jinja_env.globals["htmx"] = self
 
     def __bool__(self):

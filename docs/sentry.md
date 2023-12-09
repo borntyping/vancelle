@@ -1,15 +1,6 @@
 Sentry
 ======
 
-Dependencies
-------------
-
-Ensure the `debug` group of dependencies is installed.
-
-```shell
-poetry install --with=debug
-```
-
 Usage
 -----
 
@@ -19,12 +10,11 @@ Run [Spotlight](https://spotlightjs.com/) in the background:
 npx @spotlightjs/spotlight
 ```
 
-Configure [Sentry](https://docs.sentry.io) in the Python code:
+Enable the app config options for Sentry and Spotlight.
 
 ```python
-import sentry_sdk
-
-sentry_sdk.init(spotlight=True, enable_tracing=True)
+VANCELLE_SENTRY_ENABLED=1
+VANCELLE_SPOTLIGHT_ENABLED=1
 ```
 
 Open the application, wait for the page to finish loading, and click the Spotlight button at the bottom right of the page.

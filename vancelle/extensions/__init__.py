@@ -9,7 +9,16 @@ from .ext_htmx import HtmxExtension
 from .ext_sentry import SentryExtension
 from ..models import Base
 
-cors = flask_cors.CORS()
+cors = flask_cors.CORS(
+    allow_headers=[
+        *HtmxExtension.CORS_ALLOW_HEADERS,
+        *SentryExtension.CORS_ALLOW_HEADERS,
+    ],
+    expose_headers=[
+        *HtmxExtension.CORS_EXPOSE_HEADERS,
+        *SentryExtension.CORS_EXPOSE_HEADERS,
+    ],
+)
 db = flask_sqlalchemy.SQLAlchemy(model_class=Base, session_options={"expire_on_commit": False})
 debug_toolbar = flask_debugtoolbar.DebugToolbarExtension()
 login_manager = flask_login.LoginManager()

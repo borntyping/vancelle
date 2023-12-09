@@ -72,28 +72,6 @@
         </p>
         <!-- TMDB terms of use require this notice: https://developer.themoviedb.org/docs/faq -->
         <p class="has-text-grey">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
-        {% set queries = get_recorded_queries() %}
-        <details>
-          <summary>Debug ({{ queries|length }} queries)</summary>
-          <div class="block has-text-left is-size-7 is-clipped">
-            <table class="table">
-              <tr>
-                <th></th>
-                <th>Statement</th>
-              </tr>
-              {% for query in queries %}
-                <tr>
-                  <td>{{ loop.index }}</td>
-                  <td>
-                    <p class="">{{ query.location }}, {{ query.duration|round(2) }} seconds</p>
-                    <pre class="" style="white-space: pre-wrap; word-wrap: break-word;">{{ query.statement }}</pre>
-                    <pre class="" style="white-space: pre-wrap; word-wrap: break-word;">{{ query.parameters|tojson() }}</pre>
-                  </td>
-                </tr>
-              {% endfor %}
-            </table>
-          </div>
-        </details>
       </div>
     </footer>
     <footer id="app-toasts" hx-preserve="true">

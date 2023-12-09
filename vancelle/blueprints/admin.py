@@ -1,6 +1,5 @@
 import flask
 import flask_login
-import flask_sqlalchemy.record_queries
 import structlog
 
 from vancelle.controllers.admin import AdminController
@@ -16,11 +15,6 @@ bp.cli.short_help = "Setup and teardown the Postgres database."
 @flask_login.login_required
 def before_request():
     pass
-
-
-@bp.app_template_global()
-def get_recorded_queries():
-    return flask_sqlalchemy.record_queries.get_recorded_queries()
 
 
 @bp.route("/")

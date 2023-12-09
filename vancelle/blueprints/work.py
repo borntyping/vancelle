@@ -92,48 +92,73 @@ def create():
     return flask.render_template("work/create.html", form=form)
 
 
-toggle_layout = Toggle({"board": "Board", "table": "Table"}, default="board")
-toggle_work_type = Toggle({cls.work_type(): cls.info.title for cls in Work.iter_subclasses()})
-toggle_remote_type = Toggle({cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()})
-toggle_has_remote = Toggle({"yes": "Has remote data", "imported": "Has only imported data", "no": "No remote data"})
-toggle_shelf = Toggle({shelf.value: shelf.title for shelf in Shelf})
+class WorkIndexForm(flask_wtf.FlaskForm):
+    layout = wtforms.SelectField(
+        label="Layout",
+        choices=[("board", "Board"), ("table", "Table")],
+        default="board",
+        widget=BulmaSelect(),
+    )
+    work_type = wtforms.SelectField(
+        label="Work type",
+        choices=[("", "Any work type")] + [(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
+        widget=BulmaSelect(),
+    )
+    remote_type = wtforms.SelectField(
+        label="Remote type",
+        choices=[("", "Any remote type")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
+        widget=BulmaSelect(),
+    )
+    has_remote = wtforms.SelectField(
+        label="Has remote",
+        choices=[
+            ("", "Any remote data"),
+            ("yes", "Has remote data"),
+            ("imported", "Only imported data"),
+            ("no", "No remote data"),
+        ],
+        widget=BulmaSelect(),
+    )
+    shelf = wtforms.SelectField(
+        label="Shelf",
+        choices=[("", "Any shelf")] + [(shelf.value, shelf.title) for shelf in Shelf],
+        widget=BulmaSelect(),
+    )
 
 
 @bp.route("/works/")
 def index():
-    layout = toggle_layout.from_request(key="layout")
-    work_type = toggle_work_type.from_request(key="type", clear=["remote_type"])
-    remote_type = toggle_remote_type.from_request(key="remote_type", clear=["type"])
-    has_remote = toggle_has_remote.from_request(key="has_remote")
-    shelf = toggle_shelf.from_request(key="shelf")
-
+    form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
     statement = controller.select(
         user=flask_login.current_user,
-        work_type=work_type.value,
-        remote_type=remote_type.value,
-        has_remote=has_remote.value,
-        shelf=shelf.value,
+        work_type=form.work_type.data,
+        remote_type=form.remote_type.data,
+        has_remote=form.has_remote.data,
+        shelf=form.shelf.data,
     )
 
-    context = dict(layout=layout, work_type=work_type, remote_type=remote_type, has_remote=has_remote, shelf=shelf)
-    logger.debug("Loaded toggles", **context)
-
-    match layout.value:
+    match form.layout.data:
         case "board":
             shelves = controller.shelves(statement=statement)
             total = sum(len(v) for v in shelves.values())
-            page = flask.render_template("work/index_board.html", **context, shelves=shelves, total=total)
+            return flask.render_template(
+                "work/index_board.html",
+                form=form,
+                layout=form.layout.data,
+                shelves=shelves,
+                total=total,
+            )
         case "table":
             works = controller.table(statement=statement)
-            page = flask.render_template("work/index_table.html", **context, works=works, total=works.total)
+            return flask.render_template(
+                "work/index_table.html",
+                form=form,
+                layout=form.layout.data,
+                works=works,
+                total=works.total,
+            )
         case _:
-            raise BadRequest(f"Unknown layout {layout!r}")
-
-    response = flask.Response(page)
-    response.set_cookie(layout.key, layout.value)
-    response.set_cookie(work_type.key, work_type.value)
-    response.set_cookie(remote_type.key, remote_type.value)
-    return response
+            raise BadRequest(f"Unknown layout {form.layout.data!r}")
 
 
 @bp.route("/works/<uuid:work_id>")

@@ -42,36 +42,34 @@
   </div>
 {% endmacro %}
 
-{% macro board_category(groups, shelf) %}
-  {% set items = groups[shelf] %}
-  {% if shelf.show_if_empty or items %}
-    <div class="x-board-header x-board-{{ shelf.shelves.column }} is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered">
-      <h3 class="title is-4">{{ shelf.title }}</h3>
-      <p class="subtitle is-7">{{ shelf.description }}</p>
-      <span class="block tag is-size-7 is-{{ shelf.value }}">{{ n('item', items|length) }}</span>
-    </div>
-
-    {% for item in items %}
-      {% set details = item.resolve_details() %}
-      <div class="x-board-item x-board-{{ shelf.shelves.column }}">
-        {{ board_card(work=item, details=details, colour=shelf.value) }}
+{% macro board_categories(shelves, active_shelf) %}
+  {% for column_shelf in Shelf %}
+    {% set items = shelves[column_shelf] %}
+    {% if (column_shelf.show_if_empty and active_shelf is none) or items %}
+      <div class="x-board-header x-board-{{ column_shelf.shelves.column }} is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered">
+        <h3 class="title is-4">{{ column_shelf.title }}</h3>
+        <p class="subtitle is-7">{{ column_shelf.description }}</p>
+        <span class="block tag is-size-7 is-{{ column_shelf.value }}">{{ n('item', items|length) }}</span>
       </div>
-    {% else %}
-      <div class="x-board-{{ shelf.shelves.column }}"></div>
-    {% endfor %}
-  {% endif %}
-{% endmacro %}
 
-{% macro board(shelves) %}
-  <section class="block">
-    <div class="x-board">
-      {% for shelf in Shelf %}
-        {{ board_category(shelves, shelf) }}
+      {% for item in items %}
+        {% set details = item.resolve_details() %}
+        <div class="x-board-item x-board-{{ column_shelf.shelves.column }}">
+          {{ board_card(work=item, details=details, colour=column_shelf.value) }}
+        </div>
+      {% else %}
+        <div class="x-board-{{ column_shelf.shelves.column }}"></div>
       {% endfor %}
-    </div>
-  </section>
+    {% endif %}
+  {% endfor %}
 {% endmacro %}
 
 {% block content %}
-  {{ board(shelves) }}
+  <section class="block">
+    {% if total %}
+      <div class="x-board">{{ board_categories(shelves=shelves, active_shelf=shelf) }}</div>
+    {% else %}
+      <div class="box has-text-centered">No results.</div>
+    {% endif %}
+  </section>
 {% endblock %}

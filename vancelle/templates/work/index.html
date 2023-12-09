@@ -1,16 +1,38 @@
 {% extends 'base.html' %}
 
+{% from 'components/bulma.html' import bulma_form_field %}
+
 {% block before %}
-  <section class="has-background-white-bis py-4">
-    <div class="container is-flex is-flex-wrap-wrap is-align-content-flex-start x-gap-4">
-      {{ layout }}
-      {{ work_type }}
-      {{ has_remote }}
-      {{ remote_type }}
-      {{ shelf }}
-      <a href="{{ url_for('work.index') }}" class="tag is-rounded is-medium is-primary">
-        <span class="is-size-7">{{ n('result', total) }}</span>
-      </a>
+  <div class="section has-background-white-bis py-4">
+    <div class="container">
+      <form action="" method="get" class="is-flex-desktop x-gap-3 is-justify-content-space-between">
+        <div class="field has-addons is-justify-content-center">
+          <div class="control">
+            <a href="{{ url_with(layout="board") }}" class="button {% if layout == 'board' %}is-primary{% endif %}">Board</a>
+          </div>
+          <div class="control">
+            <a href="{{ url_with(layout="table") }}" class="button {% if layout == 'table' %}is-primary{% endif %}">Table</a>
+          </div>
+        </div>
+        <div class="field is-grouped">
+          <div class="control is-expanded">{{ form.work_type }}</div>
+          <div class="control is-expanded">{{ form.shelf }}</div>
+        </div>
+        <div class="field is-grouped">
+          <div class="control is-expanded">{{ form.remote_type }}</div>
+        </div>
+        <div class="field is-grouped">
+          <div class="control is-expanded">{{ form.has_remote }}</div>
+        </div>
+        <div class="field has-addons is-justify-content-center">
+          <div class="control">
+            <a class="button is-static">{{ n('result', total) }}</a>
+          </div>
+          <div class="control">
+            <button class="button" type="submit">Filter</button>
+          </div>
+        </div>
+      </form>
     </div>
-  </section>
+  </div>
 {% endblock %}

@@ -1,21 +1,7 @@
 {% extends 'work/index.html' %}
 
 {% from 'components/work/small_card.html' import small_card %}
-{% from 'components/work/work.html' import work_type_tag %}
-
-{% macro date_span(started, stopped) %}
-  {% if started == stopped and started and stopped %}
-    {{ started|date }}
-  {% else %}
-    {%- if started -%}
-      {{ started|date }}
-    {%- endif -%}
-    <span>&mdash;</span>
-    {%- if stopped -%}
-      {{ stopped|date }}
-    {%- endif -%}
-  {% endif %}
-{% endmacro %}
+{% from 'components/work/work.html' import work_type_tag, date_span %}
 
 {% macro board_card(work, details, colour) %}
   <div class="x-board-card has-background-{{ colour }}-light" title="{{ details }}">

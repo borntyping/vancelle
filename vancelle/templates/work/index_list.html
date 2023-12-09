@@ -1,0 +1,31 @@
+{% extends 'work/index.html' %}
+
+{% from 'components/layout.html' import section %}
+{% from 'components/pagination.html' import pagination %}
+{% from 'components/work/work.html' import work_type_tag, date_span %}
+{% from 'components/metadata.html' import sources_list, details_title, details_date_and_author, shelf_tag %}
+
+
+{% block content %}
+  {% call section("Works", p.no('result', works.total), h1=True) %}
+    <div class="box">
+      {% for work in works %}
+        {% set details = work.resolve_details() %}
+        {% set record = work.get_record() %}
+        <a href="{{ work.url_for() }}" class="is-block block">
+          <p class="is-flex is-justify-content-space-between">
+            {{ details_title(details) }}
+            <span class="has-text-right">
+              {{ work_type_tag(work) }}
+              {{ shelf_tag(work.shelf) }}
+            </span>
+          </p>
+          <p class="has-text-grey-light">
+            {{- details_date_and_author(details) -}}
+          </p>
+        </a>
+      {% endfor %}
+      {{ pagination(works) }}
+    </div>
+  {% endcall %}
+{% endblock %}

@@ -8,12 +8,12 @@ import structlog
 import wtforms
 from werkzeug.exceptions import BadRequest
 from wtforms.validators import Optional
+from wtforms.widgets import HiddenInput
 
 from vancelle.blueprints.bulma import BulmaSelect
 from vancelle.controllers.work import WorkController
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
-from vancelle.extensions.ext_html import Toggle, ToggleState
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -95,9 +95,13 @@ def create():
 class WorkIndexForm(flask_wtf.FlaskForm):
     layout = wtforms.SelectField(
         label="Layout",
-        choices=[("board", "Board"), ("table", "Table")],
+        choices=[
+            ("board", "Board"),
+            ("list", "List"),
+            ("table", "Table"),
+        ],
         default="board",
-        widget=BulmaSelect(),
+        widget=HiddenInput,
     )
     work_type = wtforms.SelectField(
         label="Work type",
@@ -137,26 +141,19 @@ def index():
         shelf=form.shelf.data,
     )
 
+    context = dict(form=form, layout=form.layout.data)
+
     match form.layout.data:
         case "board":
             shelves = controller.shelves(statement=statement)
             total = sum(len(v) for v in shelves.values())
-            return flask.render_template(
-                "work/index_board.html",
-                form=form,
-                layout=form.layout.data,
-                shelves=shelves,
-                total=total,
-            )
+            return flask.render_template("work/index_board.html", **context, shelves=shelves, total=total)
+        case "list":
+            works = controller.paginate(statement=statement)
+            return flask.render_template("work/index_list.html", **context, works=works, total=works.total)
         case "table":
-            works = controller.table(statement=statement)
-            return flask.render_template(
-                "work/index_table.html",
-                form=form,
-                layout=form.layout.data,
-                works=works,
-                total=works.total,
-            )
+            works = controller.paginate(statement=statement)
+            return flask.render_template("work/index_table.html", **context, works=works, total=works.total)
         case _:
             raise BadRequest(f"Unknown layout {form.layout.data!r}")
 

@@ -13,3 +13,17 @@
     <span class="tag is-light" style="width: 4em;">{{ work.type }}</span>
   {% endif %}
 {% endmacro %}
+
+{% macro date_span(started, stopped) %}
+  {% if started == stopped and started and stopped %}
+    {{ started|date }}
+  {% else %}
+    {%- if started -%}
+      {{ started|date }}
+    {%- endif -%}
+    <span>&mdash;</span>
+    {%- if stopped -%}
+      {{ stopped|date }}
+    {%- endif -%}
+  {% endif %}
+{% endmacro %}

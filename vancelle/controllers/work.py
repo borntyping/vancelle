@@ -63,7 +63,7 @@ class WorkController:
 
         return statement
 
-    def table(self, statement: Select[tuple[Work]]) -> flask_sqlalchemy.pagination.Pagination:
+    def paginate(self, statement: Select[tuple[Work]]) -> flask_sqlalchemy.pagination.Pagination:
         return db.paginate(statement)
 
     def shelves(self, statement: Select[tuple[Work]]) -> typing.Mapping[Shelf, list[Work]]:

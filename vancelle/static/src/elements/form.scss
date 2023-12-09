@@ -1,6 +1,10 @@
+@import "bulma/sass/utilities/mixins";
+
 form.is-flex-desktop,
 form.is-flex {
   .field {
-    margin-bottom: 0;
+    @include desktop {
+      margin-bottom: 0;
+    }
   }
 }

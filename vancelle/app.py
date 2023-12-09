@@ -13,7 +13,7 @@ from .blueprints.remote import bp as bp_remote
 from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
 from .ext.structlog import configure_logging
-from .extensions import apis, cors, db, debug_toolbar, html, htmx, login_manager
+from .extensions import apis, cors, db, debug_toolbar, html, htmx, login_manager, sentry
 from .shelf import Shelf
 
 configure_logging()
@@ -30,6 +30,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     db.init_app(app)
     debug_toolbar.init_app(app)
     login_manager.init_app(app)
+    sentry.init_app(app)
 
     apis.init_app(app)
     html.init_app(app)
@@ -60,17 +61,11 @@ def create_personal_app() -> flask.Flask:
             "to-read-maybe": Shelf.UNDECIDED,
             "to-read-non-fiction": Shelf.SHELVED,
             "to-read-sequels": Shelf.UPCOMING,
-        }
+        },
+        "SENTRY_ENABLED": True,
     }
 
     if database_url := os.environ.get("DATABASE_URL"):
         config["SQLALCHEMY_DATABASE_URI"] = database_url
 
-    app = create_app(config)
-
-    if app.debug:
-        import sentry_sdk
-
-        sentry_sdk.init(spotlight=True, enable_tracing=True)
-
-    return app
+    return create_app(config)

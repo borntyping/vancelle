@@ -9,6 +9,7 @@ import jinja2
 import markupsafe
 import wtforms.widgets
 
+from .ext_sentry import SentryExtension
 from ..inflect import p
 
 

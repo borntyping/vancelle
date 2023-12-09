@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dokku": {
-      "postdeploy": "flask admin create-database"
+      "postdeploy": "flask db upgrade"
     }
   },
   "healthchecks": {

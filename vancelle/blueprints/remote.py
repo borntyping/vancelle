@@ -6,7 +6,7 @@ import flask_login
 
 from ..controllers.remote import RemotesController
 from ..extensions import htmx
-from ..extensions.ext_html import Toggle
+from ..extensions.ext_html import ToggleState
 from ..models.remote import Remote
 
 controller = RemotesController()
@@ -22,7 +22,7 @@ def before_request():
 
 @bp.route("/remotes/")
 def index():
-    remote_type = Toggle.from_request(
+    remote_type = ToggleState.from_request(
         {cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()}, "remote_type"
     )
 

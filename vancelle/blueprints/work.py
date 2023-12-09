@@ -13,7 +13,7 @@ from vancelle.blueprints.bulma import BulmaSelect
 from vancelle.controllers.work import WorkController
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
-from vancelle.extensions.ext_html import Toggle
+from vancelle.extensions.ext_html import Toggle, ToggleState
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -92,42 +92,30 @@ def create():
     return flask.render_template("work/create.html", form=form)
 
 
+toggle_layout = Toggle({"board": "Board", "table": "Table"}, default="board")
+toggle_work_type = Toggle({cls.work_type(): cls.info.title for cls in Work.iter_subclasses()})
+toggle_remote_type = Toggle({cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()})
+toggle_has_remote = Toggle({"yes": "Has remote data", "imported": "Has only imported data", "no": "No remote data"})
+toggle_shelf = Toggle({shelf.value: shelf.title for shelf in Shelf})
+
+
 @bp.route("/works/")
 def index():
-    layout = Toggle.from_request("layout", mapping={"board": "Board", "table": "Table"}, default="board")
-    work_type = Toggle.from_request(
-        "type",
-        mapping={cls.work_type(): cls.info.title for cls in Work.iter_subclasses()},
-        args=dict(remote_type=None),
-    )
-    remote_type = Toggle.from_request(
-        "remote_type",
-        mapping={cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()},
-        args=dict(type=None),
-    )
-    has_remote = Toggle.from_request(
-        "has_remote",
-        mapping={
-            "": "All",
-            "yes": "Has remote data",
-            "imported": "Has only imported data",
-            "no": "No remote data",
-        },
-    )
+    layout = toggle_layout.from_request(key="layout")
+    work_type = toggle_work_type.from_request(key="type", clear=["remote_type"])
+    remote_type = toggle_remote_type.from_request(key="remote_type", clear=["type"])
+    has_remote = toggle_has_remote.from_request(key="has_remote")
+    shelf = toggle_shelf.from_request(key="shelf")
 
     statement = controller.select(
         user=flask_login.current_user,
         work_type=work_type.value,
         remote_type=remote_type.value,
         has_remote=has_remote.value,
-    )
-    context = dict(
-        layout=layout,
-        work_type=work_type,
-        remote_type=remote_type,
-        has_remote=has_remote,
+        shelf=shelf.value,
     )
 
+    context = dict(layout=layout, work_type=work_type, remote_type=remote_type, has_remote=has_remote, shelf=shelf)
     logger.debug("Loaded toggles", **context)
 
     match layout.value:

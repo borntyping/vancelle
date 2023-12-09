@@ -28,7 +28,8 @@ class WorkController:
         user: User = flask_login.current_user,
         work_type: str,
         remote_type: str,
-        has_remote: typing.Literal["", "yes", "no"],
+        has_remote: str,
+        shelf: str,
     ) -> Select[tuple[Work]]:
         statement = (
             select(Work)
@@ -37,8 +38,7 @@ class WorkController:
             .join(Record, isouter=True)
             .join(Remote, isouter=True)
             .order_by(
-                nulls_last(desc(Record.date_stopped)),
-                nulls_last(desc(Record.date_started)),
+                nulls_last(desc(coalesce(Record.date_stopped, Record.date_started))),
                 nulls_last(desc(coalesce(Work.release_date, Remote.release_date))),
                 desc(Work.time_created),
             )
@@ -49,6 +49,9 @@ class WorkController:
 
         if remote_type:
             statement = statement.filter(Remote.type == remote_type)
+
+        if shelf:
+            statement = statement.filter(Work.shelf == shelf)
 
         imported = ImportedWork.__mapper__.polymorphic_identity
         if has_remote == "yes":

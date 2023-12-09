@@ -31,44 +31,42 @@ class ToggleItem:
 
 @dataclasses.dataclass()
 class Toggle:
-    key: str
-    value: str | None
-    default: str | None = dataclasses.field(repr=False)
-
     mapping: typing.Mapping[str, str] = dataclasses.field(repr=False)
-    args: typing.Mapping[str, typing.Any] = dataclasses.field(repr=False)
+    default: str
 
-    @classmethod
-    def from_request(
-        cls,
-        key: str,
-        *,
-        mapping: typing.Mapping[str, str],
-        default: str = "",
-        args: typing.Mapping[str, str | None] = None,
-    ):
+    def __init__(self, mapping: typing.Mapping[str, str], default: str = ""):
+        if not default:
+            mapping = {"": "All", **mapping}
+
+        self.mapping = mapping
+        self.default = default
+
+    def from_request(self, key: str, clear: typing.Sequence[str] = ()) -> "ToggleState":
         if key in flask.request.args:
             value = flask.request.args[key]
         elif key in flask.request.cookies:
             value = flask.request.cookies[key]
         else:
-            value = default
+            value = self.default
 
-        if default == "":
-            mapping = {"": "All", **mapping}
+        return ToggleState(key=key, value=value, clear=clear, toggle=self)
 
-        if args is None:
-            args = {}
 
-        return cls(mapping=mapping, key=key, value=value, default=default, args=args)
+@dataclasses.dataclass()
+class ToggleState:
+    key: str
+    value: str
+
+    clear: typing.Sequence[str]
+    toggle: Toggle
 
     def __iter__(self) -> typing.Iterable[ToggleItem]:
-        for value, title in self.mapping.items():
+        for value, title in self.toggle.mapping.items():
             yield ToggleItem(
                 value=value,
                 title=title,
                 active=self.value == value,
-                url=url_with(**self.args, **{self.key: value}),
+                url=url_with(**{key: None for key in self.clear}, **{self.key: value}),
             )
 
     def __html__(self) -> str:
@@ -77,7 +75,7 @@ class Toggle:
 
     @property
     def title(self):
-        return self.mapping[self.value]
+        return self.toggle.mapping[self.value]
 
 
 @dataclasses.dataclass()
@@ -111,10 +109,7 @@ class HtmlExtension:
     def filter_absent(self, value) -> str:
         return str(value) if value else self.ABSENT
 
-    def filter_date(self, date: datetime.date | None, default: str = ABSENT) -> str:
-        if date is None:
-            return default
-
+    def filter_date(self, date: datetime.date | None) -> str:
         if not isinstance(date, datetime.date):
             raise ValueError(f"Not a date: {date!r}")
 

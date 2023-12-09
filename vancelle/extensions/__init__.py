@@ -1,3 +1,5 @@
+import pathlib
+
 import flask_cors
 import flask_debugtoolbar
 import flask_login
@@ -24,6 +26,7 @@ db = flask_sqlalchemy.SQLAlchemy(model_class=Base, session_options={"expire_on_c
 debug_toolbar = flask_debugtoolbar.DebugToolbarExtension()
 login_manager = flask_login.LoginManager()
 migrate = flask_migrate.Migrate(
+    directory=pathlib.Path(__file__).parent.with_name("migrations"),
     alembic_module_prefix="alembic.op.",
     sqlalchemy_module_prefix="sqlalchemy.",
 )

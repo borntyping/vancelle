@@ -55,7 +55,7 @@ namespace_packages = true
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --ignore=migrations"
+addopts = "--doctest-modules --ignore=vancelle/migrations"
 
 [build-system]
 requires = ["poetry-core"]

@@ -28,6 +28,7 @@ sentry-sdk = {extras = ["flask", "sqlalchemy"], version = "^1.38.0"}
 setuptools = "^69.0.2"
 sqlalchemy = "^2.0.23"
 structlog = "^23.2.0"
+flask-migrate = "^4.0.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
@@ -54,7 +55,7 @@ namespace_packages = true
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules"
+addopts = "--doctest-modules --ignore=migrations"
 
 [build-system]
 requires = ["poetry-core"]

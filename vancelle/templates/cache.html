@@ -13,11 +13,11 @@
 {% block content %}
   <div class="tile is-ancestor">
     {% call tile('Requests cache', 'Vancelle caches all HTTP requests to external services.') %}
-      <a href="{{ url_for('admin.clear_request_cache') }}" class="button">Clear</a>
+      <a href="{{ url_for('.clear_request_cache') }}" class="button">Clear</a>
     {% endcall %}
 
-    {% call tile('Steam', 'Vancelle needs to download the Steam AppID list before searching for Steam games.') %}
-      <form method="post" action="{{ url_for('sources.steam.cache') }}">
+    {% call tile('Steam', 'Vancelle caches a copy of the Steam AppID list to power searching for Steam applications.') %}
+      <form method="post" action="{{ url_for('.reload_steam_cache') }}">
         <button class="button" type="submit">Reload</button>
       </form>
     {% endcall %}

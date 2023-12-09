@@ -77,7 +77,8 @@ class SteamApplicationManager(Manager):
         if appid_count == 0:
             self.reload_appid_cache()
 
-    def reload_appid_cache(self) -> None:
+    @staticmethod
+    def reload_appid_cache() -> None:
         logger.warning("Reloading Steam application cache")
         apps = apis.steam_web_api.ISteamApps_GetAppList()
 

@@ -3,7 +3,7 @@ import typing
 
 import flask
 
-from .blueprints.admin import bp as bp_admin
+from .blueprints.cache import bp as bp_admin
 from .blueprints.bulma import bp as bp_bulma
 from .blueprints.data import bp as bp_io
 from .blueprints.errors import bp as bp_errors
@@ -13,7 +13,7 @@ from .blueprints.remote import bp as bp_remote
 from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
 from .ext.structlog import configure_logging
-from .extensions import apis, cors, db, debug_toolbar, html, htmx, login_manager, sentry
+from .extensions import apis, cors, db, debug_toolbar, html, htmx, login_manager, migrate, sentry
 from .shelf import Shelf
 
 configure_logging()
@@ -31,6 +31,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     db.init_app(app)
     debug_toolbar.init_app(app)
     login_manager.init_app(app)
+    migrate.init_app(app, db)
     sentry.init_app(app)
 
     apis.init_app(app)

@@ -1,6 +1,7 @@
 import flask_cors
 import flask_debugtoolbar
 import flask_login
+import flask_migrate
 import flask_sqlalchemy
 
 from .ext_apis import ApisExtension
@@ -22,6 +23,10 @@ cors = flask_cors.CORS(
 db = flask_sqlalchemy.SQLAlchemy(model_class=Base, session_options={"expire_on_commit": False})
 debug_toolbar = flask_debugtoolbar.DebugToolbarExtension()
 login_manager = flask_login.LoginManager()
+migrate = flask_migrate.Migrate(
+    alembic_module_prefix="alembic.op.",
+    sqlalchemy_module_prefix="sqlalchemy.",
+)
 sentry = SentryExtension()
 
 apis = ApisExtension()

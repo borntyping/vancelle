@@ -85,13 +85,30 @@
       {% endif %}
     </footer>
     {% block scripts %}
-      <script src="https://unpkg.com/htmx.org@1.9.6/dist/htmx.js" crossorigin="anonymous"></script>
-      <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/debug.js" crossorigin="anonymous"></script>
-      <script src="https://unpkg.com/htmx.org@1.9.6/dist/ext/loading-states.js" crossorigin="anonymous"></script>
       <script src="{{ url_for('static', filename='script.js') }}"></script>
 
+      <!-- https://htmx.org/ -->
+      <script src="https://unpkg.com/htmx.org@1.9.9/dist/htmx.js" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/htmx.org@1.9.9/dist/ext/debug.js" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/htmx.org@1.9.9/dist/ext/loading-states.js" crossorigin="anonymous"></script>
+
+      <!-- https://ionic.io/ionicons -->
       <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
       <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+      <!-- https://spotlightjs.com -->
+      <script>window.process = { env: { NODE_ENV: 'development' } };</script>
+      <script type="module" src="https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js" crossorigin="anonymous"></script>
+      <script type="module">
+        import * as Spotlight from 'https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js';
+        Spotlight.init({});
+      </script>
+
+      <!-- https://sentry.io -->
+      <script src="https://browser.sentry-cdn.com/7.86.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
+      <script type="module">
+        Sentry.init({spotlight: true})
+      </script>
     {% endblock %}
   </body>
 </html>

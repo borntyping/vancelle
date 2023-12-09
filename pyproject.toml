@@ -11,28 +11,31 @@ python = "^3.11"
 beautifulsoup4 = "^4.12.2"
 Flask = "^3.0.0"
 flask-cors = "^4.0.0"
-flask-debugtoolbar = "^0.14.1"
 flask-injector = "^0.15.0"
 flask-login = "^0.6.3"
 flask-sqlalchemy = "^3.1.1"
 flask-wtf = "^1.2.1"
 humanize = "^4.9.0"
 inflect = "^7.0.0"
-platformdirs = "^4.0.0"
-psycopg = {extras = ["binary"], version = "^3.1.13"}
+platformdirs = "^4.1.0"
+psycopg = {extras = ["binary"], version = "^3.1.14"}
 pydantic = "^2.5.2"
 python-dotenv = "^1.0.0"
 requests = "^2.31.0"
 requests-cache = "^1.1.1"
-setuptools = "^69.0.2"
 sqlalchemy = "^2.0.23"
 structlog = "^23.2.0"
+
+[tool.poetry.group.debug.dependencies]
+flask-debugtoolbar = "^0.14.1"
+sentry-sdk = {extras = ["flask"], version = "^1.38.0"}
+setuptools = "^69.0.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
 djhtml = "^3.0.6"
-pytest = "^7.4.2"
 mypy = "^1.7.1"
+pytest = "^7.4.2"
 types-requests = "^2.31.0.10"
 
 [tool.poetry.group.server.dependencies]

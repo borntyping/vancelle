@@ -66,4 +66,11 @@ def create_personal_app() -> flask.Flask:
     if database_url := os.environ.get("DATABASE_URL"):
         config["SQLALCHEMY_DATABASE_URI"] = database_url
 
-    return create_app(config)
+    app = create_app(config)
+
+    if app.debug:
+        import sentry_sdk
+
+        sentry_sdk.init(spotlight=True, enable_tracing=True)
+
+    return app

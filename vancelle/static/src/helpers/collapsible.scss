@@ -4,6 +4,7 @@
   transition: max-height .5s ease-out;
 
   &.x-is-active {
-    max-height: 10em;
+    max-height: 100vh;
+    transition: max-height .5s ease-in;
   }
 }

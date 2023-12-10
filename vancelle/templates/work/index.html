@@ -71,6 +71,11 @@
 
         <div id="index-expanded-controls" class="columns x-is-collapsible {% if form.remote_type.data or form.remote_data.data %}x-is-active{% endif %}">
           <div class="column">
+            <div class="field is-expanded">
+              <div class="control">{{ form.work_shelf(class_='x-work-index-input') }}</div>
+            </div>
+          </div>
+          <div class="column">
             <div class="field">
               <div class="control is-expanded">{{ form.remote_type(class_='x-work-index-input') }}</div>
             </div>

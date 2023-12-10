@@ -1,0 +1,16 @@
+@import "bulma/sass/grid/columns";
+
+#x-work-index {
+  .columns {
+    margin-top: 0;
+    margin-bottom: 0;
+
+    .column {
+      padding-bottom: 0;
+    }
+  }
+
+  .columns:first-of-type .column:first-of-type {
+    padding-top: 0;
+  }
+}

@@ -5,6 +5,8 @@
 @import "layout";
 @import "typography";
 
+@import "grid/columns";
+
 @import "elements/button";
 @import "elements/code";
 @import "elements/form";
@@ -24,17 +26,3 @@
 @import "helpers/collapsible";
 
 @import "bulma/bulma";
-
-#x-work-index {
-  .columns {
-    .column:not(:last-of-type) {
-      padding-bottom: 0;
-    }
-
-    &:last-of-type {
-      .column:first-child {
-        padding-top: 0;
-      }
-    }
-  }
-}

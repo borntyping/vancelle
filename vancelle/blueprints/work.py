@@ -111,7 +111,7 @@ class WorkIndexForm(flask_wtf.FlaskForm):
         validators=[Optional()],
     )
     work_shelf = wtforms.SelectField(
-        label="Shelf",
+        label="Exact shelf",
         choices=[("", "Any shelf")] + [(s.value, s.title) for s in Shelf],
         widget=BulmaSelect(),
         validators=[Optional()],

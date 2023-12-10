@@ -4,12 +4,14 @@
 {% from 'components/bulma.html' import bulma_form_field, bulma_checkbox %}
 
 {% set details = record.work.resolve_details() %}
-{% set subtitle %}
+{% set section_title = "Update record" %}
+{% set section_subtitle %}
   Record for <a href="{{ url_for('work.detail', work_id=record.work_id) }}">{{ details.title }}</a>
 {% endset %}
+{% set title = "{} - Update record".format(details.title) %}
 
 {% block content %}
-  {% call section("Update record", subtitle) %}
+  {% call section(section_title, section_subtitle) %}
     <div class="box">
       <form
         id="record"

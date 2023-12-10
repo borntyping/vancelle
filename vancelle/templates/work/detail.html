@@ -9,6 +9,7 @@
 {% from "components/remote/sources.html" import section_sources %}
 
 {% set details = work.resolve_details() %}
+{% set title = details.title %}
 
 {% macro _form_change_shelf(work, details) %}
   <form

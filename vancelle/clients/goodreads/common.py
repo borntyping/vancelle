@@ -100,7 +100,7 @@ class GoodreadsImporter:
 
         if not remote.work:
             work_id = self.reproducible_uuid(remote_id)
-            remote.work = Book(user_id=self.user.id, id=work_id)
+            remote.work = Book(user_id=self.user.id, id=work_id, shelf=shelf)
 
         if date_started or date_stopped:
             record_id = self.reproducible_uuid(remote_id)

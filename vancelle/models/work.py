@@ -56,7 +56,7 @@ class Work(Base, IntoDetails):
     release_date: Mapped[typing.Optional[datetime.date]] = mapped_column(default=None)
     cover: Mapped[typing.Optional[str]] = mapped_column(default=None)
     background: Mapped[typing.Optional[str]] = mapped_column(default=None)
-    shelf: Mapped[typing.Optional[Shelf]] = mapped_column(ShelfEnum, default=None)
+    shelf: Mapped[Shelf] = mapped_column(ShelfEnum, default=Shelf.UNSORTED)
     tags: Mapped[typing.Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
 
     records: Mapped[typing.List["Record"]] = relationship(

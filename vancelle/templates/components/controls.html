@@ -104,3 +104,21 @@
 {% macro control_remote_priority(remote) %}
   {{ _control_static_text(text=remote.info.priority, title="Priority for details from {}".format(remote.info.source)) }}
 {% endmacro %}
+
+{% macro control_record_delete(record) %}
+  {% with url = url_for("record.delete", work_id=record.work_id, record_id=record.id) %}
+    {{ _control_post(url=url, text="Delete", icon="trash-outline", title="Delete this record. You will be able to restore it.", tabindex=2) }}
+  {% endwith %}
+{% endmacro %}
+
+{% macro control_record_restore(record) %}
+  {% with url = url_for("record.restore", work_id=record.work_id, record_id=record.id) %}
+    {{ _control_post(url=url, text="Restore", icon="trash-outline", class_="is-success is-light", title="Restore this record.", tabindex=3) }}
+  {% endwith %}
+{% endmacro %}
+
+{% macro control_record_permanently_delete(record) %}
+  {% with url = url_for("record.permanently_delete", work_id=record.work_id, record_id=record.id) %}
+    {{ _control_post(url=url, text="Permanently delete", icon="trash-outline", class_="is-danger is-light", title="Delete this record. It will not be possible to recover.", tabindex=4) }}
+  {% endwith %}
+{% endmacro %}

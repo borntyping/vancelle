@@ -7,7 +7,7 @@
     <div class="container">
       <form action="" method="get" class="is-flex-desktop x-gap-3 is-justify-content-space-between">
         <input type="hidden" name="{{ form.layout.name }}" value="{{ form.layout.data }}">
-        <div class="field has-addons is-justify-content-center">
+        <div class="field has-addons is-flex-grow-1">
           {% for item_layout, item_title in form.layout.choices %}
             <div class="control">
               <a href="{{ url_with(layout=item_layout) }}" class="button {% if layout == item_layout %}is-primary{% endif %}">{{ item_title }}</a>
@@ -24,7 +24,7 @@
         <div class="field is-grouped">
           <div class="control is-expanded">{{ form.has_remote }}</div>
         </div>
-        <div class="field has-addons is-justify-content-center">
+        <div class="field has-addons">
           <div class="control">
             <a class="button is-static">{{ n('result', total) }}</a>
           </div>

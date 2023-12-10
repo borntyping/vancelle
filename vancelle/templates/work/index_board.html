@@ -29,7 +29,7 @@
   {% for column_shelf in Shelf %}
     {% set items = shelves[column_shelf] %}
     {% if (column_shelf.show_if_empty and active_shelf is none) or items %}
-      <div class="x-board-header x-board-{{ column_shelf.shelves.column }} is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered">
+      <div class="x-board-header x-board-{{ column_shelf.group.column }} is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered">
         <h3 class="title is-4">{{ column_shelf.title }}</h3>
         <p class="subtitle is-7">{{ column_shelf.description }}</p>
         <span class="block tag is-size-7 is-{{ column_shelf.value }}">{{ n('item', items|length) }}</span>
@@ -37,11 +37,11 @@
 
       {% for item in items %}
         {% set details = item.resolve_details() %}
-        <div class="x-board-item x-board-{{ column_shelf.shelves.column }}">
+        <div class="x-board-item x-board-{{ column_shelf.group.column }}">
           {{ board_card(work=item, details=details, colour=column_shelf.value) }}
         </div>
       {% else %}
-        <div class="x-board-{{ column_shelf.shelves.column }}"></div>
+        <div class="x-board-{{ column_shelf.group.column }}"></div>
       {% endfor %}
     {% endif %}
   {% endfor %}

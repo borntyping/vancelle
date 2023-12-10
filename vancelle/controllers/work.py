@@ -1,51 +1,56 @@
 import dataclasses
 import datetime
+import functools
 import typing
 import uuid
 
 import flask_login
 import flask_sqlalchemy.pagination
-from sqlalchemy import ColumnElement, any_, asc, exists, func, or_, select, nulls_last, Select, desc
 import structlog
-from sqlalchemy.orm import aliased
+from sqlalchemy import ColumnElement, Select, desc, func, nulls_last, or_, select
 from sqlalchemy.sql.functions import coalesce
 from werkzeug.exceptions import BadRequest
 
 from vancelle.extensions import db
 from vancelle.models import Base, User
-from vancelle.models.remote import ImportedWork, Remote, RemoteInfo
 from vancelle.models.record import Record
+from vancelle.models.remote import ImportedWork, Remote
 from vancelle.models.work import Work
-from vancelle.shelf import Shelf
+from vancelle.shelf import Shelf, ShelfGroup
 
 logger = structlog.get_logger(logger_name=__name__)
 
 
-@dataclasses.dataclass()
-class WorkController:
-    def select(
-        self,
-        *,
-        user: User = flask_login.current_user,
-        work_type: str,
-        work_shelf: str,
-        remote_type: str,
-        remote_data: str,
-        query: str,
-    ) -> Select[tuple[Work]]:
-        log = logger.bind(
-            user=user.username,
-            work_type=repr(work_type),
-            work_shelf=repr(work_shelf),
-            remote_type=repr(remote_type),
-            remote_data=repr(remote_data),
-            query=repr(query),
+@dataclasses.dataclass(frozen=True)
+class WorkQuery:
+    """Build SELECT queries for works."""
+
+    user: User
+    work_type: str
+    work_shelf: str
+    work_shelf_group: str
+    remote_type: str
+    remote_data: str
+    search: str
+
+    @property
+    def log(self) -> structlog.BoundLogger:
+        return logger.bind(
+            user=self.user.username,
+            work_type=repr(self.work_type),
+            work_shelf=repr(self.work_shelf),
+            remote_type=repr(self.remote_type),
+            remote_data=repr(self.remote_data),
+            query=repr(self.search),
         )
 
+    @functools.cached_property
+    def _select_statement(self) -> Select[tuple[Work]]:
         statement = (
             select(Work)
-            .filter_by(user_id=user.id)
-            .filter_by(time_deleted=None)
+            .select_from(Work)
+            .filter(Work.user_id == self.user.id)
+            .filter(Work.time_deleted == None)
             .join(Record, isouter=True)
             .join(Remote, isouter=True)
             .order_by(
@@ -55,21 +60,56 @@ class WorkController:
             )
         )
 
-        if work_type:
-            statement = statement.filter(Work.type == work_type)
-        if work_shelf:
-            statement = statement.filter(Work.shelf == work_shelf)
-        if remote_type:
-            statement = statement.filter(Remote.type == remote_type)
-        if query:
-            statement = statement.filter(self._query_filter(query))
-        if remote_data:
-            statement = statement.filter(self._remote_data_filter(remote_data))
+        if self.work_type:
+            statement = statement.filter(Work.type == self.work_type)
+        if self.work_shelf:
+            statement = statement.filter(Work.shelf == self.work_shelf)
+        if self.work_shelf_group:
+            statement = statement.filter(self._filter_work_shelf_group(self.work_shelf_group))
+        if self.remote_type:
+            statement = statement.filter(Remote.type == self.remote_type)
+        if self.search:
+            statement = statement.filter(self._filter_query(self.search))
+        if self.remote_data:
+            statement = statement.filter(self._filter_remote_data(self.remote_data))
 
-        log.info("Constructed query", statement=str(statement))
+        # sub = select.options(sa_orm.lazyload("*")).order_by(None).subquery()
+        # session = self._query_args["session"]
+
+        self.log.info("Constructed query", statement=str(statement))
         return statement
 
-    def _query_filter(self, query: str) -> ColumnElement[bool]:
+    @functools.cached_property
+    def _count_statement(self) -> Select[tuple[int]]:
+        return self._select_statement.order_by(None).with_only_columns(func.count(Work.id.distinct()))
+
+    def count(self) -> int:
+        return db.session.execute(self._count_statement).scalar()
+
+    def all(self) -> typing.Sequence[Work]:
+        return db.session.execute(self._select_statement).unique().scalars().all()
+
+    def shelves(self) -> typing.Tuple[typing.Mapping[Shelf, list[Work]], int]:
+        works = self.all()
+        groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in Shelf}
+        for work in works:
+            details = work.resolve_details()
+            if details.shelf is None:
+                raise ValueError("Work details do not include shelf")
+            groups[details.shelf].append(work)
+        return groups, len(works)
+
+    def paginate(self) -> flask_sqlalchemy.pagination.Pagination:
+        """
+        Flask-SQLAlchemy doesn't calculate the right total, since the query returns
+        non-unique works due to the joins to the record and remote tables.
+        """
+        pagination = db.paginate(self._select_statement, count=False)
+        pagination.total = self.count()
+        return pagination
+
+    @staticmethod
+    def _filter_query(query: str) -> ColumnElement[bool]:
         other = f"%{query}%"
         return or_(
             Work.title.ilike(other),
@@ -80,7 +120,14 @@ class WorkController:
             Remote.description.ilike(other),
         )
 
-    def _remote_data_filter(self, remote_data: str) -> ColumnElement[bool]:
+    @staticmethod
+    def _filter_work_shelf_group(value: str) -> ColumnElement[bool]:
+        group = ShelfGroup(value)
+        shelves = group.shelves()
+        return Work.shelf.in_(shelves)
+
+    @staticmethod
+    def _filter_remote_data(remote_data: str) -> ColumnElement[bool]:
         imported = ImportedWork.__mapper__.polymorphic_identity
         match remote_data:
             case "yes":
@@ -92,19 +139,9 @@ class WorkController:
 
         raise BadRequest("Invalid remote data filter")
 
-    def paginate(self, statement: Select[tuple[Work]]) -> flask_sqlalchemy.pagination.Pagination:
-        return db.paginate(statement)
 
-    def shelves(self, statement: Select[tuple[Work]]) -> typing.Mapping[Shelf, list[Work]]:
-        works: typing.Iterable[Work] = db.session.execute(statement).unique().scalars().all()
-        groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in Shelf}
-        for work in works:
-            details = work.resolve_details()
-            if details.shelf is None:
-                raise ValueError("Work details do not include shelf")
-            groups[details.shelf].append(work)
-        return groups
-
+@dataclasses.dataclass()
+class WorkController:
     def get_or_404(self, *, user: User = flask_login.current_user, id: uuid.UUID) -> Work:
         return db.one_or_404(select(Work).filter_by(user_id=user.id, id=id))
 

@@ -11,13 +11,13 @@ from wtforms.validators import DataRequired, Optional
 from wtforms.widgets import HiddenInput
 
 from vancelle.blueprints.bulma import BulmaSelect
-from vancelle.controllers.work import WorkController
+from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
-from vancelle.shelf import Shelf
+from vancelle.shelf import Shelf, ShelfGroup
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -26,7 +26,7 @@ controller = WorkController()
 bp = flask.Blueprint("work", __name__, url_prefix="")
 
 SHELF_CHOICES = {
-    key: [(s.value, s.title) for s in group] for key, group in itertools.groupby(Shelf, key=lambda s: s.shelves.value)
+    key: [(s.value, s.title) for s in group] for key, group in itertools.groupby(Shelf, key=lambda s: s.group.value)
 }
 
 
@@ -110,9 +110,15 @@ class WorkIndexForm(flask_wtf.FlaskForm):
         widget=BulmaSelect(),
         validators=[Optional()],
     )
-    shelf = wtforms.SelectField(
+    work_shelf = wtforms.SelectField(
         label="Shelf",
-        choices=[("", "Any shelf")] + [(shelf.value, shelf.title) for shelf in Shelf],
+        choices=[("", "Any shelf")] + [(s.value, s.title) for s in Shelf],
+        widget=BulmaSelect(),
+        validators=[Optional()],
+    )
+    work_shelf_group = wtforms.SelectField(
+        label="Shelf group",
+        choices=[("", "Any shelf group")] + [(g.value, g.title) for g in ShelfGroup],
         widget=BulmaSelect(),
         validators=[Optional()],
     )
@@ -134,35 +140,51 @@ class WorkIndexForm(flask_wtf.FlaskForm):
         widget=BulmaSelect(),
         validators=[Optional()],
     )
-    query = wtforms.SearchField(label="Query", validators=[Optional()], filters=[str.strip])
+    search = wtforms.SearchField(label="Query", validators=[Optional()])
 
 
 @bp.route("/works/")
 def index():
     data = flask.json.loads(flask.request.cookies.get("index", "{}"))
     form = WorkIndexForm(formdata=flask.request.args, data=data, meta={"csrf": False})
-    statement = controller.select(
+    query = WorkQuery(
         user=flask_login.current_user,
         work_type=form.work_type.data,
+        work_shelf=form.work_shelf.data,
+        work_shelf_group=form.work_shelf_group.data,
         remote_type=form.remote_type.data,
         remote_data=form.remote_data.data,
-        work_shelf=form.shelf.data,
-        query=form.query.data,
+        search=form.search.data,
     )
-    layout = form.layout.data
 
-    logger.debug("Using layout", layout=layout)
-    match layout:
+    match form.layout.data:
         case "board":
-            shelves = controller.shelves(statement=statement)
-            total = sum(len(v) for v in shelves.values())
-            page = flask.render_template("work/index_board.html", form=form, layout=layout, shelves=shelves, total=total)
+            shelves, total = query.shelves()
+            page = flask.render_template(
+                "work/index_board.html",
+                form=form,
+                layout=form.layout.data,
+                shelves=shelves,
+                total=total,
+            )
         case "list":
-            works = controller.paginate(statement=statement)
-            page = flask.render_template("work/index_list.html", form=form, layout=layout, works=works, total=works.total)
+            works = query.paginate()
+            page = flask.render_template(
+                "work/index_list.html",
+                form=form,
+                layout=form.layout.data,
+                works=works,
+                total=works.total,
+            )
         case "table":
-            works = controller.paginate(statement=statement)
-            page = flask.render_template("work/index_table.html", form=form, layout=layout, works=works, total=works.total)
+            works = query.paginate()
+            page = flask.render_template(
+                "work/index_table.html",
+                form=form,
+                layout=form.layout.data,
+                works=works,
+                total=works.total,
+            )
         case _:
             raise BadRequest(f"Unknown layout {form.layout.data!r}")
 

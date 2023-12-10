@@ -27,7 +27,7 @@
           {% if work_count > 0 %}
             <p class="block has-text-danger">Import is disabled, you already have {{ work_count }} {{ p.plural('work', work_count) }}.</p>
           {% else %}
-            <p class="block">Import from a <code>vancelle-backup.json</code> file.</p>
+            <p class="block">Import from a <code>{{ filename }}</code> file.</p>
           {% endif %}
           <form action="{{ url_for('user.import') }}" method="post" enctype="multipart/form-data">
             {{ form.csrf_token }}
@@ -52,7 +52,7 @@
       <div class="column">
         <div class="box">
           <h2 class="title is-5">Export data</h2>
-          <p class="block">Export {{ work_count }} {{ p.plural('work', work_count) }} to a <code>vancelle-backup.json</code> file.</p>
+          <p class="block">Export {{ work_count }} {{ p.plural('work', work_count) }} to a <code>{{ filename }}</code> file.</p>
           <a href="{{ url_for('user.export') }}" class="button is-primary">Export</a>
         </div>
       </div>

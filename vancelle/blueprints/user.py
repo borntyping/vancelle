@@ -1,3 +1,4 @@
+import gzip
 import uuid
 
 import click
@@ -19,7 +20,7 @@ from vancelle.models import User
 
 logger = structlog.get_logger(logger_name=__name__)
 
-BACKUP_FILENAME = "vancelle-backup.json"
+BACKUP_FILENAME = "vancelle-backup.json.gz"
 
 controller = UserController()
 bp = flask.Blueprint("user", __name__)
@@ -71,7 +72,8 @@ def profile():
     form = ImportForm()
 
     if form.validate_on_submit():
-        controller.import_json(form.backup.data.read(), user=flask_login.current_user)
+        data = gzip.decompress(form.backup.data.read()).decode("utf-8")
+        controller.import_json(data, user=flask_login.current_user)
         return flask.redirect(flask.url_for("user.profile"))
 
     work_count = flask_login.current_user.works.count()
@@ -85,9 +87,10 @@ def profile():
 
 @bp.route("/user/export")
 def export():
+    data = controller.export_json(user=flask_login.current_user)
     return flask.Response(
-        controller.export_json(user=flask_login.current_user),
-        mimetype="application/json",
+        response=gzip.compress(data.encode("utf-8")),
+        mimetype="application/x-gzip-compressed",
         headers={"Content-Disposition": f'attachment; filename="{BACKUP_FILENAME}"'},
     )
 

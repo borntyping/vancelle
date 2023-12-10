@@ -31,11 +31,21 @@ class RecordForm(FlaskForm):
     notes = StringField("Bookmark", validators=[Optional(), Length(max=256)], filters=[NullFilter()])
 
 
-@bp.route("/", methods=["POST"])
+@bp.route("/-/new", methods=["POST"])
 def new(work_id: uuid.UUID):
-    started_today = flask.request.args.get("started_today", default=False, type=bool)
-    stopped_today = flask.request.args.get("stopped_today", default=False, type=bool)
-    controller.create(work_id, started_today=started_today, stopped_today=stopped_today)
+    record = controller.create(work_id)
+    return htmx.redirect(record.url_for())
+
+
+@bp.route("/-/new-started-today", methods=["POST"])
+def new_started_today(work_id: uuid.UUID):
+    controller.create(work_id, started_today=True)
+    return htmx.refresh()
+
+
+@bp.route("/-/new-stopped-today", methods=["POST"])
+def new_stopped_today(work_id: uuid.UUID):
+    controller.create(work_id, stopped_today=True)
     return htmx.refresh()
 
 

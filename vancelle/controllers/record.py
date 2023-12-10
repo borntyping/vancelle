@@ -24,7 +24,7 @@ class RecordController:
             .options(joinedload(Record.work))
         )
 
-    def create(self, work_id: uuid.UUID, started_today: bool, stopped_today: bool) -> Record:
+    def create(self, work_id: uuid.UUID, started_today: bool = False, stopped_today: bool = False) -> Record:
         work = db.get_or_404(Work, work_id)
         record = Record(id=uuid.uuid4(), work=work)
 

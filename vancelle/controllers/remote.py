@@ -119,8 +119,20 @@ class RemotesController:
         """
         Create a new remote and a new work.
         """
+
+        if remote := self._get_remote_from_db(remote_id=remote_id, remote_type=remote_type):
+            logger.info("Instructed to create a remote that already exists")
+            flask.flash(
+                flask.render_template("remote/flash_already_exists.html", remote=remote),
+                "Remote already exists",
+            )
+            assert remote.work
+            return remote.work
+
         manager = self.managers[remote_type]
         remote = manager.fetch(remote_id)
+        assert not remote.work
+
         work = manager.work_type(
             id=uuid.uuid4(),
             user=user,

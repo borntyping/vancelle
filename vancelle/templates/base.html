@@ -84,7 +84,7 @@
     <footer id="app-toasts" hx-preserve="true">
       {% if not htmx %}
         {% for category, message in get_flashed_messages(with_categories=true) %}
-          {{ toast(category, message) }}
+          {{ toast(category, message|safe) }}
         {% endfor %}
       {% endif %}
     </footer>

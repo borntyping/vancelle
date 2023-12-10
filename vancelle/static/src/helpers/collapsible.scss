@@ -1,9 +1,9 @@
 .x-is-collapsible {
   max-height: 0;
   overflow-y: hidden;
-  transition: max-height .5s ease;
+  transition: max-height .5s ease-out;
 
   &.x-is-active {
-    max-height: 50em;
+    max-height: 10em;
   }
 }

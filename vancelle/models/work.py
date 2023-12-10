@@ -83,6 +83,18 @@ class Work(Base, IntoDetails):
     def record(self) -> typing.Optional["Record"]:
         return self.get_record() or Record(work=self)
 
+    @property
+    def date_started(self) -> datetime.date | None:
+        if records := [r for r in self.records if r.date_started and not r.deleted]:
+            return min(r.date_started for r in records)
+        return None
+
+    @property
+    def date_stopped(self) -> datetime.date | None:
+        if records := [r for r in self.records if r.date_stopped and not r.deleted]:
+            return max(r.date_stopped for r in records)
+        return None
+
     def url_for(self) -> str:
         return url_for("work.detail", work_id=self.id)
 

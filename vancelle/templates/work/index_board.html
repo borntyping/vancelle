@@ -14,10 +14,7 @@
         </p>
       </div>
       <div>
-        {% set record = work.get_record() %}
-        {% if record %}
-          <p class="is-size-7">{{ date_span(record.date_started, record.date_stopped) }}</p>
-        {% endif %}
+        <p class="is-size-7">{{ date_span(work.date_started, work.date_stopped) }}</p>
       </div>
     </div>
     <figure class="has-background-{{ colour }}">

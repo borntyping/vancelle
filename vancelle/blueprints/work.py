@@ -122,6 +122,17 @@ class WorkIndexForm(flask_wtf.FlaskForm):
         widget=BulmaSelect(),
         validators=[Optional()],
     )
+    work_deleted = wtforms.SelectField(
+        label="Deleted works",
+        choices=[
+            ("no", "Don't include deleted works"),
+            ("all", "Include deleted works"),
+            ("yes", "Only deleted works"),
+        ],
+        default="no",
+        widget=BulmaSelect(),
+        validators=[DataRequired()],
+    )
 
     remote_type = wtforms.SelectField(
         label="Remote type",
@@ -152,6 +163,7 @@ def index():
         work_type=form.work_type.data,
         work_shelf=form.work_shelf.data,
         work_shelf_group=form.work_shelf_group.data,
+        work_deleted=form.work_deleted.data,
         remote_type=form.remote_type.data,
         remote_data=form.remote_data.data,
         search=form.search.data,

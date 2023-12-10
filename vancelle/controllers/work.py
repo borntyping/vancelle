@@ -6,8 +6,9 @@ import uuid
 
 import flask_login
 import flask_sqlalchemy.pagination
+import sqlalchemy
 import structlog
-from sqlalchemy import ColumnElement, Select, desc, func, nulls_last, or_, select
+from sqlalchemy import ColumnElement, Select, True_, desc, func, nulls_last, or_, select
 from sqlalchemy.sql.functions import coalesce
 from werkzeug.exceptions import BadRequest
 
@@ -29,6 +30,7 @@ class WorkQuery:
     work_type: str
     work_shelf: str
     work_shelf_group: str
+    work_deleted: str
     remote_type: str
     remote_data: str
     search: str
@@ -50,7 +52,6 @@ class WorkQuery:
             select(Work)
             .select_from(Work)
             .filter(Work.user_id == self.user.id)
-            .filter(Work.time_deleted == None)
             .join(Record, isouter=True)
             .join(Remote, isouter=True)
             .order_by(
@@ -59,6 +60,8 @@ class WorkQuery:
                 desc(Work.time_created),
             )
         )
+
+        statement = statement.filter(self._filter_work_deleted(self.work_deleted))
 
         if self.work_type:
             statement = statement.filter(Work.type == self.work_type)
@@ -119,6 +122,18 @@ class WorkQuery:
             Remote.author.ilike(other),
             Remote.description.ilike(other),
         )
+
+    @staticmethod
+    def _filter_work_deleted(value: str) -> ColumnElement[bool]:
+        match value:
+            case "yes":
+                return Work.time_deleted.is_not(None)
+            case "no":
+                return Work.time_deleted.is_(None)
+            case "all":
+                return True_()
+
+        raise BadRequest("Invalid work deleted filter")
 
     @staticmethod
     def _filter_work_shelf_group(value: str) -> ColumnElement[bool]:

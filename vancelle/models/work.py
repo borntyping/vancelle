@@ -67,7 +67,7 @@ class Work(Base, IntoDetails):
     )
     remotes: Mapped[typing.List["Remote"]] = relationship(
         back_populates="work",
-        order_by="Remote.id",
+        order_by="desc(Remote.id)",
         cascade="all, delete-orphan",
         lazy="selectin",
     )

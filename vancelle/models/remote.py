@@ -4,7 +4,7 @@ import typing
 import uuid
 
 from flask import url_for
-from sqlalchemy import Enum, ForeignKey, String, func
+from sqlalchemy import Enum, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -89,7 +89,7 @@ class Remote(Base, IntoDetails, IntoProperties):
     time_updated: Mapped[typing.Optional[datetime.datetime]] = mapped_column(default=None, onupdate=func.now())
     time_deleted: Mapped[typing.Optional[datetime.datetime]] = mapped_column(default=None)
 
-    id: Mapped[str] = mapped_column(default=None, primary_key=True)
+    id: Mapped[str] = mapped_column(Text(collation="numeric"), default=None, primary_key=True)
     title: Mapped[typing.Optional[str]] = mapped_column(default=None)
     author: Mapped[typing.Optional[str]] = mapped_column(default=None)
     description: Mapped[typing.Optional[str]] = mapped_column(default=None)

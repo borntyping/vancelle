@@ -132,7 +132,8 @@ class WorkIndexForm(flask_wtf.FlaskForm):
 
 @bp.route("/works/")
 def index():
-    form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
+    data = flask.json.loads(flask.request.cookies.get("index", "{}"))
+    form = WorkIndexForm(formdata=flask.request.args, data=data, meta={"csrf": False})
     statement = controller.select(
         user=flask_login.current_user,
         work_type=form.work_type.data,
@@ -147,15 +148,21 @@ def index():
         case "board":
             shelves = controller.shelves(statement=statement)
             total = sum(len(v) for v in shelves.values())
-            return flask.render_template("work/index_board.html", **context, shelves=shelves, total=total)
+            page = flask.render_template("work/index_board.html", **context, shelves=shelves, total=total)
         case "list":
             works = controller.paginate(statement=statement)
-            return flask.render_template("work/index_list.html", **context, works=works, total=works.total)
+            page = flask.render_template("work/index_list.html", **context, works=works, total=works.total)
         case "table":
             works = controller.paginate(statement=statement)
-            return flask.render_template("work/index_table.html", **context, works=works, total=works.total)
+            page = flask.render_template("work/index_table.html", **context, works=works, total=works.total)
         case _:
             raise BadRequest(f"Unknown layout {form.layout.data!r}")
+
+    response = flask.Response(page)
+    response.set_cookie("index", flask.json.dumps(form.data))
+    response.delete_cookie("layout")
+    response.delete_cookie("type")
+    return response
 
 
 @bp.route("/works/<uuid:work_id>")

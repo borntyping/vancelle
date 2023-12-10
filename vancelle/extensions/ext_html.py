@@ -123,7 +123,8 @@ class HtmlExtension:
         if not isinstance(date, datetime.date):
             raise ValueError("Not a date")
 
-        return markupsafe.Markup(f'<span class="x-has-tabular-nums">{date}</span>')
+        formatted = humanize.naturaldate(date)
+        return markupsafe.Markup(f'<span class="x-has-tabular-nums" title="{formatted}">{date}</span>')
 
     def filter_datetime(self, d: datetime.datetime | None) -> str:
         return humanize.naturaltime(d) if d else self.ABSENT

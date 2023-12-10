@@ -105,7 +105,7 @@ class WorkIndexForm(flask_wtf.FlaskForm):
     )
     work_type = wtforms.SelectField(
         label="Work type",
-        choices=[("", "Any work type")] + [(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
+        choices=[("", "All types")] + [(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
         widget=BulmaSelect(),
     )
     remote_type = wtforms.SelectField(

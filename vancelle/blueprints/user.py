@@ -13,6 +13,7 @@ import werkzeug.exceptions
 import wtforms
 
 from vancelle.controllers.user import UserController
+from vancelle.ext.flask_login import get_user
 from vancelle.extensions import db, login_manager
 from vancelle.models import User
 
@@ -115,3 +116,12 @@ def cli_create_user(id: uuid.UUID, username: str, password: str):
     db.session.add(user)
     db.session.commit()
     logger.warning("Created user", user=user)
+
+
+@bp.cli.command("clear")
+@click.option("--username", required=True)
+def cli_clear_user(username: str) -> None:
+    user = get_user(username)
+    for work in user.works:
+        db.session.delete(work)
+    db.session.commit()

@@ -21,7 +21,7 @@
   {%- call section(title=remote.info.noun_full, subtitle=remote.id, controls=controls, h1=h1) -%}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
-        {% call panel_details(details=remote.into_details(), color=remote.info.color) %}
+        {% call panel_details(details=remote.into_details(), colour=remote.info.colour) %}
           {% if show_attached_work and remote.work %}
             {% set work_details = remote.work.resolve_details() %}
             Attached to work: <a href="{{ remote.work.url_for() }}">{{ work_details.title }}</a>.

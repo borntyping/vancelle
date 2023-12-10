@@ -38,7 +38,7 @@ class RemoteInfo:
     noun_plural: str
     noun_full: str  # Source and noun combined
 
-    color: str  # Used in CSS
+    colour: str  # Used in CSS
     priority: int = 0
 
     can_search: bool = True
@@ -50,7 +50,7 @@ class RemoteInfo:
         source: str,
         noun: str,
         *,
-        color: str,
+        colour: str,
         noun_plural: str | None = None,
         noun_full: str | None = None,
         priority: int = 0,
@@ -58,7 +58,7 @@ class RemoteInfo:
         can_link: bool = True,
         can_refresh: bool = True,
     ) -> None:
-        self.color = color
+        self.colour = colour
         self.source = source
         self.noun = noun
         self.noun_plural = noun_plural if noun_plural is not None else p.plural(noun)
@@ -158,7 +158,7 @@ class ImportedWorkAttributes(typing.TypedDict):
 class ImportedWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "imported"}
     info = RemoteInfo(
-        color="imported",
+        colour="imported",
         source="Imported",
         noun="work",
         priority=-1,
@@ -180,7 +180,7 @@ class GoodreadsBookData(typing.TypedDict, GoodreadsCsvRow, GoodreadsHtmlRow):
 class GoodreadsBook(Remote):
     __mapper_args__ = {"polymorphic_identity": "goodreads.book"}
     info = RemoteInfo(
-        color="goodreads",
+        colour="goodreads",
         source="Goodreads",
         noun="book",
         noun_full="Imported Goodreads book",
@@ -207,7 +207,7 @@ class GoodreadsBook(Remote):
 class OpenlibraryWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.work"}
     info = RemoteInfo(
-        color="openlibrary",
+        colour="openlibrary",
         source="Open Library",
         noun="work",
         priority=21,
@@ -224,7 +224,7 @@ class OpenlibraryWork(Remote):
 class OpenlibraryEdition(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.edition"}
     info = RemoteInfo(
-        color="openlibrary",
+        colour="openlibrary",
         source="Open Library",
         noun="edition",
         priority=22,
@@ -247,7 +247,7 @@ class OpenlibraryEdition(Remote):
 class RoyalroadFiction(Remote):
     __mapper_args__ = {"polymorphic_identity": "royalroad.fiction"}
     info = RemoteInfo(
-        color="royalroad",
+        colour="royalroad",
         source="Royal Road",
         noun="fiction",
         noun_plural="fiction",
@@ -261,7 +261,7 @@ class RoyalroadFiction(Remote):
 class SteamApplication(Remote):
     __mapper_args__ = {"polymorphic_identity": "steam.application"}
     info = RemoteInfo(
-        color="steam",
+        colour="steam",
         source="Steam",
         noun="application",
         priority=100,
@@ -298,7 +298,7 @@ class SteamApplication(Remote):
 class TmdbMovie(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.movie"}
     info = RemoteInfo(
-        color="tmdb-movie",
+        colour="tmdb-movie",
         source="TMDB",
         noun="movie",
         priority=40,
@@ -311,7 +311,7 @@ class TmdbMovie(Remote):
 class TmdbTvSeries(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.tv"}
     info = RemoteInfo(
-        color="tmdb-tv",
+        colour="tmdb-tv",
         source="TMDB",
         noun="series",
         priority=31,

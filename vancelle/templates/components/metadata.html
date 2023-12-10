@@ -45,17 +45,17 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{% macro panel_details_partial(details, title, color="primary") %}
-  <div class="panel is-{{ color }}">
+{% macro panel_details_partial(details, title, colour="primary") %}
+  <div class="panel is-{{ colour }}">
     <div class="panel-heading x-background" {{ _style_background_image(details) }}>{{ title }}</div>
     <div>{{ caller() }}</div>
   </div>
 {% endmacro %}
 
-{% macro panel_details(details, href, color="primary") %}
-  <div class="panel is-{{ color }} x-details">
+{% macro panel_details(details, href, colour="primary") %}
+  <div class="panel is-{{ colour }} x-details">
     <div class="panel-heading x-background" {{ _style_background_image(details) }}></div>
-    <figure class="x-cover has-background-{{ color }}-dark">
+    <figure class="x-cover has-background-{{ colour }}-dark">
       {%- if details.cover -%}
         <img src="{{ details.cover }}" alt="" loading="lazy" referrerpolicy="no-referrer">
       {%- endif -%}
@@ -102,7 +102,7 @@
   {% set details = remote.into_details() %}
   {% set properties = remote.into_properties() %}
   {% set more_properties = remote.more_properties() %}
-  <div class="panel is-{{ remote.info.color }} x-properties">
+  <div class="panel is-{{ remote.info.colour }} x-properties">
     <p class="panel-heading x-background" {{ _style_background_image(details) }}>Properties</p>
     <div class="x-properties-grid">
       {{ _properties(properties) }}

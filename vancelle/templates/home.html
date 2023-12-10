@@ -34,7 +34,7 @@
     </div>
     <div class="columns is-centered is-multiline">
       {% for remote_type, cls, count in remote_count_by_type %}
-        <div class="column">{{ gauge(count, cls.info.noun_full, url_for('work.index', type='', remote_type=remote_type), background=cls.info.color, text='%s-invert' % cls.info.color) }}</div>
+        <div class="column">{{ gauge(count, cls.info.noun_full, url_for('work.index', type='', remote_type=remote_type), background=cls.info.colour, text='%s-invert' % cls.info.colour) }}</div>
       {% endfor %}
     </div>
   </section>

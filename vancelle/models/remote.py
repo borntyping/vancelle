@@ -298,10 +298,10 @@ class SteamApplication(Remote):
 class TmdbMovie(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.movie"}
     info = RemoteInfo(
-        color="tmdb",
+        color="tmdb-movie",
         source="TMDB",
         noun="movie",
-        priority=30,
+        priority=40,
     )
 
     def external_url(self) -> str | None:
@@ -311,7 +311,7 @@ class TmdbMovie(Remote):
 class TmdbTvSeries(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.tv"}
     info = RemoteInfo(
-        color="tmdb",
+        color="tmdb-tv",
         source="TMDB",
         noun="series",
         priority=31,

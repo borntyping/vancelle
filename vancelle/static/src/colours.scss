@@ -29,7 +29,8 @@ $custom-colors: (
   // Remotes
         "imported": ($grey-lighter, findColorInvert($grey-lighter)),
         "steam": ($steam-dark, $steam-light, $steam-light, $steam-dark),
-        "tmdb": ($tmdb-primary, $tmdb-secondary),
+        "tmdb-movie": ($tmdb-primary, $tmdb-secondary),
+        "tmdb-tv": ($tmdb-primary, $tmdb-tertiary),
         "royalroad": (#181818, #c2a970),
         "openlibrary": (#e1dcc5, #02598b),
         "goodreads": (#382110, #f4f1ea),

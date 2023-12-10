@@ -16,9 +16,7 @@
 {%- endmacro -%}
 
 {%- macro shelf_tag(shelf) -%}
-  {%- set class_background = "has-background-{}".format(shelf.value) -%}
-  {%- set class_text = "has-text-{}-invert".format(shelf.value) -%}
-  <span class="tag {{ class_background }} {{ class_text }}" title="{{ shelf.description }}">{{ shelf.title }}</span>
+  <span class="tag has-background-{{ shelf.value }} has-text-{{ shelf.value }}-invert" title="{{ shelf.description }}">{{ shelf.title }}</span>
 {%- endmacro -%}
 
 {% macro details_title(details, href=None) %}

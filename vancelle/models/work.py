@@ -5,9 +5,10 @@ import typing
 import uuid
 
 from flask import url_for
-from sqlalchemy import Enum, ForeignKey, String, func
+from sqlalchemy import Enum, ForeignKey, String, asc, desc, func, nulls_last
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql.functions import coalesce
 
 from .base import Base
 from .details import Details, IntoDetails
@@ -60,7 +61,7 @@ class Work(Base, IntoDetails):
 
     records: Mapped[typing.List["Record"]] = relationship(
         back_populates="work",
-        order_by="Record.date_stopped, Record.date_started, Record.time_created",
+        order_by=nulls_last(asc(coalesce(Record.date_started, Record.date_stopped))),
         cascade="all, delete-orphan",
         lazy="selectin",
     )

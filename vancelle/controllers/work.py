@@ -38,7 +38,7 @@ class WorkController:
             .join(Record, isouter=True)
             .join(Remote, isouter=True)
             .order_by(
-                nulls_last(desc(coalesce(Record.date_stopped, Record.date_started))),
+                nulls_last(desc(coalesce(Record.date_started, Record.date_stopped))),
                 nulls_last(desc(coalesce(Work.release_date, Remote.release_date))),
                 desc(Work.time_created),
             )

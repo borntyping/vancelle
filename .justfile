@@ -12,3 +12,7 @@ docker-build:
 
 docker-run: docker-build
   docker run vancelle flask
+
+deploy:
+  git push dokku
+  git push origin

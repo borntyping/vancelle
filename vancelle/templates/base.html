@@ -47,7 +47,7 @@
     {% block before %}
     {% endblock before %}
 
-    <div class="section">
+    <div id="app-content" class="section">
       <div class="container block">
         {% block content %}{% endblock %}
       </div>
@@ -94,12 +94,14 @@
       <script src="https://unpkg.com/htmx.org@1.9.9/dist/ext/debug.js" crossorigin="anonymous"></script>
       <script src="https://unpkg.com/htmx.org@1.9.9/dist/ext/loading-states.js" crossorigin="anonymous"></script>
 
+      <!-- https://hyperscript.org -->
+      <script src="https://unpkg.com/hyperscript.org@0.9.12" crossorigin="anonymous"></script>
+
       <!-- https://ionic.io/ionicons -->
-      <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-      <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+      <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js" crossorigin="anonymous"></script>
 
       {% if sentry.sentry_enabled() %}
-              <!-- https://sentry.io -->
+        <!-- https://sentry.io -->
         <script src="https://browser.sentry-cdn.com/7.86.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
         <script>
           Sentry.init({

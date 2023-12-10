@@ -3,36 +3,85 @@
 {% from 'components/bulma.html' import bulma_form_field %}
 
 {% block before %}
-  <div class="section has-background-white-bis py-4">
-    <div class="container">
-      <form action="" method="get" class="is-flex-desktop x-gap-3 is-justify-content-space-between">
-        <input type="hidden" name="{{ form.layout.name }}" value="{{ form.layout.data }}">
-        <div class="field has-addons is-flex-grow-1">
-          {% for item_layout, item_title in form.layout.choices %}
-            <div class="control">
-              <a href="{{ url_with(layout=item_layout) }}" class="button {% if layout == item_layout %}is-primary{% endif %}">{{ item_title }}</a>
+  <form
+    id="x-work-index"
+    method="get"
+    action="{{ url_for(request.endpoint) }}"
+    hx-get="{{ url_for(request.endpoint) }}"
+    hx-trigger="submit throttle:1000ms, input changed from:.x-work-index-input throttle:1000ms"
+    hx-select="#app-content"
+    hx-target="#app-content"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    data-loading-target="#x-work-index-total">
+    <div class="section has-background-white-bis py-4">
+      <div class="container">
+        <div class="columns">
+          <div class="column">
+            <input type="hidden" name="{{ form.layout.name }}" value="{{ form.layout.data }}">
+            <div class="field is-expanded has-addons has-addons-fullwidth">
+              {% for item_layout, item_title in form.layout.choices %}
+                <div class="control">
+                  <a
+                    href="{{ url_with(layout=item_layout) }}"
+                    hx-get="{{ url_with(layout=item_layout) }}"
+                    class="button is-fullwidth {% if layout == item_layout %}is-primary{% endif %}">{{- item_title -}}</a>
+                </div>
+              {% endfor %}
+              {#<div class="control">{{ form.layout(class_='x-work-index-input') }}</div>#}
             </div>
-          {% endfor %}
-        </div>
-        <div class="field is-grouped">
-          <div class="control is-expanded">{{ form.work_type }}</div>
-          <div class="control is-expanded">{{ form.shelf }}</div>
-        </div>
-        <div class="field is-grouped">
-          <div class="control is-expanded">{{ form.remote_type }}</div>
-        </div>
-        <div class="field is-grouped">
-          <div class="control is-expanded">{{ form.has_remote }}</div>
-        </div>
-        <div class="field has-addons">
-          <div class="control">
-            <a class="button is-static">{{ n('result', total) }}</a>
           </div>
-          <div class="control">
-            <button class="button" type="submit">Filter</button>
+          <div class="column">
+            <div class="field is-expanded">
+              <div class="control">{{ form.work_type(class_='x-work-index-input') }}</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="field is-expanded">
+              <div class="control">{{ form.shelf(class_='x-work-index-input') }}</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="field is-expanded">
+              <div class="control">{{ form.query(class_='input x-work-index-input', placeholder='Search....') }}</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <a id="x-work-index-total" class="button is-static is-fullwidth" hx-swap-oob="true" data-loading-class="is-loading">{{ n('work', total) }}</a>
+              </div>
+              <div class="control">
+                <button class="button" type="submit" title="Refresh">
+                  <span class="icon">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                  </span>
+                </button>
+              </div>
+              <div class="control">
+                <button class="button" type="button" _="on click toggle .x-is-active on #index-expanded-controls" title="Display more filters">
+                  <span class="icon">
+                    <ion-icon name="chevron-down-outline"></ion-icon>
+                  </span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </form>
+
+        <div id="index-expanded-controls" class="columns x-is-collapsible {% if form.remote_type.data or form.remote_data.data %}x-is-active{% endif %}">
+          <div class="column">
+            <div class="field">
+              <div class="control is-expanded">{{ form.remote_type(class_='x-work-index-input') }}</div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="field">
+              <div class="control is-expanded">{{ form.remote_data(class_='x-work-index-input') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </form>
 {% endblock %}

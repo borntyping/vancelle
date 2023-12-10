@@ -7,7 +7,7 @@ import flask_wtf
 import structlog
 import wtforms
 from werkzeug.exceptions import BadRequest
-from wtforms.validators import Optional
+from wtforms.validators import DataRequired, Optional
 from wtforms.widgets import HiddenInput
 
 from vancelle.blueprints.bulma import BulmaSelect
@@ -101,19 +101,29 @@ class WorkIndexForm(flask_wtf.FlaskForm):
             ("table", "Table"),
         ],
         default="board",
-        widget=HiddenInput,
+        widget=BulmaSelect(),
+        validators=[DataRequired()],
     )
     work_type = wtforms.SelectField(
         label="Work type",
-        choices=[("", "All types")] + [(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
+        choices=[("", "Any type")] + [(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
         widget=BulmaSelect(),
+        validators=[Optional()],
     )
+    shelf = wtforms.SelectField(
+        label="Shelf",
+        choices=[("", "Any shelf")] + [(shelf.value, shelf.title) for shelf in Shelf],
+        widget=BulmaSelect(),
+        validators=[Optional()],
+    )
+
     remote_type = wtforms.SelectField(
         label="Remote type",
         choices=[("", "Any remote type")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
         widget=BulmaSelect(),
+        validators=[Optional()],
     )
-    has_remote = wtforms.SelectField(
+    remote_data = wtforms.SelectField(
         label="Has remote",
         choices=[
             ("", "Any remote data"),
@@ -122,12 +132,9 @@ class WorkIndexForm(flask_wtf.FlaskForm):
             ("no", "No remote data"),
         ],
         widget=BulmaSelect(),
+        validators=[Optional()],
     )
-    shelf = wtforms.SelectField(
-        label="Shelf",
-        choices=[("", "Any shelf")] + [(shelf.value, shelf.title) for shelf in Shelf],
-        widget=BulmaSelect(),
-    )
+    query = wtforms.SearchField(label="Query", validators=[Optional()], filters=[str.strip])
 
 
 @bp.route("/works/")
@@ -138,30 +145,29 @@ def index():
         user=flask_login.current_user,
         work_type=form.work_type.data,
         remote_type=form.remote_type.data,
-        has_remote=form.has_remote.data,
-        shelf=form.shelf.data,
+        remote_data=form.remote_data.data,
+        work_shelf=form.shelf.data,
+        query=form.query.data,
     )
+    layout = form.layout.data
 
-    context = dict(form=form, layout=form.layout.data)
-
-    match form.layout.data:
+    logger.debug("Using layout", layout=layout)
+    match layout:
         case "board":
             shelves = controller.shelves(statement=statement)
             total = sum(len(v) for v in shelves.values())
-            page = flask.render_template("work/index_board.html", **context, shelves=shelves, total=total)
+            page = flask.render_template("work/index_board.html", form=form, layout=layout, shelves=shelves, total=total)
         case "list":
             works = controller.paginate(statement=statement)
-            page = flask.render_template("work/index_list.html", **context, works=works, total=works.total)
+            page = flask.render_template("work/index_list.html", form=form, layout=layout, works=works, total=works.total)
         case "table":
             works = controller.paginate(statement=statement)
-            page = flask.render_template("work/index_table.html", **context, works=works, total=works.total)
+            page = flask.render_template("work/index_table.html", form=form, layout=layout, works=works, total=works.total)
         case _:
             raise BadRequest(f"Unknown layout {form.layout.data!r}")
 
     response = flask.Response(page)
-    response.set_cookie("index", flask.json.dumps(form.data))
-    response.delete_cookie("layout")
-    response.delete_cookie("type")
+    response.set_cookie("index", flask.json.dumps(form.data), samesite="Lax")
     return response
 
 

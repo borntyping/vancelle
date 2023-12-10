@@ -5,10 +5,11 @@ import uuid
 
 import flask_login
 import flask_sqlalchemy.pagination
-from sqlalchemy import any_, asc, exists, func, select, nulls_last, Select, desc
+from sqlalchemy import ColumnElement, any_, asc, exists, func, or_, select, nulls_last, Select, desc
 import structlog
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.functions import coalesce
+from werkzeug.exceptions import BadRequest
 
 from vancelle.extensions import db
 from vancelle.models import Base, User
@@ -27,10 +28,20 @@ class WorkController:
         *,
         user: User = flask_login.current_user,
         work_type: str,
+        work_shelf: str,
         remote_type: str,
-        has_remote: str,
-        shelf: str,
+        remote_data: str,
+        query: str,
     ) -> Select[tuple[Work]]:
+        log = logger.bind(
+            user=user.username,
+            work_type=repr(work_type),
+            work_shelf=repr(work_shelf),
+            remote_type=repr(remote_type),
+            remote_data=repr(remote_data),
+            query=repr(query),
+        )
+
         statement = (
             select(Work)
             .filter_by(user_id=user.id)
@@ -46,22 +57,40 @@ class WorkController:
 
         if work_type:
             statement = statement.filter(Work.type == work_type)
-
+        if work_shelf:
+            statement = statement.filter(Work.shelf == work_shelf)
         if remote_type:
             statement = statement.filter(Remote.type == remote_type)
+        if query:
+            statement = statement.filter(self._query_filter(query))
+        if remote_data:
+            statement = statement.filter(self._remote_data_filter(remote_data))
 
-        if shelf:
-            statement = statement.filter(Work.shelf == shelf)
-
-        imported = ImportedWork.__mapper__.polymorphic_identity
-        if has_remote == "yes":
-            statement = statement.filter(Work.remotes.any(Remote.type != imported))
-        elif has_remote == "imported":
-            statement = statement.filter(~Work.remotes.any(Remote.type != imported))
-        elif has_remote == "no":
-            statement = statement.filter(~Work.remotes.any())
-
+        log.info("Constructed query", statement=str(statement))
         return statement
+
+    def _query_filter(self, query: str) -> ColumnElement[bool]:
+        other = f"%{query}%"
+        return or_(
+            Work.title.ilike(other),
+            Work.author.ilike(other),
+            Work.description.ilike(other),
+            Remote.title.ilike(other),
+            Remote.author.ilike(other),
+            Remote.description.ilike(other),
+        )
+
+    def _remote_data_filter(self, remote_data: str) -> ColumnElement[bool]:
+        imported = ImportedWork.__mapper__.polymorphic_identity
+        match remote_data:
+            case "yes":
+                return Work.remotes.any(Remote.type != imported)
+            case "imported":
+                return ~Work.remotes.any(Remote.type != imported)
+            case "no":
+                return ~Work.remotes.any()
+
+        raise BadRequest("Invalid remote data filter")
 
     def paginate(self, statement: Select[tuple[Work]]) -> flask_sqlalchemy.pagination.Pagination:
         return db.paginate(statement)

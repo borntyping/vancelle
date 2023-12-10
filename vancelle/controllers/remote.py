@@ -53,27 +53,14 @@ class RemotesController:
     def _get_work_by_id(self, work_id: uuid.UUID) -> Work:
         return db.get_or_404(Work, work_id, description="Work not found")
 
-    def _get_remote_from_db(self, *, remote_type: str, remote_id: str) -> Remote:
-        log = logger.bind(remote_type=remote_type, remote_id=remote_id)
-        remote = db.one_or_404(
-            select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id),
-            description="Remote not found",
-        )
-        log.debug("Fetched remote from database", id=remote.id)
-        return remote
+    def _get_remote_from_db_or_404(self, *, remote_type: str, remote_id: str) -> Remote:
+        return db.one_or_404(self._db_get_remote(remote_type=remote_type, remote_id=remote_id), description="Remote not found")
 
-    def _get_remote(self, *, remote_type: str, remote_id: str) -> Remote:
-        log = logger.bind(remote_type=remote_type, remote_id=remote_id)
+    def _get_remote_from_db_or_none(self, *, remote_type: str, remote_id: str) -> Remote | None:
+        return db.session.execute(self._db_get_remote(remote_type=remote_type, remote_id=remote_id)).scalar_one_or_none()
 
-        if db_remote := db.session.execute(
-            select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
-        ).scalar_one_or_none():
-            log.debug("Fetched remote from database")
-            return db_remote
-
-        remote = self.managers[remote_type].fetch(remote_id)
-        log.debug("Fetched remote from source")
-        return remote
+    def _db_get_remote(self, remote_type: str, remote_id: str) -> sqlalchemy.Select:
+        return select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
 
     def index(self, *, remote_type: str | None) -> Pagination:
         query = sqlalchemy.select(Remote)
@@ -84,7 +71,7 @@ class RemotesController:
         return db.paginate(query)
 
     def refresh(self, remote_type: str, remote_id: str) -> Remote:
-        old_remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+        old_remote = self._get_remote_from_db_or_404(remote_type=remote_type, remote_id=remote_id)
 
         new_remote = self.managers[old_remote.type].fetch(old_remote.id)
         new_remote.work_id = old_remote.work_id
@@ -96,21 +83,21 @@ class RemotesController:
         return new_remote
 
     def delete(self, *, remote_type: str, remote_id: str) -> Remote:
-        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+        remote = self._get_remote_from_db_or_404(remote_type=remote_type, remote_id=remote_id)
         remote.time_deleted = sqlalchemy.func.now()
         db.session.add(remote)
         db.session.commit()
         return remote
 
     def restore(self, *, remote_type: str, remote_id: str) -> Remote:
-        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+        remote = self._get_remote_from_db_or_404(remote_type=remote_type, remote_id=remote_id)
         remote.time_deleted = None
         db.session.add(remote)
         db.session.commit()
         return remote
 
     def permanently_delete(self, *, remote_type: str, remote_id: str) -> None:
-        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+        remote = self._get_remote_from_db_or_404(remote_type=remote_type, remote_id=remote_id)
         db.session.delete(remote)
         db.session.commit()
         return None
@@ -120,7 +107,7 @@ class RemotesController:
         Create a new remote and a new work.
         """
 
-        if remote := self._get_remote_from_db(remote_id=remote_id, remote_type=remote_type):
+        if remote := self._get_remote_from_db_or_none(remote_type=remote_type, remote_id=remote_id):
             logger.info("Instructed to create a remote that already exists")
             flask.flash(
                 flask.render_template("remote/flash_already_exists.html", remote=remote),
@@ -195,7 +182,14 @@ class RemotesController:
         )
 
     def render_detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> str:
-        remote = self._get_remote(remote_type=remote_type, remote_id=remote_id)
+        log = logger.bind(remote_type=remote_type, remote_id=remote_id)
+
+        if remote := self._get_remote_from_db_or_none(remote_type=remote_type, remote_id=remote_id):
+            log.debug("Fetched remote from database")
+        else:
+            remote = self.managers[remote_type].fetch(remote_id)
+            log.debug("Fetched remote from source")
+
         work = self._get_work_by_id(work_id) if work_id else None
         context = self.managers[remote_type].context(remote)
         return flask.render_template(

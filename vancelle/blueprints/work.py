@@ -26,7 +26,7 @@ controller = WorkController()
 bp = flask.Blueprint("work", __name__, url_prefix="")
 
 SHELF_CHOICES = {
-    key: [(s.value, s.title) for s in group] for key, group in itertools.groupby(Shelf, key=lambda s: s.group.value)
+    key: [(s.value, s.title) for s in group] for key, group in itertools.groupby(Shelf, key=lambda s: s.group.title)
 }
 
 

@@ -1,8 +1,10 @@
-{% macro bulma_form_field(field, icon_left=None, icon_right=None) %}
+{% macro bulma_form_field(field, label=True, icon_left=None, icon_right=None) %}
   <div class="field">
-    {{ field.label(class_="label") }}
-    <div {{ html_params(**bulma_control_params(field)) }}>
-      {{ field(**bulma_field_params(field, icon_left=icon_left, icon_right=icon_right, **kwargs)) }}
+    {% if label %}
+      {{ field.label(class_="label") }}
+    {% endif %}
+    <div class="control {% if icon_left %}has-icons-left{% endif %} {% if icon_right %}has-icons-right{% endif %}">
+      {{ bulma_widget(field, **kwargs) }}
       {% if icon_left %}
         <span class="icon is-small is-left">
           <ion-icon name="{{ icon_left }}"></ion-icon>

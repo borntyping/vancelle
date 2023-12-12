@@ -2,7 +2,10 @@ import typing
 
 import flask
 import markupsafe
+import structlog
 import wtforms.widgets
+
+logger = structlog.get_logger(logger_name=__name__)
 
 bp = flask.Blueprint("bulma", __name__)
 
@@ -15,33 +18,42 @@ def join(string: str, value: str) -> str:
 
 
 class BulmaSelect(wtforms.widgets.Select):
+    """Wrap <select> in <div class="select ...">."""
+
     def __call__(self, field: wtforms.SelectField, **kwargs) -> str:
-        """Wrap <select> in <div class="select">."""
-        wrapper = kwargs.pop("wrapper", {})
-        markup = super().__call__(field=field, **kwargs)
+        """
+        Warning: kwargs will have trailing underscores stripped. This is because
+        wtforms `render_field` calls `clean_key()` even though it will be called
+        again by `html_params` later.
+        """
+        logger.debug("BulmaSelect", field=field, kwargs=kwargs)
 
-        class_ = wrapper.pop("class_", "")
-        class_ = join(class_, "select")
+        class_: str = kwargs.pop("class", "select is-fullwidth")
+        input_class_: str | False = kwargs.pop("input_class", False)
 
-        if wrapper.get("fullwidth", True):
-            class_ = join(class_, "is-fullwidth")
+        markup = super().__call__(field=field, class_=input_class_, **kwargs)
+        return markupsafe.Markup(f"<div {wtforms.widgets.html_params(class_=class_)}>{markup}</div>")
 
-        wrapper_params = wtforms.widgets.html_params(class_=class_, **wrapper)
-        return markupsafe.Markup(f"<div {wrapper_params}>{markup}</div>")
+
+def macro(attribute, **kwargs) -> markupsafe.Markup:
+    return flask.get_template_attribute("components/bulma.html", attribute)(**kwargs)
 
 
 @bp.app_template_global()
-def bulma_field_params(
-    field: wtforms.FormField,
-    **kwargs: typing.Any,
-) -> typing.Mapping[str, typing.Any]:
+def bulma_widget(field: wtforms.FormField, **kwargs: typing.Any) -> str:
+    """
+    Render a wtforms field.
+
+    I call it a widget here to avoid confusion with the bulma "field" and "control" elements.
+    """
+    logger.debug("bulma_widget", field=field, kwargs=kwargs)
     class_ = kwargs.pop("class_", "")
 
     match field.__class__:
         case wtforms.TextAreaField:
             class_ = join(class_, "textarea")
         case wtforms.SelectField:
-            class_ = join(class_, "select")
+            class_ = join(class_, "select is-fullwidth")
         case wtforms.BooleanField:
             raise NotImplementedError
         case _:
@@ -49,36 +61,16 @@ def bulma_field_params(
 
     if field.errors:
         class_ = join(class_, "is-danger")
+    elif field.data and field.data != field.default:
+        class_ = join(class_, "is-success")
 
     # Avoid printing the string "None" as a placeholder.
     if "placeholder" in kwargs and kwargs["placeholder"] is None:
         del kwargs["placeholder"]
 
-    if "wrapper" in kwargs:
-        del kwargs["wrapper"]
-
-    return kwargs | {"class_": class_}
+    return field(class_=class_, **kwargs)
 
 
 @bp.app_template_global()
-def bulma_control_params(
-    field: wtforms.FormField,
-    icon_left: str | None = None,
-    icon_right: str | None = None,
-    **kwargs,
-) -> typing.Mapping[str, typing.Any]:
-    classes = ["control"]
-
-    if isinstance(field, wtforms.SelectField) and kwargs.get("fullwidth", True):
-        classes.append("is-expanded")
-
-    if field.errors:
-        classes.append("is-danger")
-
-    if icon_left:
-        classes.append("has-icons-left")
-
-    if icon_right:
-        classes.append("has-icons-right")
-
-    return {"class_": " ".join(classes)}
+def bulma_form_field(field: wtforms.FormField, **kwargs: typing.Any) -> str:
+    return macro("bulma_form_field", field=field, **kwargs)

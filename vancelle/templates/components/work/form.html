@@ -1,25 +1,23 @@
-{% from 'components/bulma.html' import bulma_form_field %}
-
 {% macro block_edit_work(form, details=None) %}
   <div class="block">
     <div class="columns mb-0">
       <div class="column">
-        {{ bulma_form_field(form.type) }}
+        {{ bulma_form_field(form.type, icon_left='bookmark-outline') }}
       </div>
       <div class="column">
-        {{ bulma_form_field(form.shelf) }}
+        {{ bulma_form_field(form.shelf, icon_left='bookmarks-outline') }}
       </div>
     </div>
-    {{ bulma_form_field(form.title, placeholder=details.title if details else None) }}
-    {{ bulma_form_field(form.author, placeholder=details.author if details else None) }}
+    {{ bulma_form_field(form.title, placeholder=details.title if details else None, icon_right='text-outline') }}
+    {{ bulma_form_field(form.author, placeholder=details.author if details else None, icon_right='text-outline') }}
     {{ bulma_form_field(form.release_date) }}
     {{ bulma_form_field(form.description, placeholder=details.description if details else None) }}
     <div class="columns mb-0">
       <div class="column">
-        {{ bulma_form_field(form.cover, placeholder=details.cover if details else None) }}
+        {{ bulma_form_field(form.cover, placeholder=details.cover if details else None, icon_right='image-outline') }}
       </div>
       <div class="column">
-        {{ bulma_form_field(form.background, placeholder=details.background if details else None) }}
+        {{ bulma_form_field(form.background, placeholder=details.background if details else None, icon_right='image-outline') }}
       </div>
     </div>
   </div>

@@ -25,10 +25,6 @@ controller = WorkController()
 
 bp = flask.Blueprint("work", __name__, url_prefix="")
 
-SHELF_CHOICES = {
-    key: [(s.value, s.title) for s in group] for key, group in itertools.groupby(Shelf, key=lambda s: s.group.title)
-}
-
 
 class WorkForm(flask_wtf.FlaskForm):
     type = wtforms.SelectField(
@@ -44,13 +40,83 @@ class WorkForm(flask_wtf.FlaskForm):
     background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
     shelf = wtforms.SelectField(
         "Shelf",
-        choices=SHELF_CHOICES,
+        choices={
+            shelf_group.title: [(s.value, s.title) for s in group]
+            for shelf_group, group in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
+        },
         coerce=Shelf,
         default=Shelf.UNSORTED,
         widget=BulmaSelect(),
         validators=[Optional()],
     )
     # tags = wtforms.StringField('tags')
+
+
+class WorkIndexForm(flask_wtf.FlaskForm):
+    layout = wtforms.SelectField(
+        label="Layout",
+        choices=[
+            ("board", "Board"),
+            ("list", "List"),
+            ("table", "Table"),
+        ],
+        default="board",
+        widget=BulmaSelect(),
+        validators=[DataRequired()],
+    )
+    work_type = wtforms.SelectField(
+        label="Work type",
+        choices=[("", "Any type")] + [(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
+        default="",
+        widget=BulmaSelect(),
+        validators=[Optional()],
+    )
+    work_shelf = wtforms.SelectField(
+        label="Exact shelf",
+        choices=[("", "Any shelf")] + [(s.value, s.title) for s in Shelf],
+        default="",
+        widget=BulmaSelect(),
+        validators=[Optional()],
+    )
+    work_shelf_group = wtforms.SelectField(
+        label="Shelf group",
+        choices=[("", "Any shelf group")] + [(g.value, g.title) for g in ShelfGroup],
+        default="",
+        widget=BulmaSelect(),
+        validators=[Optional()],
+    )
+    work_deleted = wtforms.SelectField(
+        label="Deleted works",
+        choices=[
+            ("no", "Don't include deleted works"),
+            ("all", "Include deleted works"),
+            ("yes", "Only deleted works"),
+        ],
+        default="no",
+        widget=BulmaSelect(),
+        validators=[DataRequired()],
+    )
+
+    remote_type = wtforms.SelectField(
+        label="Remote type",
+        choices=[("", "Any remote type")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
+        default="",
+        widget=BulmaSelect(),
+        validators=[Optional()],
+    )
+    remote_data = wtforms.SelectField(
+        label="Has remote",
+        choices=[
+            ("", "Any remote data"),
+            ("yes", "Has remote data"),
+            ("imported", "Only imported data"),
+            ("no", "No remote data"),
+        ],
+        default="",
+        widget=BulmaSelect(),
+        validators=[Optional()],
+    )
+    search = wtforms.SearchField(label="Query", validators=[Optional()])
 
 
 @bp.record_once
@@ -91,68 +157,6 @@ def create():
         return flask.redirect(work.url_for())
 
     return flask.render_template("work/create.html", form=form)
-
-
-class WorkIndexForm(flask_wtf.FlaskForm):
-    layout = wtforms.SelectField(
-        label="Layout",
-        choices=[
-            ("board", "Board"),
-            ("list", "List"),
-            ("table", "Table"),
-        ],
-        default="board",
-        widget=BulmaSelect(),
-        validators=[DataRequired()],
-    )
-    work_type = wtforms.SelectField(
-        label="Work type",
-        choices=[("", "Any type")] + [(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    work_shelf = wtforms.SelectField(
-        label="Exact shelf",
-        choices=[("", "Any shelf")] + [(s.value, s.title) for s in Shelf],
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    work_shelf_group = wtforms.SelectField(
-        label="Shelf group",
-        choices=[("", "Any shelf group")] + [(g.value, g.title) for g in ShelfGroup],
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    work_deleted = wtforms.SelectField(
-        label="Deleted works",
-        choices=[
-            ("no", "Don't include deleted works"),
-            ("all", "Include deleted works"),
-            ("yes", "Only deleted works"),
-        ],
-        default="no",
-        widget=BulmaSelect(),
-        validators=[DataRequired()],
-    )
-
-    remote_type = wtforms.SelectField(
-        label="Remote type",
-        choices=[("", "Any remote type")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    remote_data = wtforms.SelectField(
-        label="Has remote",
-        choices=[
-            ("", "Any remote data"),
-            ("yes", "Has remote data"),
-            ("imported", "Only imported data"),
-            ("no", "No remote data"),
-        ],
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    search = wtforms.SearchField(label="Query", validators=[Optional()])
 
 
 @bp.route("/works/")

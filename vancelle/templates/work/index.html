@@ -8,7 +8,7 @@
     method="get"
     action="{{ url_for(request.endpoint) }}"
     hx-get="{{ url_for(request.endpoint) }}"
-    hx-trigger="submit throttle:1000ms, input changed from:.x-work-index-input throttle:1000ms"
+    hx-trigger="input changed from:.x-work-index-input throttle:1000ms, keyup changed delay:500ms from:#search, submit throttle:1000ms"
     hx-select="#app-content"
     hx-target="#app-content"
     hx-swap="outerHTML"
@@ -32,27 +32,11 @@
             </div>
           </div>
           <!--
-          <div class="column">
-            <div class="field is-expanded">
-              <div class="control">{{ form.layout(class_='x-work-index-input') }}</div>
-            </div>
-          </div>
+          <div class="column">{{ bulma_widget(form.layout, input_class_='x-work-index-input') }}</div>
           -->
-          <div class="column">
-            <div class="field is-expanded">
-              <div class="control">{{ form.work_type(class_='x-work-index-input') }}</div>
-            </div>
-          </div>
-          <div class="column">
-            <div class="field is-expanded">
-              <div class="control">{{ form.work_shelf_group(class_='x-work-index-input') }}</div>
-            </div>
-          </div>
-          <div class="column">
-            <div class="field is-expanded">
-              <div class="control">{{ form.search(class_='input x-work-index-input', placeholder='Search....') }}</div>
-            </div>
-          </div>
+          <div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input') }}</div>
+          <div class="column">{{ bulma_form_field(form.work_shelf_group, label=False, input_class_='x-work-index-input') }}</div>
+          <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', placeholder='Search....') }}</div>
           <div class="column">
             <div class="field has-addons">
               <div class="control is-expanded">
@@ -77,26 +61,10 @@
         </div>
 
         <div id="index-expanded-controls" class="columns x-is-collapsible {% if form.work_shelf.data or form.work_deleted.data != form.work_deleted.default or form.remote_type.data or form.remote_data.data %}x-is-active{% endif %}">
-          <div class="column">
-            <div class="field is-expanded">
-              <div class="control">{{ form.work_shelf(class_='x-work-index-input') }}</div>
-            </div>
-          </div>
-          <div class="column">
-            <div class="field">
-              <div class="control is-expanded">{{ form.work_deleted(class_='x-work-index-input') }}</div>
-            </div>
-          </div>
-          <div class="column">
-            <div class="field">
-              <div class="control is-expanded">{{ form.remote_type(class_='x-work-index-input') }}</div>
-            </div>
-          </div>
-          <div class="column">
-            <div class="field">
-              <div class="control is-expanded">{{ form.remote_data(class_='x-work-index-input') }}</div>
-            </div>
-          </div>
+          <div class="column">{{ bulma_widget(form.work_shelf, input_class_='x-work-index-input') }}</div>
+          <div class="column">{{ bulma_widget(form.work_deleted, input_class_='x-work-index-input') }}</div>
+          <div class="column">{{ bulma_widget(form.remote_type, input_class_='x-work-index-input') }}</div>
+          <div class="column">{{ bulma_widget(form.remote_data, input_class_='x-work-index-input') }}</div>
         </div>
       </div>
     </div>

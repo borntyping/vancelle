@@ -129,7 +129,7 @@ class Work(Base, IntoDetails):
             cover=next((d.cover for d in details if d.cover), None),
             background=next((d.background for d in details if d.background), None),
             tags=next((d.tags for d in details if d.tags), set()),
-            shelf=next((d.shelf for d in details if d.shelf), Shelf.UNSORTED),
+            shelf=self.shelf,
             external_url=None,
         )
 

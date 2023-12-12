@@ -44,8 +44,9 @@ class WorkForm(flask_wtf.FlaskForm):
     background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
     shelf = wtforms.SelectField(
         "Shelf",
-        choices=SHELF_CHOICES | {"Other": [("", "Clear shelf")]},
-        coerce=lambda x: Shelf(x) if x else None,  # type: ignore
+        choices=SHELF_CHOICES,
+        coerce=Shelf,
+        default=Shelf.UNSORTED,
         widget=BulmaSelect(),
         validators=[Optional()],
     )

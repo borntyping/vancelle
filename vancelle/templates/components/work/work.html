@@ -1,18 +1,8 @@
-{% macro work_type_tag(work) %}
-  {% if work.type == 'book' %}
-    <span class="tag is-light is-primary" style="width: 4em;">Book</span>
-  {% elif work.type == 'film' %}
-    <span class="tag is-light is-info" style="width: 4em;">Film</span>
-  {% elif work.type == 'game' %}
-    <span class="tag is-light is-danger" style="width: 4em;">Game</span>
-  {% elif work.type == 'show' %}
-    <span class="tag is-light is-link" style="width: 4em;">Show</span>
-  {% else %}
-    <span class="tag is-light" style="width: 4em;">{{ work.type }}</span>
-  {% endif %}
+{% macro tag_work_type(work) %}
+  <span class="tag is-light">{{ work.info.title }}</span>
 {% endmacro %}
 
-{% macro date_span(started, stopped) %}
+{% macro span_date(started, stopped) %}
   {% if started == stopped and started and stopped %}
     {{ started|date }}
   {% else %}

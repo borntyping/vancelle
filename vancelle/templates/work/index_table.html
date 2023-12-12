@@ -2,7 +2,7 @@
 
 {% from 'components/layout.html' import section %}
 {% from 'components/pagination.html' import pagination %}
-{% from 'components/work/work.html' import work_type_tag %}
+{% from 'components/work/work.html' import tag_work_type %}
 {% from 'components/metadata.html' import sources_list, details_combined_title, shelf_tag %}
 
 {% block content %}
@@ -22,7 +22,7 @@
         {% for work in works %}
           {% set details = work.resolve_details() %}
           <tr>
-            <td class="has-text-centered">{{ work_type_tag(work) }}</td>
+            <td class="has-text-centered">{{ tag_work_type(work) }}</td>
             <td class="has-text-grey" style="width: 50%;">
               {{ details_combined_title(details, href=work.url_for()) }}
             </td>

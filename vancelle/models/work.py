@@ -173,6 +173,6 @@ class Music(Work):
     info = WorkInfo(noun="music", plural="music", priority=5)
 
 
-class BoardGame(Work):
+class TabletopGame(Work):
     __mapper_args__ = {"polymorphic_identity": "boardgame"}
-    info = WorkInfo(noun="board game", priority=6)
+    info = WorkInfo(noun="tabletop game", title="Tabletop game", priority=6)

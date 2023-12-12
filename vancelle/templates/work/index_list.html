@@ -2,7 +2,7 @@
 
 {% from 'components/layout.html' import section %}
 {% from 'components/pagination.html' import pagination %}
-{% from 'components/work/work.html' import work_type_tag, date_span %}
+{% from 'components/work/work.html' import tag_work_type, span_date %}
 {% from 'components/metadata.html' import sources_list, details_title, details_date_and_author, shelf_tag %}
 
 
@@ -16,7 +16,7 @@
           <p class="is-flex is-justify-content-space-between">
             {{ details_title(details) }}
             <span class="has-text-right">
-              {{ work_type_tag(work) }}
+              {{ tag_work_type(work) }}
               {{ shelf_tag(details.shelf) }}
             </span>
           </p>

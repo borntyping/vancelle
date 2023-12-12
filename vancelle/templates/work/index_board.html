@@ -1,6 +1,6 @@
 {% extends 'work/index.html' %}
 
-{% from 'components/work/work.html' import work_type_tag, date_span %}
+{% from 'components/work/work.html' import tag_work_type, span_date %}
 
 {% macro board_card(work, details, colour) %}
   <div class="x-board-card has-background-{{ colour }}-light" title="{{ details }}">
@@ -13,7 +13,7 @@
         </p>
       </div>
       <div>
-        <p class="is-size-7">{{ date_span(work.date_started, work.date_stopped) }}</p>
+        <p class="is-size-7">{{ span_date(work.date_started, work.date_stopped) }}</p>
       </div>
     </div>
     <figure class="has-background-{{ colour }}">

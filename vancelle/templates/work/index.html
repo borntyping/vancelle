@@ -12,6 +12,7 @@
     hx-select="#app-content"
     hx-target="#app-content"
     hx-swap="outerHTML"
+    hx-swap-oob="true"
     hx-push-url="true"
     data-loading-target="#x-work-index-total">
     <div class="section has-background-white-bis py-4">
@@ -28,9 +29,15 @@
                     class="button is-fullwidth {% if layout == item_layout %}is-primary{% endif %}">{{- item_title -}}</a>
                 </div>
               {% endfor %}
-              {#<div class="control">{{ form.layout(class_='x-work-index-input') }}</div>#}
             </div>
           </div>
+          <!--
+          <div class="column">
+            <div class="field is-expanded">
+              <div class="control">{{ form.layout(class_='x-work-index-input') }}</div>
+            </div>
+          </div>
+          -->
           <div class="column">
             <div class="field is-expanded">
               <div class="control">{{ form.work_type(class_='x-work-index-input') }}</div>

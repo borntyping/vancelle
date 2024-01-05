@@ -58,15 +58,13 @@ class WorkIndexForm(flask_wtf.FlaskForm):
         choices=[
             ("board", "Board"),
             ("list", "List"),
-            ("table", "Table"),
         ],
         default="board",
         widget=BulmaSelect(),
         validators=[DataRequired()],
     )
-    work_type = wtforms.SelectField(
+    work_type = wtforms.HiddenField(
         label="Work type",
-        choices=[("", "Any type")] + [(cls.work_type(), cls.info.noun_title) for cls in Work.iter_subclasses()],
         default="",
         widget=BulmaSelect(),
         validators=[Optional()],
@@ -161,8 +159,7 @@ def create():
 
 @bp.route("/works/")
 def index():
-    data = flask.json.loads(flask.request.cookies.get("index", "{}"))
-    form = WorkIndexForm(formdata=flask.request.args, data=data, meta={"csrf": False})
+    form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
     query = WorkQuery(
         user=flask_login.current_user,
         work_type=form.work_type.data,
@@ -206,7 +203,7 @@ def index():
             raise BadRequest(f"Unknown layout {form.layout.data!r}")
 
     response = flask.Response(page)
-    response.set_cookie("index", flask.json.dumps(form.data), samesite="Lax")
+    response.delete_cookie("index")
     return response
 
 

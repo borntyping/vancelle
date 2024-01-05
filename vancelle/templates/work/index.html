@@ -15,11 +15,13 @@
     hx-swap-oob="true"
     hx-push-url="true"
     data-loading-target="#x-work-index-total">
+    <input type="hidden" name="{{ form.layout.name }}" value="{{ form.layout.data }}">
+    <input type="hidden" name="{{ form.work_type.name }}" value="{{ form.work_type.data }}">
+
     <div class="section has-background-white-bis py-4">
       <div class="container">
         <div class="columns">
           <div class="column">
-            <input type="hidden" name="{{ form.layout.name }}" value="{{ form.layout.data }}">
             <div class="field is-expanded has-addons has-addons-fullwidth">
               {% for item_layout, item_title in form.layout.choices %}
                 <div class="control">
@@ -31,16 +33,21 @@
               {% endfor %}
             </div>
           </div>
-          <!--
-          <div class="column">{{ bulma_widget(form.layout, input_class_='x-work-index-input') }}</div>
-          -->
-          <div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input') }}</div>
+          {#<div class="column">{{ bulma_widget(form.layout, input_class_='x-work-index-input') }}</div>#}
+          {#<div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input') }}</div>#}
           <div class="column">{{ bulma_form_field(form.work_shelf_group, label=False, input_class_='x-work-index-input') }}</div>
           <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', placeholder='Search....') }}</div>
           <div class="column">
             <div class="field has-addons">
               <div class="control is-expanded">
                 <a id="x-work-index-total" class="button is-static is-fullwidth" hx-swap-oob="true" data-loading-class="is-loading">{{ n('work', total) }}</a>
+              </div>
+              <div class="control">
+                <a href="{{ url_for('work.index') }}" class="button" title="Reset">
+                  <span class="icon">
+                    <ion-icon name="close-outline"></ion-icon>
+                  </span>
+                </a>
               </div>
               <div class="control">
                 <button class="button" type="submit" title="Refresh">

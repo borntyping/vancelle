@@ -8,7 +8,7 @@
     method="get"
     action="{{ url_for(request.endpoint) }}"
     hx-get="{{ url_for(request.endpoint) }}"
-    hx-trigger="input changed from:.x-work-index-input throttle:1000ms, keyup changed delay:500ms from:#search, submit throttle:1000ms"
+    hx-trigger="submit, input changed from:.x-work-index-input throttle:1000ms, keyup changed from:#search delay:500ms"
     hx-select="#app-content"
     hx-target="#app-content"
     hx-swap="outerHTML"
@@ -34,7 +34,7 @@
           {#<div class="column">{{ bulma_form_field(form.layout, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>#}
           <div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
           <div class="column">{{ bulma_form_field(form.work_shelf_group, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
-          <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', placeholder='Search....', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
           <div class="column">
             <div class="field has-addons">
               <div class="control is-expanded">

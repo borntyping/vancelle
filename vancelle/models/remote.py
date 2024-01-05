@@ -143,14 +143,18 @@ class Remote(Base, IntoDetails, IntoProperties):
         return {remote_type: mapper.class_ for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
 
     @classmethod
-    def iter_subclasses(cls) -> typing.Sequence[typing.Type["Remote"]]:
-        return list(
-            sorted(
-                (subclass.class_ for subclass in cls.__mapper__.polymorphic_map.values()),
-                key=lambda subclass: subclass.info.priority,
-                reverse=True,
-            )
-        )
+    def iter_subclasses(cls, can_search: bool | None = None) -> typing.Sequence[typing.Type["Remote"]]:
+        subclasses = (subclass.class_ for subclass in cls.__mapper__.polymorphic_map.values())
+        subclasses = sorted(subclasses, key=lambda subclass: subclass.info.priority, reverse=True)
+
+        if can_search is not None:
+            subclasses = (s for s in subclasses if s.info.can_search)
+
+        return list(subclasses)
+
+    @classmethod
+    def iter_subclasses_for_search(cls) -> typing.Sequence[typing.Type["Remote"]]:
+        return [subclass for subclass in cls.iter_subclasses() if subclass.info.can_search]
 
 
 class ImportedWorkAttributes(typing.TypedDict):

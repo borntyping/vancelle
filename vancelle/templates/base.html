@@ -1,4 +1,4 @@
-{%- from 'components/navbar.html' import navbar_item -%}
+{%- from 'components/navbar.html' import navbar_group, navbar_divider, navbar_item -%}
 {%- from 'components/toast.html' import toast -%}
 <!DOCTYPE html>
 <html lang="en">
@@ -19,25 +19,40 @@
       <div class="container">
         <div class="navbar-brand">
           <a href="{{ url_for('work.home') }}" class="navbar-item has-text-weight-bold">Vancelle</a>
+          <a role="button" class="navbar-burger" _="on click toggle .is-active on .navbar-menu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
         </div>
         <div class="navbar-menu">
           <div class="navbar-start">
-            {{ navbar_item('work.index', 'Index') }}
-            {{ navbar_item('work.create', 'New') }}
+            {% call navbar_group('Works', 'work.index') %}
+              {{ navbar_item('All', 'work.index', work_type=None) }}
+              {{ navbar_divider() }}
+              {% for cls in Work.iter_subclasses() %}
+                {{ navbar_item(cls.info.plural_title, 'work.index', work_type=cls.work_type()) }}
+              {% endfor %}
+            {% endcall %}
+            {% call navbar_group('Add new work', 'work.create') %}
+              {% for cls in Remote.iter_subclasses(can_search=True) %}
+                {{ navbar_item(cls.info.noun_full, 'remote.search_source', remote_type=cls.remote_type()) }}
+              {% endfor %}
+            {% endcall %}
           </div>
           <div class="navbar-end">
             {% if current_user.is_authenticated %}
-              <div class="navbar-item has-dropdown is-hoverable">
+              <div class="navbar-item has-dropdown" _="on click toggle .is-active">
                 <a class="navbar-link">{{ current_user.username }}</a>
                 <div class="navbar-dropdown is-right">
-                  {{ navbar_item("user.profile", "Import/export data") }}
-                  {{ navbar_item("remote.index", "Manage remote data") }}
-                  {{ navbar_item("cache.index", "Manage cached data") }}
-                  {{ navbar_item("user.logout", "Logout") }}
+                  {{ navbar_item("Import/export data", "user.profile") }}
+                  {{ navbar_item("Manage remote data", "remote.index") }}
+                  {{ navbar_item("Manage cached data", "cache.index") }}
+                  {{ navbar_item("Logout", "user.logout") }}
                 </div>
               </div>
             {% else %}
-              {{ navbar_item("user.login", "Login") }}
+              {{ navbar_item("Login", "user.login") }}
             {% endif %}
           </div>
         </div>

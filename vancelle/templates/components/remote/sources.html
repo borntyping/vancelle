@@ -1,7 +1,7 @@
 {% from "components/layout.html" import section %}
 
 {% macro section_sources(work_id=None, h1=False) %}
-  {% set subclasses = searchable_remotes() %}
+  {% set subclasses = Remote.iter_subclasses(can_search=True) %}
   {% call section('Search external sources for metadata', n('available source', subclasses|length), h1=h1) %}
     <div class="box">
       <div class="columns is-multiline is-centered">

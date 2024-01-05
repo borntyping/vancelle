@@ -7,18 +7,56 @@ import humanize
 import inflect
 import jinja2
 import markupsafe
+import structlog
 import wtforms.widgets
 
-from .ext_sentry import SentryExtension
 from ..inflect import p
+
+logger = structlog.get_logger(logger_name=__name__)
 
 
 def url_with(endpoint: str | None = None, **kwargs):
+    """Like url_for(), but keeps parameters from the current request."""
     endpoint = endpoint if endpoint else flask.request.endpoint
     values = flask.request.view_args | flask.request.args | kwargs  # type: ignore
 
     assert endpoint is not None
     return flask.url_for(endpoint=endpoint, **values)
+
+
+def compare_endpoints(
+    *,
+    request_endpoint: str,
+    request_args: dict,
+    other_endpoint: str,
+    other_args: dict,
+) -> bool:
+    """Testable implementation of 'url_is_active()'."""
+    result = request_endpoint == other_endpoint and all(request_args.get(k) == v for k, v in other_args.items())
+    logger.debug(
+        "compare_endpoints()",
+        request_endpoint=request_endpoint,
+        request_args=request_args,
+        other_endpoint=other_endpoint,
+        other_args=other_args,
+        result=result,
+    )
+    return request_endpoint == other_endpoint and all(request_args.get(k) == v for k, v in other_args.items())
+
+
+def url_is_active(endpoint: str, **kwargs: typing.Any) -> bool:
+    """
+    Compare an endpoint and it's arguments to the current request, returning true if they match.
+
+    `/works/?work_type='books'&work_shelf='upcoming'` should match `url_is_active('works.index', work_type='books')`.
+    """
+
+    return compare_endpoints(
+        request_endpoint=flask.request.endpoint,
+        request_args=flask.request.view_args | flask.request.args,
+        other_endpoint=endpoint,
+        other_args=kwargs,
+    )
 
 
 @dataclasses.dataclass()
@@ -95,6 +133,7 @@ class HtmlExtension:
         app.jinja_env.globals["n"] = self.count_plural
         app.jinja_env.globals["p"] = p
         app.jinja_env.globals["url_with"] = url_with
+        app.jinja_env.globals["url_is_active"] = url_is_active
         app.jinja_env.globals["html_params"] = self.html_params
 
     def count_plural(self, word: str, count: int) -> str:

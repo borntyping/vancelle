@@ -2,8 +2,23 @@ import logging
 import os
 import pathlib
 
+import flask
 import pytest
 import structlog
+
+from vancelle.app import create_app
+
+
+@pytest.fixture()
+def app() -> flask.Flask:
+    return create_app(
+        {
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+            "STEAM_WEB_API_KEY": "",
+            "TMDB_READ_ACCESS_TOKEN": "invalid",
+        }
+    )
 
 
 @pytest.fixture()

@@ -161,7 +161,6 @@ class Work(Base, IntoDetails):
         )
 
 
-
 class Book(Work):
     __mapper_args__ = {"polymorphic_identity": "book"}
     info = WorkInfo(slug="books", noun="book", priority=1)

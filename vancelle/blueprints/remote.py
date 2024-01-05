@@ -66,7 +66,7 @@ def permanently_delete(remote_type: str, remote_id: str):
     return htmx.refresh()
 
 
-@bp.route("/sources/<string:remote_type>/")
+@bp.route("/remotes/-/search/<string:remote_type>")
 def search_source(remote_type: str):
     query = flask.request.args.get("query", default="", type=str)
     work_id = flask.request.args.get("work_id", type=uuid.UUID)
@@ -81,8 +81,3 @@ def link_work(work_id: uuid.UUID):
 
     work = controller.link_work(work_id=work_id, remote_type=remote_type, remote_id=remote_id)
     return htmx.redirect(work.url_for())
-
-
-@bp.app_template_global()
-def searchable_remotes() -> list[typing.Type[Remote]]:
-    return [cls for cls in Remote.iter_subclasses() if cls.info.can_search]

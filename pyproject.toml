@@ -56,7 +56,9 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --ignore=vancelle/migrations"
-
+filterwarnings = [
+    "ignore:The '__version__' attribute is deprecated:DeprecationWarning",
+]
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.masonry.api"

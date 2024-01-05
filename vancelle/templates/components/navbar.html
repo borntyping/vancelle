@@ -1,46 +1,16 @@
-{% macro navbar_item(endpoint, name, active=True) %}
-  <a href="{{ url_for(endpoint, **kwargs) }}" class="navbar-item {{ 'is-active' if endpoint == request.endpoint and active else '' }}">{{ name }}</a>
+{% macro navbar_divider() %}
+  <hr class="navbar-divider">
 {% endmacro %}
 
-{% macro navbar_group(endpoint,  name, items, dropdown_classes = '') %}
+{% macro navbar_group(name, endpoint, dropdown_classes = '') %}
   <div class="navbar-item has-dropdown is-hoverable">
-    <a href="{{ url_for(endpoint) }}" class="navbar-link">{{ name }}</a>
+    <a href="{{ url_for(endpoint, **kwargs) }}" class="navbar-link">{{ name }}</a>
     <div class="navbar-dropdown {{ dropdown_classes }}">
-      {% for endpoint, name in items %}
-        <a href="{{ url_for(endpoint) }}" class="navbar-item">{{ name }}</a>
-      {% endfor %}
+      {{ caller() }}
     </div>
   </div>
 {% endmacro %}
 
-{% macro navbar(start = [], end = [], brand = None, class='is-dark') %}
-  <nav id="app-navbar" class="navbar {{ class }}">
-    <div class="container">
-      {% if brand is not none %}
-        <div class="navbar-brand">
-          <a href="{{ url_for(brand[0]) }}" class="navbar-item has-text-white has-text-weight-bold">{{ brand[1] }}</a>
-        </div>
-      {% endif %}
-      <div class="navbar-menu">
-        <div class="navbar-start">
-          {% for endpoint, name, items in start %}
-            {% if items is not none %}
-              {{ navbar_group(endpoint, name, items) }}
-            {% else %}
-              {{ navbar_item(endpoint, name) }}
-            {% endif %}
-          {% endfor %}
-        </div>
-        <div class="navbar-end">
-          {% for endpoint, name, items in end %}
-            {% if items is not none %}
-              {{ navbar_group(endpoint, name, items, dropdown_classes='is-right') }}
-            {% else %}
-              {{ navbar_item(endpoint, name) }}
-            {% endif %}
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </nav>
+{% macro navbar_item(name, endpoint) %}
+  <a href="{{ url_for(endpoint, **kwargs) }}" class="navbar-item {{ 'is-active' if url_is_active(endpoint, **kwargs) else '' }}">{{ name }}</a>
 {% endmacro %}

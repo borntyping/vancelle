@@ -22,15 +22,28 @@ from ..shelf import Shelf
 
 @dataclasses.dataclass()
 class WorkInfo:
+    slug: str
     noun: str
-    title: str
+    noun_title: str
     plural: str
+    plural_title: str
     priority: int
 
-    def __init__(self, noun: str, *, title: str | None = None, plural: str | None = None, priority: int) -> None:
+    def __init__(
+        self,
+        slug: str,
+        noun: str,
+        *,
+        noun_title: str | None = None,
+        plural: str | None = None,
+        plural_title: str | None = None,
+        priority: int,
+    ) -> None:
+        self.slug = slug
         self.noun = noun
-        self.title = title or noun.title()
-        self.plural = plural or p.plural(noun)
+        self.noun_title = noun_title or self.noun.title()
+        self.plural = plural or p.plural(self.noun)
+        self.plural_title = plural_title or self.plural.title()
         self.priority = priority
 
 
@@ -148,31 +161,32 @@ class Work(Base, IntoDetails):
         )
 
 
+
 class Book(Work):
     __mapper_args__ = {"polymorphic_identity": "book"}
-    info = WorkInfo(noun="book", priority=1)
+    info = WorkInfo(slug="books", noun="book", priority=1)
 
 
 class Game(Work):
     __mapper_args__ = {"polymorphic_identity": "game"}
-    info = WorkInfo(noun="game", priority=2)
+    info = WorkInfo(slug="games", noun="game", priority=2)
 
 
 class Film(Work):
     __mapper_args__ = {"polymorphic_identity": "film"}
-    info = WorkInfo(noun="film", priority=3)
+    info = WorkInfo(slug="films", noun="film", priority=3)
 
 
 class Show(Work):
     __mapper_args__ = {"polymorphic_identity": "show"}
-    info = WorkInfo(noun="show", priority=4)
+    info = WorkInfo(slug="shows", noun="show", priority=4)
 
 
 class Music(Work):
     __mapper_args__ = {"polymorphic_identity": "music"}
-    info = WorkInfo(noun="music", plural="music", priority=5)
+    info = WorkInfo(slug="music", noun="music", plural="music", priority=5)
 
 
 class TabletopGame(Work):
     __mapper_args__ = {"polymorphic_identity": "boardgame"}
-    info = WorkInfo(noun="tabletop game", title="Tabletop game", priority=6)
+    info = WorkInfo(slug="tabletop-games", noun="tabletop game", noun_title="Tabletop game", priority=6)

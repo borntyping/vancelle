@@ -53,6 +53,7 @@ class RemoteInfo:
         colour: str,
         noun_plural: str | None = None,
         noun_full: str | None = None,
+        noun_full_plural: str | None = None,
         priority: int = 0,
         can_search: bool = True,
         can_link: bool = True,
@@ -63,6 +64,7 @@ class RemoteInfo:
         self.noun = noun
         self.noun_plural = noun_plural if noun_plural is not None else p.plural(noun)
         self.noun_full = noun_full or f"{self.source} {self.noun}"
+        self.noun_full_plural = noun_full_plural or f"{self.source} {self.noun_plural}"
         self.priority = priority
         self.can_search = can_search
         self.can_link = can_link

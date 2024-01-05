@@ -29,7 +29,7 @@ bp = flask.Blueprint("work", __name__, url_prefix="")
 class WorkForm(flask_wtf.FlaskForm):
     type = wtforms.SelectField(
         "Type",
-        choices=[(cls.work_type(), cls.info.title) for cls in Work.iter_subclasses()],
+        choices=[(cls.work_type(), cls.info.noun_title) for cls in Work.iter_subclasses()],
         widget=BulmaSelect(),
     )
     title = wtforms.StringField("Title", validators=[Optional()], filters=[NullFilter()])
@@ -135,7 +135,7 @@ def before_request():
 @bp.route("/")
 def home():
     return flask.render_template(
-        "home.html",
+        "work/home.html",
         categories=[cls.info.plural for cls in Work.iter_subclasses()],
         works_count=controller.count(Work),
         remotes_count=controller.count(Remote),

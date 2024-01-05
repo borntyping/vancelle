@@ -16,8 +16,6 @@ from .ext.structlog import configure_logging
 from .extensions import apis, cors, db, debug_toolbar, html, htmx, login_manager, migrate, sentry
 from .shelf import Shelf
 
-configure_logging()
-
 
 def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app = flask.Flask(__name__)
@@ -52,6 +50,11 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     return app
 
 
+def create_app_once(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
+    configure_logging()
+    return create_app(config)
+
+
 def create_personal_app() -> flask.Flask:
     config: dict[str, typing.Any] = {
         "GOODREADS_SHELF_MAPPING": {
@@ -71,4 +74,4 @@ def create_personal_app() -> flask.Flask:
     if database_url := os.environ.get("DATABASE_URL"):
         config["SQLALCHEMY_DATABASE_URI"] = database_url
 
-    return create_app(config)
+    return create_app_once(config)

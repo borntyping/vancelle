@@ -15,13 +15,11 @@
     hx-swap-oob="true"
     hx-push-url="true"
     data-loading-target="#x-work-index-total">
-    <input type="hidden" name="{{ form.layout.name }}" value="{{ form.layout.data }}">
-    <input type="hidden" name="{{ form.work_type.name }}" value="{{ form.work_type.data }}">
-
     <div class="section has-background-white-bis py-4">
       <div class="container">
         <div class="columns">
           <div class="column">
+            <input type="hidden" name="{{ form.layout.name }}" value="{{ form.layout.data }}">
             <div class="field is-expanded has-addons has-addons-fullwidth">
               {% for item_layout, item_title in form.layout.choices %}
                 <div class="control">
@@ -33,10 +31,10 @@
               {% endfor %}
             </div>
           </div>
-          {#<div class="column">{{ bulma_widget(form.layout, input_class_='x-work-index-input') }}</div>#}
-          {#<div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input') }}</div>#}
-          <div class="column">{{ bulma_form_field(form.work_shelf_group, label=False, input_class_='x-work-index-input') }}</div>
-          <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', placeholder='Search....') }}</div>
+          {#<div class="column">{{ bulma_form_field(form.layout, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>#}
+          <div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.work_shelf_group, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', placeholder='Search....', modified_class='is-primary') }}</div>
           <div class="column">
             <div class="field has-addons">
               <div class="control is-expanded">
@@ -68,10 +66,10 @@
         </div>
 
         <div id="index-expanded-controls" class="columns x-is-collapsible {% if form.work_shelf.data or form.work_deleted.data != form.work_deleted.default or form.remote_type.data or form.remote_data.data %}x-is-active{% endif %}">
-          <div class="column">{{ bulma_widget(form.work_shelf, input_class_='x-work-index-input') }}</div>
-          <div class="column">{{ bulma_widget(form.work_deleted, input_class_='x-work-index-input') }}</div>
-          <div class="column">{{ bulma_widget(form.remote_type, input_class_='x-work-index-input') }}</div>
-          <div class="column">{{ bulma_widget(form.remote_data, input_class_='x-work-index-input') }}</div>
+          <div class="column">{{ bulma_widget(form.work_shelf, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_widget(form.work_deleted, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_widget(form.remote_type, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_widget(form.remote_data, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
         </div>
       </div>
     </div>

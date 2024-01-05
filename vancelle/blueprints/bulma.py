@@ -40,7 +40,12 @@ def macro(attribute, **kwargs) -> markupsafe.Markup:
 
 
 @bp.app_template_global()
-def bulma_widget(field: wtforms.FormField, **kwargs: typing.Any) -> str:
+def bulma_widget(
+    field: wtforms.FormField,
+    errors_class: str = "is-danger",
+    modified_class: str = "is-success",
+    **kwargs: typing.Any,
+) -> str:
     """
     Render a wtforms field.
 
@@ -60,9 +65,9 @@ def bulma_widget(field: wtforms.FormField, **kwargs: typing.Any) -> str:
             class_ = join(class_, "input")
 
     if field.errors:
-        class_ = join(class_, "is-danger")
+        class_ = join(class_, errors_class)
     elif field.data and field.data != field.default:
-        class_ = join(class_, "is-success")
+        class_ = join(class_, modified_class)
 
     # Avoid printing the string "None" as a placeholder.
     if "placeholder" in kwargs and kwargs["placeholder"] is None:

@@ -63,22 +63,23 @@ class WorkIndexForm(flask_wtf.FlaskForm):
         widget=BulmaSelect(),
         validators=[DataRequired()],
     )
-    work_type = wtforms.HiddenField(
+    work_type = wtforms.SelectField(
         label="Work type",
+        choices=[("", "All works")] + [(cls.work_type(), cls.info.plural_title) for cls in Work.iter_subclasses()],
         default="",
         widget=BulmaSelect(),
         validators=[Optional()],
     )
     work_shelf = wtforms.SelectField(
         label="Exact shelf",
-        choices=[("", "Any shelf")] + [(s.value, s.title) for s in Shelf],
+        choices=[("", "All shelves")] + [(s.value, s.title) for s in Shelf],
         default="",
         widget=BulmaSelect(),
         validators=[Optional()],
     )
     work_shelf_group = wtforms.SelectField(
         label="Shelf group",
-        choices=[("", "Any shelf group")] + [(g.value, g.title) for g in ShelfGroup],
+        choices=[("", "All shelves")] + [(g.value, g.title) for g in ShelfGroup],
         default="",
         widget=BulmaSelect(),
         validators=[Optional()],
@@ -97,7 +98,7 @@ class WorkIndexForm(flask_wtf.FlaskForm):
 
     remote_type = wtforms.SelectField(
         label="Remote type",
-        choices=[("", "Any remote type")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
+        choices=[("", "All remote types")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
         default="",
         widget=BulmaSelect(),
         validators=[Optional()],

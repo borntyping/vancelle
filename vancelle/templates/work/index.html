@@ -32,9 +32,9 @@
             </div>
           </div>
           {#<div class="column">{{ bulma_form_field(form.layout, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>#}
-          <div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+
           <div class="column">{{ bulma_form_field(form.work_shelf_group, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
-          <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.search, label=False, input_class_='x-work-index-input', modified_class='is-primary', placeholder="Search titles and authors...") }}</div>
           <div class="column">
             <div class="field has-addons">
               <div class="control is-expanded">
@@ -66,10 +66,11 @@
         </div>
 
         <div id="index-expanded-controls" class="columns x-is-collapsible {% if form.work_shelf.data or form.work_deleted.data != form.work_deleted.default or form.remote_type.data or form.remote_data.data %}x-is-active{% endif %}">
-          <div class="column">{{ bulma_widget(form.work_shelf, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
-          <div class="column">{{ bulma_widget(form.work_deleted, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
-          <div class="column">{{ bulma_widget(form.remote_type, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
-          <div class="column">{{ bulma_widget(form.remote_data, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.work_type, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.work_shelf, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.work_deleted, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.remote_type, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
+          <div class="column">{{ bulma_form_field(form.remote_data, label=False, input_class_='x-work-index-input', modified_class='is-primary') }}</div>
         </div>
       </div>
     </div>

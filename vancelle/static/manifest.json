@@ -8,12 +8,12 @@
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/static/vancelle/android-chrome-192x192.png?v=1",
+      "src": "/static/favicon/android-chrome-192x192.png?v=1",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/static/vancelle/android-chrome-512x512.png?v=1",
+      "src": "/static/favicon/android-chrome-512x512.png?v=1",
       "sizes": "512x512",
       "type": "image/png"
     }

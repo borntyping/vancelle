@@ -1,11 +1,11 @@
 {% from 'components/layout.html' import section %}
 
-{%- macro internal_link(href, text=None) -%}
+{%- macro internal_url(href, text=None) -%}
   <a href="{{ href }}" class="has-text-link is-flex-wrap-nowrap">{{ text if text else href|pretty_url }}</a>
 {%- endmacro -%}
 
-{%- macro external_link(href, text=None) -%}
-  <a href="{{ href }}" class="icon-text has-text-link is-flex-wrap-nowrap" rel="noopener noreferrer nofollow" target="_blank">
+{%- macro external_url(href, text=None) -%}
+  <a href="{{ href }}" class="icon-text has-text-link is-flex-wrap-nowrap" rel="noopener noreferrer nofollow" target="_blank" title="{{ href }}">
     <span class="icon"><ion-icon name="exit-outline"></ion-icon></span> <span>{{ text if text else href|pretty_url }}</span>
   </a>
 {%- endmacro -%}
@@ -113,7 +113,7 @@
       </p>
       {% if details.external_url %}
         <p class="block">
-          {{ external_link(details.external_url) }}
+          {{ external_url(details.external_url) }}
         </p>
       {% endif %}
       {% if caller is defined %}

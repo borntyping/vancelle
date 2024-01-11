@@ -4,7 +4,7 @@ import alembic
 import flask
 
 from vancelle.models import Base
-from vancelle.extensions import db, migrate
+from vancelle.extensions import db
 
 logger = logging.getLogger("alembic.env")
 

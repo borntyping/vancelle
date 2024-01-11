@@ -132,7 +132,7 @@ class HtmlExtension:
     @staticmethod
     def pretty_url(url: str):
         parts = urllib.parse.urlparse(url)
-        return parts.hostname + parts.path + parts.fragment
+        return parts.hostname
 
     @staticmethod
     def html_classes(*args: typing.Union[str, typing.List[str], typing.Dict[str, bool]]) -> str:

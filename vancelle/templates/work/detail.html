@@ -59,7 +59,6 @@
     <div class="columns x-has-fullheight-containers">
       <div class="column">
         {% call panel_details(id=work.id, details=details, properties=properties, data=None) %}
-          Details from {{ sources_list(work) }}.
         {% endcall %}
       </div>
       <div class="column">{{ panel_library_card(work=work) }}</div>

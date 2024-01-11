@@ -20,5 +20,6 @@
         {{ bulma_form_field(form.background, placeholder=details.background if details else None, icon_right='image-outline') }}
       </div>
     </div>
+    {{ bulma_form_field(form.external_url, placeholder=details.external_url if details else None, icon_right='link-outline') }}
   </div>
 {% endmacro %}

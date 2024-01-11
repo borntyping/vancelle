@@ -64,6 +64,7 @@ class WorkForm(flask_wtf.FlaskForm):
         validators=[Optional()],
     )
     # tags = wtforms.StringField('tags')
+    external_url = wtforms.URLField("External URL", validators=[Optional()], filters=[NullFilter()])
 
 
 class WorkIndexForm(flask_wtf.FlaskForm):
@@ -251,7 +252,6 @@ def update(work_id: uuid.UUID):
     if form.validate_on_submit():
         form.populate_obj(work)
         db.session.commit()
-        flask.flash(f"Logged in as {user.username}", "Logged in")
         return htmx.redirect(work.url_for())
 
     return flask.render_template("work/update.html", work=work, form=form)

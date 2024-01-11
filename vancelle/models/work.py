@@ -71,6 +71,7 @@ class Work(Base, IntoDetails, IntoProperties):
     background: Mapped[typing.Optional[str]] = mapped_column(default=None)
     shelf: Mapped[Shelf] = mapped_column(ShelfEnum, default=Shelf.UNSORTED)
     tags: Mapped[typing.Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
+    external_url: Mapped[typing.Optional[str]] = mapped_column(default=None)
 
     records: Mapped[typing.List["Record"]] = relationship(
         back_populates="work",
@@ -127,7 +128,7 @@ class Work(Base, IntoDetails, IntoProperties):
             background=self.background,
             shelf=self.shelf,
             tags=self.tags,
-            external_url=None,
+            external_url=self.external_url,
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
@@ -150,7 +151,7 @@ class Work(Base, IntoDetails, IntoProperties):
             background=next((d.background for d in details if d.background), None),
             tags=next((d.tags for d in details if d.tags), set()),
             shelf=self.shelf,
-            external_url=None,
+            external_url=next((d.external_url for d in details if d.external_url), None),
         )
 
     @classmethod

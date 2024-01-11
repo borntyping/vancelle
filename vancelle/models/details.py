@@ -65,7 +65,7 @@ class InternalUrlProperty(Property):
         if not self:
             return self.absent()
 
-        return self.macro("internal_link", href=self.link, text=self.text)
+        return self.macro("internal_url", href=self.link, text=self.text)
 
 
 @dataclasses.dataclass()
@@ -81,7 +81,7 @@ class ExternalUrlProperty(Property):
         if not self:
             return self.absent()
 
-        return self.macro("external_link", href=self.link, text=self.text)
+        return self.macro("external_url", href=self.link, text=self.text)
 
 
 @dataclasses.dataclass()

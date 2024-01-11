@@ -1,13 +1,21 @@
-{% from "components/controls.html" import control_remote_detail, control_remote_delete, control_remote_restore, control_remote_permanently_delete, control_remote_refresh, control_remote_link_work, control_remote_create_work, control_remote_priority %}
+{% from "components/controls.html" import control_remote_detail, control_remote_delete, control_remote_restore, control_remote_permanently_delete, control_remote_refresh, control_remote_work, control_remote_link_work, control_remote_create_work, control_remote_priority %}
 {% from "components/layout.html" import section %}
 {% from "components/metadata.html" import panel_details, panel_properties %}
 
 {%- macro section_remote(remote, show_attached_work, candidate_work=None, h1=False) -%}
+  {% set details = remote.into_details() %}
+  {% set title = details.title %}
+  {% set subtitle %}
+    {{ remote.info.noun_full }} {{ remote.id }}
+  {% endset %}
   {% set controls %}
     {% if remote.deleted %}
       {{ control_remote_permanently_delete(remote=remote) }}
       {{ control_remote_restore(remote=remote) }}
     {% elif remote.work %}
+      {% if show_attached_work or True %}
+        {{ control_remote_work(remote=remote) }}
+      {% endif %}
       {{ control_remote_refresh(remote=remote) }}
       {{ control_remote_delete(remote=remote) }}
     {% elif candidate_work %}
@@ -18,14 +26,10 @@
     {{ control_remote_detail(remote=remote) }}
     {{ control_remote_priority(remote=remote) }}
   {% endset %}
-  {%- call section(title=remote.info.noun_full, subtitle=remote.id, controls=controls, h1=h1) -%}
+  {%- call section(title=title, subtitle=subtitle, controls=controls, h1=h1) -%}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
         {% call panel_details(details=remote.into_details(), colour=remote.info.colour) %}
-          {% if show_attached_work and remote.work %}
-            {% set work_details = remote.work.resolve_details() %}
-            Attached to work: <a href="{{ remote.work.url_for() }}">{{ work_details.title }}</a>.
-          {% endif %}
         {% endcall %}
       </div>
       <div class="column">{{ panel_properties(remote=remote) }}</div>

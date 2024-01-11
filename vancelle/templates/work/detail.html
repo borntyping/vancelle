@@ -3,33 +3,18 @@
 {% from "components/controls.html" import control_work_update, control_work_delete, control_work_restore, control_work_permanently_delete %}
 {% from "components/bulma.html" import search_field %}
 {% from "components/layout.html" import section %}
-{% from "components/metadata.html" import panel_details, panel_properties %}
+{% from "components/metadata.html" import panel_details, panel_properties, sources_list %}
 {% from "components/record/library_card.html" import panel_library_card %}
 {% from "components/remote/section.html" import section_remote %}
 
-{% set details = work.resolve_details() %}
-{% set title = details.title %}
-
-{% set controls %}
-  {% if work.deleted %}
-    {{ control_work_permanently_delete(work, False) }}
-    {{ control_work_restore(work, False) }}
-  {% else %}
-    {{ control_work_update(work, False) }}
-    {{ control_work_delete(work, False) }}
-  {% endif %}
-{% endset %}
-
-{% set subclasses = Remote.iter_subclasses(can_search=True) %}
-
-{% macro _form_change_shelf(work, details) %}
+{% macro _control_change_shelf(work, details) %}
   <form
     method="post"
     action="{{ url_for('work.update', work_id=work.id) }}"
     hx-post="{{ url_for('work.update', work_id=work.id) }}"
     hx-trigger="input changed from:find select throttle:1000ms"
     data-loading-target="#shelf-loading"
-    class="">
+    class="control">
     {{ form.csrf_token }}
     <div class="field has-addons">
       <div class="control">
@@ -51,26 +36,38 @@
   </form>
 {% endmacro %}
 
-{% set subtitle %}
-  {{ work.info.noun_title }} with metadata from {{ p.no('remote', work.remotes|length) }}
-{% endset %}
+{% macro _section_work(work) %}
+  {% set details = work.resolve_details() %}
 
-{% block content %}
-  {% call section(title=details.title, subtitle=subtitle, controls=controls, h1=True) %}
+  {% set title = details.title %}
+  {% set subtitle %}
+    {{ work.info.noun_title }} with details from {{ p.no('remote', work.remotes|length) }}
+  {% endset %}
+  {% set controls %}
+    {{ _control_change_shelf(work, details) }}
+    {% if work.deleted %}
+      {{ control_work_permanently_delete(work, False) }}
+      {{ control_work_restore(work, False) }}
+    {% else %}
+      {{ control_work_update(work, False) }}
+      {{ control_work_delete(work, False) }}
+    {% endif %}
+  {% endset %}
+
+  {% call section(title=title, subtitle=subtitle, controls=controls, h1=True) %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
         {% call panel_details(details) %}
-          {{ _form_change_shelf(work, details) }}
+          Details from {{ sources_list(work) }}.
         {% endcall %}
       </div>
       <div class="column">{{ panel_library_card(work=work) }}</div>
     </div>
   {% endcall %}
+{% endmacro %}
 
-  {% for remote in work.iter_remotes() %}
-    {{ section_remote(remote, show_attached_work=False) }}
-  {% endfor %}
-
+{% macro _section_search_remotes() %}
+  {% set subclasses = Remote.iter_subclasses(can_search=True) %}
   {% call section('Search external sources for metadata', n('available source', subclasses|length), h1=False) %}
     <div class="box">
       <div class="columns is-multiline is-centered">
@@ -84,4 +81,14 @@
       </div>
     </div>
   {% endcall %}
+{% endmacro %}
+
+{% block content %}
+  {{ _section_work(work) }}
+
+  {% for remote in work.iter_remotes() %}
+    {{ section_remote(remote, show_attached_work=False) }}
+  {% endfor %}
+
+  {{ _section_search_remotes() }}
 {% endblock %}

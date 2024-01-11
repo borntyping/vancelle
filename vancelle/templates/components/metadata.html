@@ -63,10 +63,20 @@
     <div class="x-title">
       <h3 class="title is-4">{{ details_title(details) }}</h3>
       <p class="subtitle is-6">{{ details_date_and_author(details) }}</p>
+      <p class="block">
+        {% if details.shelf %}
+          {{ shelf_tag(details.shelf) }}
+        {% endif %}
+        {% if details.tags %}
+          {% for tag in details.tags|default([], tre) %}
+            <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        {% endif %}
+      </p>
       {% if caller is defined %}
-        {{ caller() }}
-      {% else %}
-        <p class="block">{{ shelf_tag(details.shelf) if details.shelf else '' }}</p>
+        <p class="block">
+          {{ caller() }}
+        </p>
       {% endif %}
     </div>
     {% if details.description %}

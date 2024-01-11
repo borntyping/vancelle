@@ -83,6 +83,10 @@
   {%- endif -%}
 {%- endmacro -%}
 
+{% macro control_remote_work(remote) %}
+  {{ _control_link(url=remote.work.url_for(), text="View linked work", icon="document-text-outline", title="View the work linked to this remote.", class_='is-primary') }}
+{% endmacro %}
+
 {% macro control_remote_link_work(remote, work, class_="is-info") %}
   {% with url = url_for("remote.link_work", work_id=work.id, remote_type=remote.type, remote_id=remote.id) %}
     {{ _control_post(url=url, text="Link work", icon="add-outline", class_=class_, title="Link work to {}".format(work.resolve_details().title), tabindex=1) }}

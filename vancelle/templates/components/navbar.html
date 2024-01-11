@@ -2,12 +2,10 @@
   <hr class="navbar-divider">
 {% endmacro %}
 
-{% macro navbar_group(name, endpoint, dropdown_classes = '') %}
-  <div class="navbar-item has-dropdown is-hoverable">
-    <a href="{{ url_for(endpoint, **kwargs) }}" class="navbar-link">{{ name }}</a>
-    <div class="navbar-dropdown {{ dropdown_classes }}">
-      {{ caller() }}
-    </div>
+{% macro navbar_group(name, is_right=False) %}
+  <div class="navbar-item is-hoverable has-dropdown" _="on click toggle .is-active">
+    <span class="navbar-link">{{ name }}</span>
+    <div class="{{ html_classes('navbar-dropdown', {'is-right': is_right}) }}">{{ caller() }}</div>
   </div>
 {% endmacro %}
 

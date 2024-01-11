@@ -38,14 +38,16 @@
         </div>
         <div class="navbar-menu">
           <div class="navbar-start">
-            {% call navbar_group('Works', 'work.index') %}
+            {% call navbar_group('Works') %}
               {{ navbar_item('All', 'work.index', work_type=None) }}
               {{ navbar_divider() }}
               {% for cls in Work.iter_subclasses() %}
                 {{ navbar_item(cls.info.plural_title, 'work.index', work_type=cls.work_type()) }}
               {% endfor %}
             {% endcall %}
-            {% call navbar_group('Add new work', 'work.create') %}
+            {% call navbar_group('Add new work') %}
+              {{ navbar_item('Create new work', 'work.create') }}
+              {{ navbar_divider() }}
               {% for cls in Remote.iter_subclasses(can_search=True) %}
                 {{ navbar_item(cls.info.noun_full, 'remote.search_source', remote_type=cls.remote_type()) }}
               {% endfor %}
@@ -53,15 +55,12 @@
           </div>
           <div class="navbar-end">
             {% if current_user.is_authenticated %}
-              <div class="navbar-item has-dropdown" _="on click toggle .is-active">
-                <a class="navbar-link">{{ current_user.username }}</a>
-                <div class="navbar-dropdown is-right">
-                  {{ navbar_item("Import/export data", "user.profile") }}
-                  {{ navbar_item("Manage remote data", "remote.index") }}
-                  {{ navbar_item("Manage cached data", "cache.index") }}
-                  {{ navbar_item("Logout", "user.logout") }}
-                </div>
-              </div>
+              {% call navbar_group(current_user.username, is_right=True) %}
+                {{ navbar_item("Import/export data", "user.profile") }}
+                {{ navbar_item("Manage remote data", "remote.index") }}
+                {{ navbar_item("Manage cached data", "cache.index") }}
+                {{ navbar_item("Logout", "user.logout") }}
+              {% endcall %}
             {% else %}
               {{ navbar_item("Login", "user.login") }}
             {% endif %}

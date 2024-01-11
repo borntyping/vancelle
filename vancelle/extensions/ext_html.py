@@ -134,6 +134,7 @@ class HtmlExtension:
         app.jinja_env.globals["p"] = p
         app.jinja_env.globals["url_with"] = url_with
         app.jinja_env.globals["url_is_active"] = url_is_active
+        app.jinja_env.globals["html_classes"] = self.html_classes
         app.jinja_env.globals["html_params"] = self.html_params
 
     def count_plural(self, word: str, count: int) -> str:
@@ -141,6 +142,22 @@ class HtmlExtension:
             raise ValueError("Count must be a number")
 
         return f"{count} {p.plural(word, count)}"
+
+    @staticmethod
+    def html_classes(*args: typing.Union[str, typing.List[str], typing.Dict[str, bool]]) -> str:
+        classes = []
+
+        for arg in args:
+            if isinstance(arg, str):
+                classes.append(arg)
+            elif isinstance(arg, list):
+                classes.extend(arg)
+            elif isinstance(arg, dict):
+                classes.extend([k for k, v in arg.items() if v])
+            else:
+                raise TypeError
+
+        return " ".join(classes)
 
     def html_params(self, **kwargs: typing.Any) -> markupsafe.Markup:
         return markupsafe.Markup(wtforms.widgets.html_params(**kwargs))

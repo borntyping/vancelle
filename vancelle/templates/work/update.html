@@ -8,7 +8,7 @@
 {% set details = work.resolve_details() %}
 
 {% block content %}
-  {% call section("Update work", subtitle=details_combined_title(details, work.url_for())) %}
+  {% call section("Update work", subtitle=details_combined_title(details, work.url_for()), h1=True) %}
     <div class="box">
       <form
         id="work"

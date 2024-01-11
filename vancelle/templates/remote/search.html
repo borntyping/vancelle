@@ -4,43 +4,43 @@
 {% from 'components/remote/table.html' import table_remotes %}
 {% from 'components/metadata.html' import details_combined_title %}
 
+{% set title %}
+  {% if work %}
+    Link {{ p.a(remote_info.noun_full) }}
+  {% else %}
+    Search {{ remote_info.source }} for {{ p.a(remote_info.noun) }}
+  {% endif %}
+{% endset %}
+
+{% set subtitle %}
+  {% if work %}
+    The {{ remote_info.noun }} will be linked to {{ details_combined_title(work.resolve_details(), work.url_for()) }}
+  {% else %}
+    Create a new work by importing details from {{ remote_info.source }}
+  {% endif %}
+{% endset %}
+
+{% set controls %}
+  {% if work %}
+    <a href="{{ url_with(work_id=None) }}" title="Search without linking to {{ work.resolve_details().title }}" class="delete"></a>
+  {% endif %}
+{% endset %}
+
 {% block content %}
   {% set id = 'search' %}
-  {% set id_subtitle = '{}-subtitle'.format(id) %}
+  {% set id_count = '{}-results-count'.format(id) %}
   {% set id_input = '{}-input'.format(id) %}
   {% set id_results = '{}-results'.format(id) %}
   {% set id_input = '{}-input'.format(id) %}
   {% set id_submit = '{}-submit'.format(id) %}
+  {% set action = url_with(query=None) %}
 
-  {% set url = url_with(query=None) %}
-
-  {% set title %}
-    {% if work %}
-      Link {{ p.a(remote_info.noun_full) }}
-    {% else %}
-      Add {{ p.a(remote_info.noun_full) }} to your collection
-    {% endif %}
-  {% endset %}
-
-  {% set subtitle %}
-    {% if work %}
-      {{ details_combined_title(work.resolve_details(), work.url_for()) }},
-    {% endif %}
-    <span id="{{ id_subtitle }}" hx-swap-oob="true">{{ p.no('result', items.total) }}</span>
-  {% endset %}
-
-  {% set controls %}
-    {% if work %}
-      <a href="{{ url_with(work_id=None) }}" title="Search without linking to {{ work.resolve_details().title }}" class="delete"></a>
-    {% endif %}
-  {% endset %}
-
-  {% call section(title=title, subtitle=subtitle, controls=controls, id=id) %}
+  {% call section(title=title, subtitle=subtitle, controls=controls, id=id, h1=True) %}
     <div class="box">
       <form
         method="get"
-        action="{{ url }}"
-        hx-get="{{ url }}"
+        action="{{ action }}"
+        hx-get="{{ action }}"
         hx-trigger="input changed delay:500ms from:#{{ id_input }}, search from:#{{ id_input }}"
         hx-swap="innerHTML"
         hx-push-url="true"
@@ -61,7 +61,10 @@
               class="input">
           </div>
           <div class="control">
-            <button id="{{ id_submit }}" class="button" type="submit" data-loading-class="is-loading" hx-get="{{ url }}" hx-include="#{{ id }}">Search</button>
+            <span id="{{ id_count }}" class="button is-static" hx-swap-oob="true">{{ p.no('result', items.total) }}</span>
+          </div>
+          <div class="control">
+            <button id="{{ id_submit }}" class="button" type="submit" data-loading-class="is-loading" hx-get="{{ action }}" hx-include="#{{ id }}">Search</button>
           </div>
         </div>
       </form>

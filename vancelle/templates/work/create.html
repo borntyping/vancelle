@@ -2,12 +2,9 @@
 
 {% from "components/layout.html" import section %}
 {% from 'components/work/form.html' import block_edit_work %}
-{% from "components/remote/sources.html" import section_sources %}
 
 {% block content %}
-  {{ section_sources(h1=True) }}
-
-  {% call section('Enter details manually', 'Create a new work using the provided details', h1=True) %}
+  {% call section('Create a new work', 'Manually enter details for a work', h1=True) %}
     <div class="box">
       <form
         id="work"

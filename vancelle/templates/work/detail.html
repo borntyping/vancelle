@@ -6,10 +6,21 @@
 {% from "components/metadata.html" import panel_details, panel_properties %}
 {% from "components/record/library_card.html" import panel_library_card %}
 {% from "components/remote/section.html" import section_remote %}
-{% from "components/remote/sources.html" import section_sources %}
 
 {% set details = work.resolve_details() %}
 {% set title = details.title %}
+
+{% set controls %}
+  {% if work.deleted %}
+    {{ control_work_permanently_delete(work, False) }}
+    {{ control_work_restore(work, False) }}
+  {% else %}
+    {{ control_work_update(work, False) }}
+    {{ control_work_delete(work, False) }}
+  {% endif %}
+{% endset %}
+
+{% set subclasses = Remote.iter_subclasses(can_search=True) %}
 
 {% macro _form_change_shelf(work, details) %}
   <form
@@ -40,18 +51,12 @@
   </form>
 {% endmacro %}
 
-{% macro _section_work(work, details, form) %}
-  {% set controls %}
-    {% if work.deleted %}
-      {{ control_work_permanently_delete(work, False) }}
-      {{ control_work_restore(work, False) }}
-    {% else %}
-      {{ control_work_update(work, False) }}
-      {{ control_work_delete(work, False) }}
-    {% endif %}
-  {% endset %}
+{% set subtitle %}
+  {{ work.info.noun_title }} with metadata from {{ p.no('remote', work.remotes|length) }}
+{% endset %}
 
-  {% call section(title=work.type|capitalize, subtitle=work.id, controls=controls, h1=True) %}
+{% block content %}
+  {% call section(title=details.title, subtitle=subtitle, controls=controls, h1=True) %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
         {% call panel_details(details) %}
@@ -61,14 +66,22 @@
       <div class="column">{{ panel_library_card(work=work) }}</div>
     </div>
   {% endcall %}
-{% endmacro %}
-
-{% block content %}
-  {{ _section_work(work, details, form) }}
 
   {% for remote in work.iter_remotes() %}
     {{ section_remote(remote, show_attached_work=False) }}
   {% endfor %}
 
-  {{ section_sources(work_id=work.id) }}
+  {% call section('Search external sources for metadata', n('available source', subclasses|length), h1=False) %}
+    <div class="box">
+      <div class="columns is-multiline is-centered">
+        {% for cls in subclasses %}
+          <div class="column is-4 has-text-centered">
+            <a href="{{ url_for('remote.search_source', remote_type=cls.remote_type(), work_id=work.id) }}" class="button is-{{ cls.info.colour }} is-fullwidth">
+              Search {{ cls.info.full_plural }}
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endcall %}
 {% endblock %}

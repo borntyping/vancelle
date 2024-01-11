@@ -8,17 +8,16 @@ class ShelfGroup(enum.Enum):
     Used to group individual shelves in form controls and the board layout.
     """
 
-    UNDECIDED = ("undecided", "Undecided", "outer-left")
-    UPCOMING = ("upcoming", "Upcoming", "inner-left")
-    PLAYING = ("playing", "Playing", "center")
-    PAUSED = ("paused", "Paused", "inner-right")
-    COMPLETED = ("completed", "Completed", "outer-right")
+    UNDECIDED = ("undecided", "Undecided")
+    UPCOMING = ("upcoming", "Upcoming")
+    PLAYING = ("playing", "Playing")
+    PAUSED = ("paused", "Paused")
+    COMPLETED = ("completed", "Completed")
 
-    def __new__(cls, value: str, title: str, column: str):
+    def __new__(cls, value: str, title: str):
         obj = object.__new__(cls)
         obj._value_ = value
         obj.title = title
-        obj.column = column
         return obj
 
     def shelves(self) -> typing.Sequence["Shelf"]:

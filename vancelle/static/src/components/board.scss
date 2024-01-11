@@ -39,29 +39,28 @@ $x-board-card-cover: 2fr;
     grid-auto-rows: minmax(0, 1fr);
     grid-auto-flow: column;
 
-    .x-board-outer-left {
-      grid-column: 1;
+    .x-board-item {
       min-width: 0;
-    }
 
-    .x-board-inner-left {
-      grid-column: 1;
-      min-width: 0;
-    }
+      &[data-shelf="unsorted"],
+      &[data-shelf="unreleased"],
+      &[data-shelf="undecided"],
+      &[data-shelf="upcoming"],
+      &[data-shelf="reference"],
+      &[data-shelf="abandoned"] {
+        grid-column: 1;
+      }
 
-    .x-board-center {
-      grid-column: 2;
-      min-width: 0;
-    }
-
-    .x-board-inner-right {
-      grid-column: 2;
-      min-width: 0;
-    }
-
-    .x-board-outer-right {
-      grid-column: 2;
-      min-width: 0;
+      &[data-shelf="playing"],
+      &[data-shelf="replaying"],
+      &[data-shelf="ongoing"],
+      &[data-shelf="infinite"],
+      &[data-shelf="paused"],
+      &[data-shelf="shelved"],
+      &[data-shelf="completed"],
+       {
+        grid-column: 2;
+      }
     }
   }
 
@@ -73,37 +72,40 @@ $x-board-card-cover: 2fr;
     grid-auto-rows: minmax(0, 1fr);
     grid-auto-flow: column;
 
-    .x-board-outer-left {
-      grid-column: 1;
-      min-width: 0;
-    }
-
-    .x-board-inner-left {
-      grid-column: 2;
-      min-width: 0;
-    }
-
-    .x-board-center {
-      grid-column: 3;
+    .x-board-item {
       min-width: 0;
 
-      &.x-board-item {
-        //grid-row: span 2;
+      &[data-shelf="unsorted"],
+      &[data-shelf="unreleased"],
+      &[data-shelf="undecided"] {
+        grid-column: 1;
       }
 
-      .x-board-card {
-        grid-template-columns: calc($x-board-card-text + $x-board-card-cover + $x-board-card-text) $x-board-card-cover;
+      &[data-shelf="upcoming"] {
+        grid-column: 2;
       }
-    }
 
-    .x-board-inner-right {
-      grid-column: 4;
-      min-width: 0;
-    }
+      &[data-shelf="playing"],
+      &[data-shelf="replaying"],
+      &[data-shelf="ongoing"],
+      &[data-shelf="infinite"] {
+        grid-column: 3;
 
-    .x-board-outer-right {
-      grid-column: 5;
-      min-width: 0;
+        .x-board-card {
+          grid-template-columns: calc($x-board-card-text + $x-board-card-cover + $x-board-card-text) $x-board-card-cover;
+        }
+      }
+
+      &[data-shelf="paused"],
+      &[data-shelf="shelved"],
+      &[data-shelf="reference"] {
+        grid-column: 4;
+      }
+
+      &[data-shelf="completed"],
+      &[data-shelf="abandoned"] {
+        grid-column: 5;
+      }
     }
   }
 }

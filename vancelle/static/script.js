@@ -1,20 +1,4 @@
 /**
- * Close a modal by finding the .app-htmx-modal element and removing it, then
- * restoring the page's original URL as the HTMX responses that created the
- * modal may have changed the URL.
- *
- * @type {Element} element
- * @type {onclick} event
- * @type {string} selector
- * */
-function closeHtmxModal(element, event, selector = '.app-htmx-modal') {
-    const modal = element.closest(selector)
-    console.debug("Closing modal", {element, selector, modal})
-    modal.remove()
-    event.stopPropagation()
-}
-
-/**
  * Close a toast.
  *
  * @type {Element} element
@@ -24,6 +8,27 @@ function closeToast(element) {
     console.debug("Closing toast", {element, toast})
     toast.remove()
     // toast.classList.add("app-fade-out")
+}
+
+/**
+ * Switch between tabs.
+ * Containing element must have the 'x-tabs' class.
+ * Tab content must have the 'x-tab' class.
+ */
+function switchTab(element, newTabSelector) {
+  const container = element.closest('.x-tabs-container')
+
+  // Remove .is-active from all tabs
+  container.querySelector('.tabs').querySelectorAll('li').forEach((li) => li.classList.remove("is-active"))
+
+  // Add .is-active to the clicked tab
+  element.classList.add('is-active')
+
+  // Hide all tab content
+  container.querySelectorAll('.x-tab-content').forEach((e) => e.setAttribute('hidden', ''))
+
+  // Display the selected tab content
+  container.querySelector(newTabSelector).removeAttribute('hidden')
 }
 
 /**

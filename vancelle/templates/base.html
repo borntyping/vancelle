@@ -81,6 +81,14 @@
     {% block after %}
     {% endblock after %}
 
+    <aside id="app-toasts" hx-preserve="true">
+      {% if not htmx %}
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+          {{ toast(category, message|safe) }}
+        {% endfor %}
+      {% endif %}
+    </aside>
+
     <footer id="app-footer" class="footer">
       <div class="content has-text-centered">
         <p>
@@ -103,13 +111,6 @@
         <!-- TMDB terms of use require this notice: https://developer.themoviedb.org/docs/faq -->
         <p class="has-text-grey">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
       </div>
-    </footer>
-    <footer id="app-toasts" hx-preserve="true">
-      {% if not htmx %}
-        {% for category, message in get_flashed_messages(with_categories=true) %}
-          {{ toast(category, message|safe) }}
-        {% endfor %}
-      {% endif %}
     </footer>
     {% block scripts %}
       <script src="{{ url_for('static', filename='script.js') }}"></script>

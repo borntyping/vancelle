@@ -12,6 +12,7 @@ from wtforms.widgets import HiddenInput
 
 from vancelle.blueprints.bulma import BulmaSelect
 from vancelle.controllers.work import WorkController, WorkQuery
+from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
 from vancelle.models import User
@@ -24,6 +25,22 @@ logger = structlog.get_logger(logger_name=__name__)
 controller = WorkController()
 
 bp = flask.Blueprint("work", __name__, url_prefix="")
+
+SHELF_FORM_CHOICES = {
+    shelf_group.title: [(s.value, s.title) for s in group]
+    for shelf_group, group in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
+}
+
+
+class ShelveWorkForm(flask_wtf.FlaskForm):
+    shelf = wtforms.SelectField(
+        "Shelf",
+        choices=SHELF_FORM_CHOICES,
+        coerce=Shelf,
+        default=Shelf.UNSORTED,
+        widget=BulmaSelect(),
+        validators=[DataRequired()],
+    )
 
 
 class WorkForm(flask_wtf.FlaskForm):
@@ -40,10 +57,7 @@ class WorkForm(flask_wtf.FlaskForm):
     background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
     shelf = wtforms.SelectField(
         "Shelf",
-        choices={
-            shelf_group.title: [(s.value, s.title) for s in group]
-            for shelf_group, group in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
-        },
+        choices=SHELF_FORM_CHOICES,
         coerce=Shelf,
         default=Shelf.UNSORTED,
         widget=BulmaSelect(),
@@ -215,6 +229,20 @@ def detail(work_id: uuid.UUID):
     return flask.render_template("work/detail.html", work=work, form=form)
 
 
+@bp.route("/works/<uuid:work_id>/-/shelve", methods={"get", "post"})
+def shelve(work_id: uuid.UUID):
+    work = controller.get_or_404(id=work_id)
+    form = ShelveWorkForm(obj=work)
+
+    if not form.validate_on_submit():
+        raise ApplicationError(form.errors)
+
+    form.populate_obj(work)
+    db.session.commit()
+    flask.flash(f"Moved {work.resolve_details().title} to the {work.shelf.title} shelf.", "Shelved work")
+    return htmx.redirect(work.url_for())
+
+
 @bp.route("/works/<uuid:work_id>/-/update", methods={"get", "post"})
 def update(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
@@ -223,6 +251,7 @@ def update(work_id: uuid.UUID):
     if form.validate_on_submit():
         form.populate_obj(work)
         db.session.commit()
+        flask.flash(f"Logged in as {user.username}", "Logged in")
         return htmx.redirect(work.url_for())
 
     return flask.render_template("work/update.html", work=work, form=form)

@@ -3,15 +3,15 @@
 {% from "components/controls.html" import control_work_update, control_work_delete, control_work_restore, control_work_permanently_delete %}
 {% from "components/bulma.html" import search_field %}
 {% from "components/layout.html" import section %}
-{% from "components/metadata.html" import panel_details, panel_properties, sources_list %}
+{% from "components/metadata.html" import panel_details, sources_list %}
 {% from "components/record/library_card.html" import panel_library_card %}
 {% from "components/remote/section.html" import section_remote %}
 
 {% macro _control_change_shelf(work, details) %}
   <form
     method="post"
-    action="{{ url_for('work.update', work_id=work.id) }}"
-    hx-post="{{ url_for('work.update', work_id=work.id) }}"
+    action="{{ url_for('work.shelve', work_id=work.id) }}"
+    hx-post="{{ url_for('work.shelve', work_id=work.id) }}"
     hx-trigger="input changed from:find select throttle:1000ms"
     data-loading-target="#shelf-loading"
     class="control">
@@ -38,6 +38,7 @@
 
 {% macro _section_work(work) %}
   {% set details = work.resolve_details() %}
+  {% set properties = work.into_properties() %}
 
   {% set title = details.title %}
   {% set subtitle %}
@@ -57,7 +58,7 @@
   {% call section(title=title, subtitle=subtitle, controls=controls, h1=True) %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
-        {% call panel_details(details) %}
+        {% call panel_details(id=work.id, details=details, properties=properties, data=None) %}
           Details from {{ sources_list(work) }}.
         {% endcall %}
       </div>

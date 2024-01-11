@@ -1,7 +1,6 @@
 import dataclasses
 import datetime
 import typing
-import urllib.parse
 
 import flask
 import structlog
@@ -23,6 +22,11 @@ class Property:
     def absent(self) -> str:
         return flask.render_template_string("{{ absent }}")
 
+    @staticmethod
+    def macro(attribute: str, **context: typing.Any) -> str:
+        render = flask.get_template_attribute("components/metadata.html", attribute)
+        return render(**context)
+
 
 @dataclasses.dataclass()
 class StringProperty(Property):
@@ -37,11 +41,22 @@ class StringProperty(Property):
 
 
 @dataclasses.dataclass()
-class UrlProperty(Property):
+class TimeProperty(Property):
+    name: str
+    value: datetime.datetime | datetime.date | typing.Any
+
+    def __bool__(self) -> bool:
+        return self.value is not None
+
+    def __str__(self) -> str:
+        return self.macro("time_property", property=self)
+
+
+@dataclasses.dataclass()
+class InternalUrlProperty(Property):
     name: str
     link: str | None
     text: str | None = None
-    external: bool = True
 
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
@@ -50,20 +65,23 @@ class UrlProperty(Property):
         if not self:
             return self.absent()
 
-        text = self.text or urllib.parse.urlparse(self.link).hostname
+        return self.macro("internal_link", href=self.link, text=self.text)
 
-        if not self.external:
-            return self.internal_link(href=self.link, text=text)
 
-        return self.external_link(href=self.link, text=text)
+@dataclasses.dataclass()
+class ExternalUrlProperty(Property):
+    name: str
+    link: str | None
+    text: str | None = None
 
-    def internal_link(self, *args, **kwargs) -> str:
-        macro = flask.get_template_attribute("components/links.html", "internal_link")
-        return macro(*args, **kwargs)
+    def __bool__(self) -> bool:
+        return bool(self.link or self.text)
 
-    def external_link(self, *args, **kwargs) -> str:
-        macro = flask.get_template_attribute("components/links.html", "external_link")
-        return macro(*args, **kwargs)
+    def __str__(self) -> str:
+        if not self:
+            return self.absent()
+
+        return self.macro("external_link", href=self.link, text=self.text)
 
 
 @dataclasses.dataclass()
@@ -79,26 +97,7 @@ class IterableProperty(Property):
         return sorted(self.items) if self.sorted else iter(self.items)
 
     def __str__(self) -> str:
-        render = flask.get_template_attribute("components/metadata.html", "list_property")
-        return render(property=self)
-
-
-@dataclasses.dataclass()
-class JsonProperty(Property):
-    name: str
-    value: typing.Any
-
-    def __bool__(self) -> bool:
-        return bool(self.value)
-
-    def __html__(self) -> str:
-        if not self:
-            return self.absent()
-
-        if isinstance(self.value, dict):
-            return flask.render_template_string("<pre><code>{{ value|tojson(indent=2) }}</code></pre>", value=self.value)
-
-        return flask.render_template_string("<code>{{ value }}</code>", value=self.value)
+        return self.macro("list_property", property=self)
 
 
 class IntoProperties:
@@ -140,10 +139,9 @@ class Details(IntoProperties):
         yield StringProperty("Release date", self.release_date)
         yield StringProperty("Shelf", self.shelf.title if self.shelf else None)
         yield IterableProperty("Tags", list(self.tags) if self.tags else ())
-
-    def more_properties(self) -> typing.Iterable[Property]:
-        yield UrlProperty("Cover", self.cover)
-        yield UrlProperty("Background", self.background)
+        yield ExternalUrlProperty("External URL", self.external_url)
+        yield ExternalUrlProperty("Cover URL", self.cover)
+        yield ExternalUrlProperty("Background URL", self.background)
 
 
 class IntoDetails:

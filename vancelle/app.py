@@ -22,6 +22,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
+    app.config["REMEMBER_COOKIE_SAMESITE"] = True
     app.config.from_mapping(config)
     app.config.from_prefixed_env("VANCELLE")
 
@@ -67,8 +68,8 @@ def create_personal_app() -> flask.Flask:
             "to-read-non-fiction": Shelf.SHELVED,
             "to-read-sequels": Shelf.UPCOMING,
         },
-        # "SENTRY_ENABLED": True,
-        # "SPOTLIGHT_ENABLED": True,
+        "SENTRY_ENABLED": False,
+        "SPOTLIGHT_ENABLED": False,
     }
 
     if database_url := os.environ.get("DATABASE_URL"):

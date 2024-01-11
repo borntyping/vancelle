@@ -1,6 +1,6 @@
 {% from "components/controls.html" import control_remote_detail, control_remote_delete, control_remote_restore, control_remote_permanently_delete, control_remote_refresh, control_remote_work, control_remote_link_work, control_remote_create_work, control_remote_priority %}
 {% from "components/layout.html" import section %}
-{% from "components/metadata.html" import panel_details, panel_properties %}
+{% from "components/metadata.html" import panel_details %}
 
 {%- macro section_remote(remote, show_attached_work, candidate_work=None, h1=False) -%}
   {% set details = remote.into_details() %}
@@ -29,10 +29,9 @@
   {%- call section(title=title, subtitle=subtitle, controls=controls, h1=h1) -%}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
-        {% call panel_details(details=remote.into_details(), colour=remote.info.colour) %}
+        {% call panel_details(id=remote.id, details=remote.into_details(), properties=remote.into_properties(), data=remote.data, colour=remote.info.colour) %}
         {% endcall %}
       </div>
-      <div class="column">{{ panel_properties(remote=remote) }}</div>
     </div>
   {%- endcall -%}
 {%- endmacro -%}

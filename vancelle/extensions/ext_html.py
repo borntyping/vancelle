@@ -9,6 +9,7 @@ import jinja2
 import markupsafe
 import structlog
 import wtforms.widgets
+import urllib.parse
 
 from ..inflect import p
 
@@ -24,23 +25,8 @@ def url_with(endpoint: str | None = None, **kwargs):
     return flask.url_for(endpoint=endpoint, **values)
 
 
-def compare_endpoints(
-    *,
-    request_endpoint: str,
-    request_args: dict,
-    other_endpoint: str,
-    other_args: dict,
-) -> bool:
+def compare_endpoints(*, request_endpoint: str, request_args: dict, other_endpoint: str, other_args: dict) -> bool:
     """Testable implementation of 'url_is_active()'."""
-    result = request_endpoint == other_endpoint and all(request_args.get(k) == v for k, v in other_args.items())
-    logger.debug(
-        "compare_endpoints()",
-        request_endpoint=request_endpoint,
-        request_args=request_args,
-        other_endpoint=other_endpoint,
-        other_args=other_args,
-        result=result,
-    )
     return request_endpoint == other_endpoint and all(request_args.get(k) == v for k, v in other_args.items())
 
 
@@ -50,7 +36,6 @@ def url_is_active(endpoint: str, **kwargs: typing.Any) -> bool:
 
     `/works/?work_type='books'&work_shelf='upcoming'` should match `url_is_active('works.index', work_type='books')`.
     """
-
     return compare_endpoints(
         request_endpoint=flask.request.endpoint,
         request_args=flask.request.view_args | flask.request.args,
@@ -136,12 +121,18 @@ class HtmlExtension:
         app.jinja_env.globals["url_is_active"] = url_is_active
         app.jinja_env.globals["html_classes"] = self.html_classes
         app.jinja_env.globals["html_params"] = self.html_params
+        app.jinja_env.filters["pretty_url"] = self.pretty_url
 
     def count_plural(self, word: str, count: int) -> str:
         if not isinstance(count, int):
             raise ValueError("Count must be a number")
 
         return f"{count} {p.plural(word, count)}"
+
+    @staticmethod
+    def pretty_url(url: str):
+        parts = urllib.parse.urlparse(url)
+        return parts.hostname + parts.path + parts.fragment
 
     @staticmethod
     def html_classes(*args: typing.Union[str, typing.List[str], typing.Dict[str, bool]]) -> str:

@@ -47,5 +47,6 @@
 
   @include widescreen {
     width: 10%;
+    min-width: 20em;
   }
 }

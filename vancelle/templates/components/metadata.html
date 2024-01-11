@@ -1,5 +1,14 @@
 {% from 'components/layout.html' import section %}
-{% from 'components/links.html' import external_link %}
+
+{%- macro internal_link(href, text=None) -%}
+  <a href="{{ href }}" class="has-text-link is-flex-wrap-nowrap">{{ text if text else href|pretty_url }}</a>
+{%- endmacro -%}
+
+{%- macro external_link(href, text=None) -%}
+  <a href="{{ href }}" class="icon-text has-text-link is-flex-wrap-nowrap" rel="noopener noreferrer nofollow" target="_blank">
+    <span class="icon"><ion-icon name="exit-outline"></ion-icon></span> <span>{{ text if text else href|pretty_url }}</span>
+  </a>
+{%- endmacro -%}
 
 {% macro source_tag(remote) %}
   <span class="tag is-info">{{ remote.info.source }}</span>
@@ -45,6 +54,35 @@
   {%- endif -%}
 {%- endmacro -%}
 
+{%- macro list_property(property) -%}
+  {{ p.join(property.items|map('string')|list) if property else absent }}
+{%- endmacro -%}
+
+{%- macro time_property(property) -%}
+  {{ property.value if property else absent }}
+{%- endmacro -%}
+
+{% macro _property_name(property) %}
+  <span class="has-text-weight-bold">{{ property.name }}</span>
+{% endmacro %}
+
+{% macro _property_value(property) %}
+  {{ property|safe }}
+{% endmacro %}
+
+{% macro _properties(properties) %}
+  <table class="table is-small is-fullwidth has-background-white-bis">
+    <tbody>
+      {% for property in properties %}
+        <tr>
+          <td>{{ _property_name(property) }}</td>
+          <td>{{ _property_value(property) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
 {% macro panel_details_partial(details, title, colour="primary") %}
   <div class="panel is-{{ colour }}">
     <div class="panel-heading x-background" {{ _style_background_image(details) }}>{{ title }}</div>
@@ -52,8 +90,8 @@
   </div>
 {% endmacro %}
 
-{% macro panel_details(details, href, colour="primary") %}
-  <div class="panel is-{{ colour }} x-details">
+{% macro panel_details(id, details, properties, data, colour="primary") %}
+  <div id="{{ id }}" class="panel is-{{ colour }} x-details">
     <div class="panel-heading x-background" {{ _style_background_image(details) }}></div>
     <figure class="x-cover has-background-{{ colour }}-dark">
       {%- if details.cover -%}
@@ -68,65 +106,46 @@
           {{ shelf_tag(details.shelf) }}
         {% endif %}
         {% if details.tags %}
-          {% for tag in details.tags|default([], tre) %}
+          {% for tag in details.tags|default([], True) %}
             <span class="tag">{{ tag }}</span>
           {% endfor %}
         {% endif %}
       </p>
+      {% if details.external_url %}
+        <p class="block">
+          {{ external_link(details.external_url) }}
+        </p>
+      {% endif %}
       {% if caller is defined %}
         <p class="block">
           {{ caller() }}
         </p>
       {% endif %}
     </div>
-    {% if details.description %}
-      <div class="x-description has-background-white-bis">
-        <p>{{ details.description|escape }}</p>
+    <div class="x-description x-tabs-container has-background-white-bis">
+      <div class="tabs is-small is-centered mb-0">
+        <ul>
+          <li hx-on:click="switchTab(this, '.x-tab-description')" class="is-active"><a>Description</a></li>
+          <li hx-on:click="switchTab(this, '.x-tab-details')"><a>Details</a></li>
+          <li hx-on:click="switchTab(this, '.x-tab-properties')"><a>Properties</a></li>
+          {% if data is not none %}
+            <li hx-on:click="switchTab(this, '.x-tab-data')"><a>Data</a></li>
+          {% endif %}
+        </ul>
       </div>
-    {% endif %}
-  </div>
-{% endmacro %}
-
-{%- macro list_property(property) -%}
-  {{ p.join(property.items|map('string')|list) if property else absent }}
-{%- endmacro -%}
-
-{% macro _property_name(property) %}
-  <span class="has-text-weight-bold">{{ property.name }}</span>
-{% endmacro %}
-
-{% macro _property_value(property) %}
-  {{ property|safe }}
-{% endmacro %}
-
-{% macro _properties(properties) %}
-  {% for property in properties %}
-    {% if property %}
-      <div class="panel-block">{{ _property_name(property) }}</div>
-      <div class="panel-block">{{ _property_value(property) }}</div>
-    {% endif %}
-  {% endfor %}
-{% endmacro %}
-
-{% macro panel_properties(remote) %}
-  {% set details = remote.into_details() %}
-  {% set properties = remote.into_properties() %}
-  {% set more_properties = remote.more_properties() %}
-  <div class="panel is-{{ remote.info.colour }} x-properties">
-    <p class="panel-heading x-background" {{ _style_background_image(details) }}>Properties</p>
-    <div class="x-properties-grid">
-      {{ _properties(properties) }}
-      {% if more_properties %}
-        <details>
-          <summary class="panel-block">More...</summary>
-          {{ _properties(more_properties) }}
-        </details>
-      {% endif %}
-      {% if remote.data %}
-        <details>
-          <summary class="panel-block">Data...</summary>
-          <div class="x-properties-grid-json"><pre><code>{{ remote.data|tojson(indent=2) }}</code></pre></div>
-        </details>
+      <div class="x-tab-content x-tab-description p-3">
+        <p>{{ details.description|escape if details.description else absent }}</p>
+      </div>
+      <div class="x-tab-content x-tab-details" hidden>
+        {{ _properties(details.into_properties()) }}
+      </div>
+      <div class="x-tab-content x-tab-properties" hidden>
+        {{ _properties(properties) if properties else absent }}
+      </div>
+      {% if data is not none %}
+        <div class="x-tab-content x-tab-data" hidden>
+          <pre><code>{{ data|tojson(indent=2) }}</code></pre>
+        </div>
       {% endif %}
     </div>
   </div>

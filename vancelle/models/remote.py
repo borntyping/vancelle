@@ -10,18 +10,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .details import (
+    InternalUrlProperty,
     Property,
     IterableProperty,
     Details,
     IntoDetails,
     IntoProperties,
-    JsonProperty,
     StringProperty,
-    UrlProperty,
+    ExternalUrlProperty,
 )
 from .types import ShelfEnum
 from ..clients.goodreads.types import GoodreadsCsvRow, GoodreadsHtmlRow
-from ..clients.steam.client_store_api import AppDetails
 from ..inflect import p
 from ..shelf import Shelf
 
@@ -128,10 +127,8 @@ class Remote(Base, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield UrlProperty(self.info.source, self.external_url())
-
-    def more_properties(self) -> typing.Iterable[Property]:
         yield StringProperty("ID", self.id)
+        yield ExternalUrlProperty("{} URL".format(self.info.source), self.external_url())
 
     @classmethod
     def remote_type(cls) -> str:
@@ -173,7 +170,8 @@ class ImportedWork(Remote):
         can_refresh=False,
     )
 
-    def more_properties(self) -> typing.Iterable[StringProperty]:
+    def into_properties(self) -> typing.Iterable[StringProperty]:
+        yield from super().into_properties()
         yield StringProperty("Imported from", self.data.get("imported_from"))
         yield StringProperty("Imported from path", self.data.get("filename"))
         yield StringProperty("External URL", self.data.get("url"))
@@ -205,8 +203,6 @@ class GoodreadsBook(Remote):
             or self.data.get("html", {}).get("exclusive_shelf", None)
             or None,
         )
-
-    def more_properties(self) -> typing.Iterable[StringProperty]:
         yield StringProperty("ASIN", self.data.get("asin"))
 
 
@@ -221,10 +217,6 @@ class OpenlibraryWork(Remote):
 
     def external_url(self) -> str:
         return f"https://openlibrary.org/works/{self.id}"
-
-    def more_properties(self) -> typing.Iterable[StringProperty]:
-        yield UrlProperty("API", self.data.get("url"))
-        yield JsonProperty("Work", self.data.get("work"))
 
 
 class OpenlibraryEdition(Remote):
@@ -243,11 +235,8 @@ class OpenlibraryEdition(Remote):
     def into_properties(self) -> typing.Iterable[StringProperty]:
         yield from super().into_properties()
         yield StringProperty("ISBN", self.data.get("isbn13"))
-
-    def more_properties(self) -> typing.Iterable[StringProperty]:
-        yield UrlProperty("URL", self.external_url())
-        yield UrlProperty("API", self.data.get("url"))
-        yield JsonProperty("Edition", self.data.get("edition"))
+        yield ExternalUrlProperty("URL", self.external_url())
+        yield ExternalUrlProperty("API", self.data.get("url"))
 
 
 class RoyalroadFiction(Remote):
@@ -278,27 +267,26 @@ class SteamApplication(Remote):
 
     def into_properties(self) -> typing.Iterable[Property]:
         yield from super().into_properties()
-        yield UrlProperty("Website", self.data.get("website"))
+        yield ExternalUrlProperty("Website", self.data.get("website"))
 
         if fullgame := self.data.get("fullgame"):
             url = url_for("remote.detail", remote_type=self.remote_type(), remote_id=fullgame["appid"])
-            yield UrlProperty("Full game", url, fullgame["name"], external=False)
+            yield InternalUrlProperty("Full game", url, fullgame["name"])
 
         if dlc := self.data.get("dlc"):
             for appid in dlc:
                 url = url_for("remote.detail", remote_type=self.remote_type(), remote_id=appid)
-                yield UrlProperty("DLC", url, appid, external=False)
+                yield InternalUrlProperty("DLC", url, appid)
 
         yield IterableProperty("Developers", [d for d in self.data.get("developers", []) if d])
         yield IterableProperty("Publishers", [p for p in self.data.get("publishers", []) if p])
 
-    def more_properties(self) -> typing.Iterable[Property]:
         yield StringProperty("Type", self.data.get("type"))
-        yield UrlProperty("Background", self.data.get("background"))
-        yield UrlProperty("Background (raw)", self.data.get("background_raw"))
-        yield UrlProperty("Capsule image", self.data.get("capsule_image"))
-        yield UrlProperty("Capsule image (v5)", self.data.get("capsule_imagev5"))
-        yield UrlProperty("Header image", self.data.get("header_image"))
+        yield ExternalUrlProperty("Background", self.data.get("background"))
+        yield ExternalUrlProperty("Background (raw)", self.data.get("background_raw"))
+        yield ExternalUrlProperty("Capsule image", self.data.get("capsule_image"))
+        yield ExternalUrlProperty("Capsule image (v5)", self.data.get("capsule_imagev5"))
+        yield ExternalUrlProperty("Header image", self.data.get("header_image"))
 
 
 class TmdbMovie(Remote):

@@ -86,6 +86,7 @@ class WorkIndexForm(flask_wtf.FlaskForm):
     )
     work_shelf = wtforms.SelectField(
         label="Exact shelf",
+        coerce=lambda x: Shelf(x) if x else None,
         choices=[("", "All shelves")] + [(s.value, s.title) for s in Shelf],
         default="",
         widget=BulmaSelect(),
@@ -93,6 +94,7 @@ class WorkIndexForm(flask_wtf.FlaskForm):
     )
     work_shelf_group = wtforms.SelectField(
         label="Shelf group",
+        coerce=lambda x: ShelfGroup(x) if x else None,
         choices=[("", "All shelves")] + [(g.value, g.title) for g in ShelfGroup],
         default="",
         widget=BulmaSelect(),
@@ -193,6 +195,8 @@ def index():
                 "work/index_board.html",
                 form=form,
                 layout=form.layout.data,
+                work_shelf=form.work_shelf.data,
+                work_shelf_group=form.work_shelf_group.data,
                 shelves=shelves,
                 total=total,
             )

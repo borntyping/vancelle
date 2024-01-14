@@ -28,8 +28,8 @@ class WorkQuery:
 
     user: User
     work_type: str
-    work_shelf: str
-    work_shelf_group: str
+    work_shelf: Shelf
+    work_shelf_group: ShelfGroup
     work_deleted: str
     remote_type: str
     remote_data: str
@@ -136,8 +136,7 @@ class WorkQuery:
         raise BadRequest("Invalid work deleted filter")
 
     @staticmethod
-    def _filter_work_shelf_group(value: str) -> ColumnElement[bool]:
-        group = ShelfGroup(value)
+    def _filter_work_shelf_group(group: ShelfGroup) -> ColumnElement[bool]:
         shelves = group.shelves()
         return Work.shelf.in_(shelves)
 

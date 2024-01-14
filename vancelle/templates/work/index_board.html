@@ -24,34 +24,28 @@
   </div>
 {% endmacro %}
 
-{% macro board_categories(shelves, active_shelf) %}
-  {% for column_shelf in Shelf %}
-    {% set items = shelves[column_shelf] %}
-    {% if (column_shelf.show_if_empty and active_shelf is none) or items %}
-      <div class="x-board-item is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered" data-shelf="{{ column_shelf.value }}">
-        <h3 class="title is-4">{{ column_shelf.title }}</h3>
-        <p class="subtitle is-7">{{ column_shelf.description }}</p>
-        <span class="block tag is-size-7 is-{{ column_shelf.value }}">{{ n('item', items|length) }}</span>
-      </div>
-
-      {% for item in items %}
-        {% set details = item.resolve_details() %}
-        <div class="x-board-item" data-shelf="{{ column_shelf.value }}">
-          {{ board_card(work=item, details=details, colour=column_shelf.value) }}
-        </div>
-      {% else %}
-        <div class="x-board-{{ column_shelf.group.column }}"></div>
-      {% endfor %}
-    {% endif %}
-  {% endfor %}
-{% endmacro %}
-
 {% block content %}
   <section class="block">
-    {% if total %}
-      <div class="x-board">{{ board_categories(shelves=shelves, active_shelf=shelf) }}</div>
-    {% else %}
-      <div class="box has-text-centered">No results.</div>
-    {% endif %}
+    <div class="x-board" data-work-shelf="{{ work_shelf if work_shelf else 'all' }}" data-work-shelf-group="{{ work_shelf_group if work_shelf_group else 'all' }}">
+      {% for column_shelf in Shelf %}
+        {% set items = shelves[column_shelf] %}
+        {% if items or (column_shelf.group == work_shelf_group and column_shelf.show_if_empty) or column_shelf == work_shelf %}
+          <div class="x-board-item x-board-item-header is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered" data-shelf="{{ column_shelf.value }}">
+            <h3 class="title is-4">{{ column_shelf.title }}</h3>
+            <p class="subtitle is-7">{{ column_shelf.description }}</p>
+            <span class="block tag is-size-7 is-{{ column_shelf.value }}">{{ n('item', items|length) }}</span>
+          </div>
+
+          {% for item in items %}
+            {% set details = item.resolve_details() %}
+            <div class="x-board-item" data-shelf="{{ column_shelf.value }}">
+              {{ board_card(work=item, details=details, colour=column_shelf.value) }}
+            </div>
+          {% else %}
+            <div class="x-board-item"></div>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
   </section>
 {% endblock %}

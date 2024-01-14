@@ -39,7 +39,7 @@ class Shelf(enum.Enum):
 
     UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", ShelfGroup.UNDECIDED, False)
     UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", ShelfGroup.UNDECIDED, False)
-    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", ShelfGroup.UNDECIDED)
+    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", ShelfGroup.UPCOMING)
 
     UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", ShelfGroup.UPCOMING)
 

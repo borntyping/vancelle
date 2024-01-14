@@ -66,6 +66,7 @@ class ApisExtension:
         cache_name = str(cache_path / f"{name}.db")
         return requests_cache.CachedSession(
             cache_name=cache_name,
+            cache_control=True,
             backend="sqlite",
             expire_after=requests_cache.NEVER_EXPIRE,
         )

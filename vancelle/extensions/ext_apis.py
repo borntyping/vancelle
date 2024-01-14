@@ -29,7 +29,7 @@ class ApisExtensionState:
 
 class ApisExtension:
     EXTENSION_NAME: typing.ClassVar[str] = "vancelle/clients"
-    CACHE_PATH_KEY: typing.ClassVar[str] = "VANCELLE_CACHE_PATH"
+    CACHE_PATH_KEY: typing.ClassVar[str] = "CACHE_PATH"
 
     def init_app(self, app: flask.Flask) -> None:
         default_cache_path = platformdirs.user_cache_path(appname=app.name, appauthor="borntyping").as_posix()

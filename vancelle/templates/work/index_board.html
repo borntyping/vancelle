@@ -26,23 +26,20 @@
 
 {% block content %}
   <section class="block">
-    <div class="x-board" data-work-shelf="{{ work_shelf if work_shelf else 'all' }}" data-work-shelf-group="{{ work_shelf_group if work_shelf_group else 'all' }}">
-      {% for column_shelf in Shelf %}
-        {% set items = shelves[column_shelf] %}
-        {% if items or (column_shelf.group == work_shelf_group and column_shelf.show_if_empty) or column_shelf == work_shelf %}
-          <div class="x-board-item x-board-item-header is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered" data-shelf="{{ column_shelf.value }}">
-            <h3 class="title is-4">{{ column_shelf.title }}</h3>
-            <p class="subtitle is-7">{{ column_shelf.description }}</p>
-            <span class="block tag is-size-7 is-{{ column_shelf.value }}">{{ n('item', items|length) }}</span>
+    <div class="x-board" data-work-shelf="{{ work_shelf if work_shelf else 'all' }}" data-work-shelf-group="{{ work_case if work_case else 'all' }}">
+      {% for shelf, items in shelves.items() %}
+        {% if items and ((work_case and shelf in work_case.shelves) or (work_shelf and shelf == work_shelf)) or shelf.show_if_empty %}
+          <div class="x-board-item x-board-item-header is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered" data-shelf="{{ shelf.value }}" data-count="{{ items|length }}">
+            <h3 class="title is-4">{{ shelf.title }}</h3>
+            <p class="subtitle is-7">{{ shelf.description }}</p>
+            <span class="block tag is-size-7 is-{{ shelf.value }}">{{ n('item', items|length) }}</span>
           </div>
 
           {% for item in items %}
             {% set details = item.resolve_details() %}
-            <div class="x-board-item" data-shelf="{{ column_shelf.value }}">
-              {{ board_card(work=item, details=details, colour=column_shelf.value) }}
+            <div class="x-board-item" data-shelf="{{ shelf.value }}">
+              {{ board_card(work=item, details=details, colour=shelf.value) }}
             </div>
-          {% else %}
-            <div class="x-board-item"></div>
           {% endfor %}
         {% endif %}
       {% endfor %}

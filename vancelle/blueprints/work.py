@@ -17,7 +17,7 @@ from vancelle.extensions import apis, db, htmx
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
-from vancelle.shelf import Shelf, ShelfGroup
+from vancelle.shelf import Shelf, Case
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -26,8 +26,8 @@ controller = WorkController()
 bp = flask.Blueprint("work", __name__, url_prefix="")
 
 SHELF_FORM_CHOICES = {
-    shelf_group.title: [(s.value, s.title) for s in group]
-    for shelf_group, group in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
+    group: [(shelf.value, shelf.title) for shelf in items]
+    for group, items in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
 }
 
 
@@ -92,10 +92,10 @@ class WorkIndexForm(flask_wtf.FlaskForm):
         widget=BulmaSelect(),
         validators=[Optional()],
     )
-    work_shelf_group = wtforms.SelectField(
-        label="Shelf group",
-        coerce=lambda x: ShelfGroup(x) if x else None,
-        choices=[("", "All shelves")] + [(g.value, g.title) for g in ShelfGroup],
+    work_case = wtforms.SelectField(
+        label="Shelves",
+        coerce=lambda x: Case(x) if x else None,
+        choices=[("", "All shelves")] + [(g.value, g.title) for g in Case],
         default="",
         widget=BulmaSelect(),
         validators=[Optional()],
@@ -181,7 +181,7 @@ def index():
         user=flask_login.current_user,
         work_type=form.work_type.data,
         work_shelf=form.work_shelf.data,
-        work_shelf_group=form.work_shelf_group.data,
+        work_case=form.work_case.data,
         work_deleted=form.work_deleted.data,
         remote_type=form.remote_type.data,
         remote_data=form.remote_data.data,
@@ -196,7 +196,7 @@ def index():
                 form=form,
                 layout=form.layout.data,
                 work_shelf=form.work_shelf.data,
-                work_shelf_group=form.work_shelf_group.data,
+                work_case=form.work_case.data,
                 shelves=shelves,
                 total=total,
             )

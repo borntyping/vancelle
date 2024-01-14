@@ -17,7 +17,7 @@ from vancelle.models import Base, User
 from vancelle.models.record import Record
 from vancelle.models.remote import ImportedWork, Remote
 from vancelle.models.work import Work
-from vancelle.shelf import Shelf, ShelfGroup
+from vancelle.shelf import Shelf, Case
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -28,8 +28,8 @@ class WorkQuery:
 
     user: User
     work_type: str
-    work_shelf: Shelf
-    work_shelf_group: ShelfGroup
+    work_shelf: Shelf | None
+    work_case: Case | None
     work_deleted: str
     remote_type: str
     remote_data: str
@@ -67,8 +67,8 @@ class WorkQuery:
             statement = statement.filter(Work.type == self.work_type)
         if self.work_shelf:
             statement = statement.filter(Work.shelf == self.work_shelf)
-        if self.work_shelf_group:
-            statement = statement.filter(self._filter_work_shelf_group(self.work_shelf_group))
+        if self.work_case:
+            statement = statement.filter(Work.shelf.in_(self.work_case.shelves))
         if self.remote_type:
             statement = statement.filter(Remote.type == self.remote_type)
         if self.search:
@@ -94,7 +94,8 @@ class WorkQuery:
 
     def shelves(self) -> typing.Tuple[typing.Mapping[Shelf, list[Work]], int]:
         works = self.all()
-        groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in Shelf}
+        iter_shelves = self.work_case.shelves if self.work_case else Shelf
+        groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in iter_shelves}
         for work in works:
             details = work.resolve_details()
             if details.shelf is None:
@@ -134,11 +135,6 @@ class WorkQuery:
                 return True_()
 
         raise BadRequest("Invalid work deleted filter")
-
-    @staticmethod
-    def _filter_work_shelf_group(group: ShelfGroup) -> ColumnElement[bool]:
-        shelves = group.shelves()
-        return Work.shelf.in_(shelves)
 
     @staticmethod
     def _filter_remote_data(remote_data: str) -> ColumnElement[bool]:

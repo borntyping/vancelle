@@ -34,13 +34,17 @@ $x-board-card-cover: 2fr;
   display: grid;
   grid-gap: 1em;
 
+  // Add a margin around screenshots without affecting layout.
+  margin: -1em;
+  padding: 1em;
+
   // Show a dense layout when we're filtering shelves.
   &:not([data-work-shelf="all"][data-work-shelf-group="all"]) {
     grid-template-columns: repeat(6, 1fr);
     grid-auto-flow: row;
     grid-auto-rows: minmax(0, 1fr);
 
-    .x-board-item-header {
+    .x-board-item-header:not([data-count="0"]) {
       grid-column: 1 !important;
     }
   }

@@ -3,28 +3,6 @@ import typing
 
 
 @enum.verify(enum.UNIQUE)
-class ShelfGroup(enum.Enum):
-    """
-    Used to group individual shelves in form controls and the board layout.
-    """
-
-    UNDECIDED = ("undecided", "Undecided")
-    UPCOMING = ("upcoming", "Upcoming")
-    PLAYING = ("playing", "Playing")
-    PAUSED = ("paused", "Paused")
-    COMPLETED = ("completed", "Completed")
-
-    def __new__(cls, value: str, title: str):
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj.title = title
-        return obj
-
-    def shelves(self) -> typing.Sequence["Shelf"]:
-        return [s for s in Shelf if s.group == self]
-
-
-@enum.verify(enum.UNIQUE)
 class Shelf(enum.Enum):
     """
     >>> Shelf('unsorted')
@@ -37,34 +15,52 @@ class Shelf(enum.Enum):
     'Not assigned to a shelf yet'
     """
 
-    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", ShelfGroup.UNDECIDED, False)
-    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", ShelfGroup.UNDECIDED, False)
-    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", ShelfGroup.UPCOMING)
+    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", "Undecided", False)
+    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", "Undecided", False)
+    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", "Undecided")
 
-    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", ShelfGroup.UPCOMING)
+    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", "Upcoming")
 
-    PLAYING = ("playing", "Playing", "Currently reading/playing/watching", ShelfGroup.PLAYING)
-    REPLAYING = ("replaying", "Replaying", "Returning to a completed work", ShelfGroup.PLAYING, False)
-    ONGOING = ("ongoing", "Ongoing", "A long-term or incomplete work", ShelfGroup.PLAYING, False)
-    INFINITE = ("infinite", "Infinite", "A work that won't be completed", ShelfGroup.PLAYING, False)
+    PLAYING = ("playing", "Playing", "Currently reading/playing/watching", "Playing")
+    REPLAYING = ("replaying", "Replaying", "Returning to a completed work", "Playing", False)
+    ONGOING = ("ongoing", "Ongoing", "A long-term or incomplete work", "Playing", False)
+    INFINITE = ("infinite", "Infinite", "A work that won't be completed", "Playing", False)
 
-    PAUSED = ("paused", "Paused", "Might continue soon", ShelfGroup.PAUSED)
-    SHELVED = ("shelved", "Shelved", "Might continue one day", ShelfGroup.PAUSED, False)
-    REFERENCE = ("reference", "Reference", "Reference material with no status", ShelfGroup.PAUSED, False)
+    PAUSED = ("paused", "Paused", "Might continue soon", "Paused")
+    SHELVED = ("shelved", "Shelved", "Might continue one day", "Paused", False)
+    REFERENCE = ("reference", "Reference", "Reference material with no status", "Paused", False)
 
-    COMPLETED = ("completed", "Completed", "A completed work - well done!", ShelfGroup.COMPLETED)
-    ABANDONED = ("abandoned", "Abandoned", "Gave up on", ShelfGroup.COMPLETED, False)
+    COMPLETED = ("completed", "Completed", "A completed work - well done!", "Completed")
+    ABANDONED = ("abandoned", "Abandoned", "Gave up on", "Completed", False)
 
     title: str
     description: str
-    group: ShelfGroup
+    group: str
     show_if_empty: bool
 
-    def __new__(cls, value: str, title: str, description: str, group: ShelfGroup, show_if_empty: bool = True):
+    def __new__(cls, value: str, title: str, description: str, group: str, show_if_empty: bool = True):
         obj = object.__new__(cls)
         obj._value_ = value
         obj.title = title
         obj.description = description
         obj.group = group
         obj.show_if_empty = show_if_empty
+        return obj
+
+
+@enum.verify(enum.UNIQUE)
+class Case(enum.Enum):
+    """Used to group shelves for display."""
+
+    UPCOMING = ("upcoming", "Upcoming", [Shelf.UPCOMING, Shelf.UNRELEASED, Shelf.UNDECIDED])
+    PLAYING = ("playing", "Playing", [Shelf.PLAYING, Shelf.REPLAYING, Shelf.ONGOING, Shelf.INFINITE])
+    PAUSED = ("paused", "Paused", [Shelf.PAUSED, Shelf.SHELVED])
+    COMPLETED = ("completed", "Completed", [Shelf.COMPLETED, Shelf.ABANDONED])
+    OTHER = ("other", "Other", [Shelf.UNSORTED, Shelf.REFERENCE])
+
+    def __new__(cls, value: str, title: str, shelves: typing.List[Shelf]):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj.title = title
+        obj.shelves = shelves
         return obj

@@ -8,6 +8,7 @@ from .blueprints.bulma import bp as bp_bulma
 from .blueprints.data import bp as bp_data
 from .blueprints.errors import bp as bp_errors
 from .blueprints.health import bp as bp_health
+from .blueprints.home import bp as bp_home
 from .blueprints.record import bp as bp_record
 from .blueprints.remote import bp as bp_remote
 from .blueprints.user import bp as bp_user
@@ -41,6 +42,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app.register_blueprint(bp_bulma)
     app.register_blueprint(bp_errors)
     app.register_blueprint(bp_health)
+    app.register_blueprint(bp_home)
     app.register_blueprint(bp_data)
     app.register_blueprint(bp_user)
 

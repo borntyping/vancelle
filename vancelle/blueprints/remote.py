@@ -3,9 +3,10 @@ import uuid
 
 import flask
 import flask_login
+from werkzeug.exceptions import NotFound
 
 from ..controllers.remote import RemotesController
-from ..extensions import htmx
+from ..extensions import apis, htmx
 from ..extensions.ext_html import Toggle
 from ..models.remote import Remote
 
@@ -34,6 +35,22 @@ def detail(remote_type: str, remote_id: str):
     work_id = flask.request.args.get("work_id", type=uuid.UUID)
 
     return controller.render_detail(remote_type=remote_type, remote_id=remote_id, work_id=work_id)
+
+
+@bp.route("/remotes/<string:remote_type>/<string:remote_id>/cover")
+def cover(remote_type: str, remote_id: str):
+    remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
+    if not remote.cover:
+        raise NotFound("Remote has no cover image.")
+    return apis.images.as_response(remote.cover)
+
+
+@bp.route("/remotes/<string:remote_type>/<string:remote_id>/background")
+def background(remote_type: str, remote_id: str):
+    remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
+    if not remote.background:
+        raise NotFound("Remote has no background image.")
+    return apis.images.as_response(remote.background)
 
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/create-work", methods={"post"})

@@ -106,6 +106,12 @@ class Remote(Base, IntoDetails, IntoProperties):
     def url_for(self, work: typing.Optional["Work"] = None) -> str:
         return url_for("remote.detail", remote_type=self.type, remote_id=self.id, work_id=work.id if work else None)
 
+    def url_for_cover(self) -> str | None:
+        return url_for("remote.cover", remote_type=self.type, remote_id=self.id) if self.cover else None
+
+    def url_for_background(self) -> str | None:
+        return url_for("remote.background", remote_type=self.type, remote_id=self.id) if self.cover else None
+
     @property
     def deleted(self) -> bool:
         return self.time_deleted is not None
@@ -119,8 +125,8 @@ class Remote(Base, IntoDetails, IntoProperties):
             author=self.author,
             description=self.description,
             release_date=self.release_date,
-            cover=self.cover,
-            background=self.background,
+            cover=self.url_for_cover(),
+            background=self.url_for_background(),
             shelf=self.shelf,
             tags=self.tags,
             external_url=self.external_url(),

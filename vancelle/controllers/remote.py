@@ -50,17 +50,30 @@ class RemotesController:
             if cls.remote_type() not in self.managers:
                 raise NotImplementedError(f"No manager registered for {cls.remote_type()} ({cls.info=})")
 
-    def _get_work_by_id(self, work_id: uuid.UUID) -> Work:
+    def _get_work_from_db(self, work_id: uuid.UUID) -> Work:
         return db.get_or_404(Work, work_id, description="Work not found")
 
     def _get_remote_from_db_or_404(self, *, remote_type: str, remote_id: str) -> Remote:
-        return db.one_or_404(self._db_get_remote(remote_type=remote_type, remote_id=remote_id), description="Remote not found")
+        return db.one_or_404(
+            self._get_remote_query(remote_type=remote_type, remote_id=remote_id), description="Remote not found"
+        )
 
     def _get_remote_from_db_or_none(self, *, remote_type: str, remote_id: str) -> Remote | None:
-        return db.session.execute(self._db_get_remote(remote_type=remote_type, remote_id=remote_id)).scalar_one_or_none()
+        return db.session.execute(self._get_remote_query(remote_type=remote_type, remote_id=remote_id)).scalar_one_or_none()
 
-    def _db_get_remote(self, remote_type: str, remote_id: str) -> sqlalchemy.Select:
+    def _get_remote_query(self, remote_type: str, remote_id: str) -> sqlalchemy.Select:
         return select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
+
+    def get_remote(self, remote_type: str, remote_id: str) -> Remote:
+        log = logger.bind(remote_type=remote_type, remote_id=remote_id)
+
+        if remote := self._get_remote_from_db_or_none(remote_type=remote_type, remote_id=remote_id):
+            log.debug("Fetched remote from database")
+            return remote
+
+        remote = self.managers[remote_type].fetch(remote_id)
+        log.debug("Fetched remote from source")
+        return remote
 
     def index(self, *, remote_type: str | None) -> Pagination:
         query = sqlalchemy.select(Remote)
@@ -142,7 +155,7 @@ class RemotesController:
     def link_work(self, *, remote_id: str, remote_type: str, work_id: uuid.UUID) -> Work:
         """Create a new remote, linked to an existing work."""
         log = logger.bind(remote_id=remote_id, remote_type=remote_type, work_id=work_id)
-        work = self._get_work_by_id(work_id=work_id)
+        work = self._get_work_from_db(work_id=work_id)
 
         # if remote := db.session.execute(
         #     select(Remote).filter(Remote.work_id == work_id, Remote.type == remote_type)
@@ -162,7 +175,7 @@ class RemotesController:
         items: Pagination
 
         if work_id:
-            work = self._get_work_by_id(work_id)
+            work = self._get_work_from_db(work_id)
             query = query or work.resolve_details().title
         else:
             work = None
@@ -182,15 +195,9 @@ class RemotesController:
         )
 
     def render_detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> str:
-        log = logger.bind(remote_type=remote_type, remote_id=remote_id)
+        remote = self.get_remote(remote_type=remote_type, remote_id=remote_id)
+        work = self._get_work_from_db(work_id) if work_id else None
 
-        if remote := self._get_remote_from_db_or_none(remote_type=remote_type, remote_id=remote_id):
-            log.debug("Fetched remote from database")
-        else:
-            remote = self.managers[remote_type].fetch(remote_id)
-            log.debug("Fetched remote from source")
-
-        work = self._get_work_by_id(work_id) if work_id else None
         context = self.managers[remote_type].context(remote)
         return flask.render_template(
             [f"remote/{remote_type}/detail.html", "remote/detail.html"],

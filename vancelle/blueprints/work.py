@@ -6,15 +6,14 @@ import flask_login
 import flask_wtf
 import structlog
 import wtforms
-from werkzeug.exceptions import BadRequest
+import werkzeug.exceptions
 from wtforms.validators import DataRequired, Optional
-from wtforms.widgets import HiddenInput
 
 from vancelle.blueprints.bulma import BulmaSelect
 from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NullFilter
-from vancelle.extensions import db, htmx
+from vancelle.extensions import apis, db, htmx
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -216,7 +215,7 @@ def index():
                 total=works.total,
             )
         case _:
-            raise BadRequest(f"Unknown layout {form.layout.data!r}")
+            raise werkzeug.exceptions.BadRequest(f"Unknown layout {form.layout.data!r}")
 
     response = flask.Response(page)
     response.delete_cookie("index")
@@ -228,6 +227,22 @@ def detail(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
     form = WorkForm(obj=work)
     return flask.render_template("work/detail.html", work=work, form=form)
+
+
+@bp.route("/works/<uuid:work_id>/cover")
+def cover(work_id: uuid.UUID):
+    work = controller.get_or_404(id=work_id)
+    if not work.cover:
+        raise werkzeug.exceptions.NotFound("Work has no cover image.")
+    return apis.images.as_response(work.cover)
+
+
+@bp.route("/works/<uuid:work_id>/background")
+def background(work_id: uuid.UUID):
+    work = controller.get_or_404(id=work_id)
+    if not work.background:
+        raise werkzeug.exceptions.NotFound("Work has no background image.")
+    return apis.images.as_response(work.background)
 
 
 @bp.route("/works/<uuid:work_id>/-/shelve", methods={"get", "post"})

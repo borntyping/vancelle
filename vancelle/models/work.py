@@ -112,6 +112,12 @@ class Work(Base, IntoDetails, IntoProperties):
     def url_for(self) -> str:
         return url_for("work.detail", work_id=self.id)
 
+    def url_for_cover(self) -> str | None:
+        return url_for("work.cover", work_id=self.id) if self.cover else None
+
+    def url_for_background(self) -> str | None:
+        return url_for("work.background", work_id=self.id) if self.background else None
+
     def iter_remotes(self) -> typing.Iterable["Remote"]:
         return reversed(sorted(self.remotes, key=lambda remote: remote.info.priority))
 
@@ -124,8 +130,8 @@ class Work(Base, IntoDetails, IntoProperties):
             author=self.author,
             description=self.description,
             release_date=self.release_date,
-            cover=self.cover,
-            background=self.background,
+            cover=self.url_for_cover(),
+            background=self.url_for_background(),
             shelf=self.shelf,
             tags=self.tags,
             external_url=self.external_url,

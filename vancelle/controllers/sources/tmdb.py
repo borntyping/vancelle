@@ -19,7 +19,7 @@ class TmdbMovieManager(Manager[TmdbMovie]):
             title=data["title"],
             author=p.join([c["name"] for c in data["production_companies"]]),
             description=data["overview"],
-            release_date=apis.tmdb.release_date(data["release_date"]),
+            release_date=apis.tmdb.release_date(data.get("release_date")),
             cover=apis.tmdb.poster_url(data["poster_path"]),
             background=apis.tmdb.backdrop_url(data["backdrop_path"]),
             data=data,
@@ -35,7 +35,7 @@ class TmdbMovieManager(Manager[TmdbMovie]):
                 title=data["title"],
                 description=data["overview"],
                 cover=apis.tmdb.poster_url(data["poster_path"]),
-                release_date=apis.tmdb.release_date(data["release_date"]),
+                release_date=apis.tmdb.release_date(data.get("release_date")),
             )
             for data in search["results"]
         ]
@@ -54,7 +54,7 @@ class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
             title=data["name"],
             author=p.join([c["name"] for c in data["production_companies"]]),
             description=data["overview"],
-            release_date=apis.tmdb.release_date(data["first_air_date"]),
+            release_date=apis.tmdb.release_date(data.get("first_air_date")),
             cover=apis.tmdb.poster_url(data["poster_path"]),
             background=apis.tmdb.backdrop_url(data["backdrop_path"]),
             data=data,
@@ -70,7 +70,7 @@ class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
                 title=data["name"],
                 description=data["overview"],
                 cover=apis.tmdb.poster_url(data["poster_path"]),
-                release_date=apis.tmdb.release_date(data["first_air_date"]),
+                release_date=apis.tmdb.release_date(data.get("first_air_date")),
             )
             for data in search["results"]
         ]

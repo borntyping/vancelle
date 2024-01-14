@@ -14,10 +14,12 @@ class RequestsClient:
     def get(self, url: str, **kwargs: typing.Any) -> requests_cache.AnyResponse:
         response = self.session.get(url, **kwargs)
         response.raise_for_status()
-        logger.info(
+        logger.debug(
             "Finished request",
             url=response.url,
             status_code=response.status_code,
-            from_cache=response.from_cache,
+            elapsed=response.elapsed,
+            from_cache=getattr(response, "from_cache", None),
+            expires_delta=getattr(response, "expires_delta", None),
         )
         return response

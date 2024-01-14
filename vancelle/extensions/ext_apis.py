@@ -40,35 +40,41 @@ class ApisExtension:
 
         app.extensions[self.EXTENSION_NAME] = ApisExtensionState(
             images=ImageCache(
-                session=self._session(cache_path, "images"),
+                session=self._session(cache_path, "images", backend="filesystem"),
             ),
             openlibrary=CachedOpenLibraryClient(
-                session=self._session(cache_path, "openlibrary"),
+                session=self._session(cache_path, "openlibrary.sqlite"),
             ),
             royalroad=RoyalRoadScraper(
-                session=self._session(cache_path, "royalroad"),
+                session=self._session(cache_path, "royalroad.sqlite"),
             ),
             steam_store=SteamStoreAPI(
-                session=self._session(cache_path, "steam_store"),
+                session=self._session(cache_path, "steam_store.sqlite"),
             ),
             steam_web=SteamWebAPI(
-                session=self._session(cache_path, "steam_web"),
+                session=self._session(cache_path, "steam_web.sqlite"),
                 api_key=app.config["STEAM_WEB_API_KEY"],
             ),
             tmdb=TmdbAPI.create(
-                dedicated_session=self._session(cache_path, "tmdb"),
+                dedicated_session=self._session(cache_path, "tmdb.sqlite"),
                 token=app.config["TMDB_READ_ACCESS_TOKEN"],
             ),
         )
-        app.logger.info(f"Request caches will be placed in {cache_path}")
 
-    def _session(self, cache_path: pathlib.Path, name: str) -> requests_cache.CachedSession:
-        cache_name = str(cache_path / f"{name}.db")
+        app.logger.info(f"Outgoing requests will be cached in {cache_path}")
+
+    def _session(
+        self,
+        cache_path: pathlib.Path,
+        name: str,
+        backend: requests_cache.BackendSpecifier = "sqlite",
+    ) -> requests_cache.CachedSession:
         return requests_cache.CachedSession(
-            cache_name=cache_name,
+            cache_name=str(cache_path / name),
             cache_control=True,
-            backend="sqlite",
+            backend=backend,
             expire_after=requests_cache.NEVER_EXPIRE,
+            stale_if_error=True,
         )
 
     def _state(self) -> ApisExtensionState:

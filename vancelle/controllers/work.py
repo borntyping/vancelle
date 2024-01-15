@@ -97,10 +97,7 @@ class WorkQuery:
         iter_shelves = self.work_case.shelves if self.work_case else Shelf
         groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in iter_shelves}
         for work in works:
-            details = work.resolve_details()
-            if details.shelf is None:
-                raise ValueError("Work details do not include shelf")
-            groups[details.shelf].append(work)
+            groups[work.shelf].append(work)
         return groups, len(works)
 
     def paginate(self) -> flask_sqlalchemy.pagination.Pagination:

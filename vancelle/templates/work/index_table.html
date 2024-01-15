@@ -26,7 +26,7 @@
             <td class="has-text-grey" style="width: 50%;">
               {{ details_combined_title(details, href=work.url_for()) }}
             </td>
-            <td class="has-text-centered">{{ shelf_tag(details.shelf) }}</td>
+            <td class="has-text-centered">{{ shelf_tag(work.shelf) }}</td>
             <td class="has-text-centered">{{ work.date_started|date if work.date_started else absent }}</td>
             <td class="has-text-centered">{{ work.date_stopped|date if work.date_stopped else absent }}</td>
             <td class="has-text-right">{{ sources_list(work) }}</td>

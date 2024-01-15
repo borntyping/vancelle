@@ -102,9 +102,6 @@
       <h3 class="title is-4">{{ details_title(details) }}</h3>
       <p class="subtitle is-6">{{ details_date_and_author(details) }}</p>
       <p class="block">
-        {% if details.shelf %}
-          {{ shelf_tag(details.shelf) }}
-        {% endif %}
         {% if details.tags %}
           {% for tag in details.tags|default([], True) %}
             <span class="tag">{{ tag }}</span>

@@ -140,8 +140,6 @@ class Details(IntoProperties):
         yield StringProperty("Shelf", self.shelf.title if self.shelf else None)
         yield IterableProperty("Tags", list(self.tags) if self.tags else ())
         yield ExternalUrlProperty("External URL", self.external_url)
-        yield ExternalUrlProperty("Cover URL", self.cover)
-        yield ExternalUrlProperty("Background URL", self.background)
 
 
 class IntoDetails:

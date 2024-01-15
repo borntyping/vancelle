@@ -70,8 +70,8 @@ def create_personal_app() -> flask.Flask:
             "to-read-non-fiction": Shelf.SHELVED,
             "to-read-sequels": Shelf.UPCOMING,
         },
-        "SENTRY_ENABLED": False,
-        "SPOTLIGHT_ENABLED": False,
+        "SENTRY_ENABLED": True,
+        "SPOTLIGHT_ENABLED": True,
     }
 
     if database_url := os.environ.get("DATABASE_URL"):

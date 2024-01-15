@@ -134,7 +134,14 @@
         </ul>
       </div>
       <div class="x-tab-content x-tab-description p-3">
-        <p>{{ details.description|escape if details.description else absent }}</p>
+        {% if details.description %}
+          {# TODO: Should descriptions be stored as a list? #}
+          {% for line in details.description.split('\n') %}
+            <p class="block">{{ line }}</p>
+          {% endfor %}
+        {% else %}
+          <p>{{ absent }}</p>
+        {% endif %}
       </div>
       <div class="x-tab-content x-tab-details" hidden>
         {{ _properties(details.into_properties()) }}

@@ -1,6 +1,8 @@
 import dataclasses
 import typing
 
+import bs4
+import requests
 import requests_cache
 import structlog
 
@@ -23,3 +25,9 @@ class RequestsClient:
             expires_delta=getattr(response, "expires_delta", None),
         )
         return response
+
+    def soup(self, url: str, **kwargs: typing.Any) -> bs4.BeautifulSoup:
+        return self.request_into_soup(self.get(url, **kwargs))
+
+    def request_into_soup(self, response: requests.Response) -> bs4.BeautifulSoup:
+        return bs4.BeautifulSoup(response.text, features="html.parser")

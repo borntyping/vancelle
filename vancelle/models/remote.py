@@ -4,23 +4,22 @@ import typing
 import uuid
 
 from flask import url_for
-from sqlalchemy import Enum, ForeignKey, String, Text, func
+from sqlalchemy import ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .details import (
-    InternalUrlProperty,
-    Property,
-    IterableProperty,
     Details,
+    ExternalUrlProperty,
+    InternalUrlProperty,
     IntoDetails,
     IntoProperties,
+    IterableProperty,
+    Property,
     StringProperty,
-    ExternalUrlProperty,
 )
 from .types import ShelfEnum
-from ..clients.goodreads.types import GoodreadsCsvRow, GoodreadsHtmlRow
 from ..inflect import p
 from ..shelf import Shelf
 
@@ -110,7 +109,7 @@ class Remote(Base, IntoDetails, IntoProperties):
         return url_for("remote.cover", remote_type=self.type, remote_id=self.id) if self.cover else None
 
     def url_for_background(self) -> str | None:
-        return url_for("remote.background", remote_type=self.type, remote_id=self.id) if self.cover else None
+        return url_for("remote.background", remote_type=self.type, remote_id=self.id) if self.background else None
 
     @property
     def deleted(self) -> bool:
@@ -134,7 +133,8 @@ class Remote(Base, IntoDetails, IntoProperties):
 
     def into_properties(self) -> typing.Iterable[Property]:
         yield StringProperty("ID", self.id)
-        yield ExternalUrlProperty("{} URL".format(self.info.source), self.external_url())
+        yield ExternalUrlProperty("Cover", self.cover)
+        yield ExternalUrlProperty("Background", self.background)
 
     @classmethod
     def remote_type(cls) -> str:
@@ -183,16 +183,14 @@ class ImportedWork(Remote):
         yield StringProperty("External URL", self.data.get("url"))
 
 
-class GoodreadsBookData(typing.TypedDict, GoodreadsCsvRow, GoodreadsHtmlRow):
-    filename: str
+class GoodreadsPrivateBook(Remote):
+    """A Goodreads book imported from a CSV export or HTML dump of a user's books list."""
 
-
-class GoodreadsBook(Remote):
     __mapper_args__ = {"polymorphic_identity": "goodreads.book"}
     info = RemoteInfo(
         colour="goodreads",
         source="Goodreads",
-        noun="book",
+        noun="imported book",
         noun_full="Imported Goodreads book",
         priority=10,
         can_search=False,
@@ -212,13 +210,40 @@ class GoodreadsBook(Remote):
         yield StringProperty("ASIN", self.data.get("asin"))
 
 
+class GoodreadsPublicBook(Remote):
+    """A Goodreads book scraped from the Goodreads website, without logging in."""
+
+    __mapper_args__ = {"polymorphic_identity": "goodreads.book.public"}
+    info = RemoteInfo(
+        colour="goodreads",
+        source="Goodreads",
+        noun="book",
+        noun_full="Goodreads book",
+        priority=13,
+    )
+
+    def external_url(self) -> str | None:
+        return f"https://www.goodreads.com/book/show/{self.id}"
+
+    def into_properties(self) -> typing.Iterable[StringProperty]:
+        yield from super().into_properties()
+
+        if data := self.data.get("data"):
+            yield StringProperty("ISBN", data.get("isbn"))
+            yield StringProperty("Number of pages", data.get("numberOfPages"))
+            yield StringProperty("Name", data.get("name"))
+
+        if scraped := self.data.get("scraped"):
+            yield StringProperty("Series", scraped.get("series"))
+
+
 class OpenlibraryWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.work"}
     info = RemoteInfo(
         colour="openlibrary",
         source="Open Library",
         noun="work",
-        priority=21,
+        priority=11,
     )
 
     def external_url(self) -> str:
@@ -231,7 +256,7 @@ class OpenlibraryEdition(Remote):
         colour="openlibrary",
         source="Open Library",
         noun="edition",
-        priority=22,
+        priority=12,
         can_search=False,
     )
 

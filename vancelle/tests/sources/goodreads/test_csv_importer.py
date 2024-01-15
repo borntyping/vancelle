@@ -3,14 +3,14 @@ import pathlib
 import uuid
 
 from vancelle.models import User
-from vancelle.models.remote import GoodreadsBook
+from vancelle.models.remote import GoodreadsPrivateBook
 from vancelle.models.record import Record
 from vancelle.shelf import Shelf
 from vancelle.clients.goodreads.csv import GoodreadsCsvImporter
 
 
 class MockGoodreadsCsvImporter(GoodreadsCsvImporter):
-    def get_remote(self, remote_id: str) -> GoodreadsBook | None:
+    def get_remote(self, remote_id: str) -> GoodreadsPrivateBook | None:
         return None
 
     def get_record(self, record_id: uuid.UUID) -> Record | None:

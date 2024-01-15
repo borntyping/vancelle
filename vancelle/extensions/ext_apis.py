@@ -7,6 +7,7 @@ import platformdirs
 import requests_cache
 import structlog
 
+from ..clients.goodreads.http import GoodreadsPublicScraper
 from ..clients.images.client import ImageCache
 from ..clients.openlibrary.client import CachedOpenLibraryClient, OpenLibraryAPI
 from ..clients.royalroad.client import RoyalRoadScraper
@@ -18,7 +19,8 @@ logger = structlog.get_logger(logger_name=__name__)
 
 
 @dataclasses.dataclass(kw_only=True)
-class ApisExtensionState:
+class Clients:
+    goodreads: GoodreadsPublicScraper
     images: ImageCache
     openlibrary: OpenLibraryAPI
     royalroad: RoyalRoadScraper
@@ -27,7 +29,7 @@ class ApisExtensionState:
     tmdb: TmdbAPI
 
 
-class ApisExtension:
+class ClientsExtension:
     EXTENSION_NAME: typing.ClassVar[str] = "vancelle/clients"
     CACHE_PATH_KEY: typing.ClassVar[str] = "CACHE_PATH"
 
@@ -38,7 +40,10 @@ class ApisExtension:
         cache_path = pathlib.Path(app.config[self.CACHE_PATH_KEY])
         cache_path.mkdir(exist_ok=True)
 
-        app.extensions[self.EXTENSION_NAME] = ApisExtensionState(
+        app.extensions[self.EXTENSION_NAME] = Clients(
+            goodreads=GoodreadsPublicScraper(
+                session=self._session(cache_path, "goodreads", backend="filesystem"),
+            ),
             images=ImageCache(
                 session=self._session(cache_path, "images", backend="filesystem"),
             ),
@@ -77,8 +82,12 @@ class ApisExtension:
             stale_if_error=True,
         )
 
-    def _state(self) -> ApisExtensionState:
+    def _state(self) -> Clients:
         return flask.current_app.extensions[self.EXTENSION_NAME]
+
+    @property
+    def goodreads(self) -> GoodreadsPublicScraper:
+        return self._state().goodreads
 
     @property
     def images(self) -> ImageCache:

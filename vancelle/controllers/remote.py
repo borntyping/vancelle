@@ -11,7 +11,7 @@ from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import select
 
 from vancelle.controllers.sources.base import Manager
-from vancelle.controllers.sources.goodreads import GoodreadsBookManager
+from vancelle.controllers.sources.goodreads import GoodreadsPrivateBookManager, GoodreadsPublicBookManager
 from vancelle.controllers.sources.imported import ImportedWorkManager
 from vancelle.controllers.sources.openlibrary import OpenlibraryEditionManager, OpenlibraryWorkManager
 from vancelle.controllers.sources.royalroad import RoyalroadFictionManager
@@ -28,7 +28,8 @@ logger = structlog.get_logger(logger_name=__name__)
 
 
 DEFAULT_MANAGERS = (
-    GoodreadsBookManager(),
+    GoodreadsPrivateBookManager(),
+    GoodreadsPublicBookManager(),
     OpenlibraryWorkManager(),
     OpenlibraryEditionManager(),
     ImportedWorkManager(),

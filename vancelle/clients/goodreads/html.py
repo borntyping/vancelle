@@ -10,7 +10,7 @@ import bs4.element
 import structlog
 
 from .common import GoodreadsImporter
-from ...models.remote import GoodreadsBook
+from ...models.remote import GoodreadsPrivateBook
 from ...types import Sentinel, sentinel
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -51,11 +51,13 @@ class Field:
 
 @dataclasses.dataclass(frozen=True)
 class GoodreadsHtmlImporter(GoodreadsImporter):
-    def load_file(self, path: pathlib.Path) -> typing.Iterable[GoodreadsBook]:
+    def load_file(self, path: pathlib.Path) -> typing.Iterable[GoodreadsPrivateBook]:
         with path.open("r") as f:
             yield from self.parse_markup(markup=f, filename=path.name)
 
-    def parse_markup(self, markup: str | typing.IO[str] | typing.IO[bytes], *, filename: str) -> typing.Iterable[GoodreadsBook]:
+    def parse_markup(
+        self, markup: str | typing.IO[str] | typing.IO[bytes], *, filename: str
+    ) -> typing.Iterable[GoodreadsPrivateBook]:
         log = logger.bind(filename=filename)
 
         log.debug("Making soup")
@@ -69,7 +71,7 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         for e in elements:
             yield self.parse_row(e, filename=filename)
 
-    def parse_row(self, element: bs4.Tag, filename: str) -> GoodreadsBook:
+    def parse_row(self, element: bs4.Tag, filename: str) -> GoodreadsPrivateBook:
         with self.field(element, "cover") as tag:
             cover: str = tag.find("img").attrs.get("src")
 

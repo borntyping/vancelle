@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm.attributes import flag_modified
 
 from vancelle.models import User
-from vancelle.models.remote import GoodreadsBook
+from vancelle.models.remote import GoodreadsPrivateBook
 from vancelle.models.record import Record
 from vancelle.models.work import Book
 from vancelle.extensions import db
@@ -36,19 +36,19 @@ class GoodreadsImporter:
 
         return self.shelf_mapping[exclusive_shelf]
 
-    def load_file(self, path: pathlib.Path) -> typing.Iterable[Book | GoodreadsBook]:
+    def load_file(self, path: pathlib.Path) -> typing.Iterable[Book | GoodreadsPrivateBook]:
         raise NotImplementedError
 
-    def load_stream(self, stream: typing.IO[bytes], *, filename: str) -> typing.Iterable[Book | GoodreadsBook]:
+    def load_stream(self, stream: typing.IO[bytes], *, filename: str) -> typing.Iterable[Book | GoodreadsPrivateBook]:
         raise NotImplementedError
 
-    def add_items(self, items: typing.Sequence[Book | GoodreadsBook]) -> None:
+    def add_items(self, items: typing.Sequence[Book | GoodreadsPrivateBook]) -> None:
         db.session.add_all(items)
         db.session.commit()
         logger.warning("Imported books from Goodreads", count=len(items))
 
-    def get_remote(self, remote_id: str) -> GoodreadsBook | None:
-        return db.session.execute(select(GoodreadsBook).filter_by(id=remote_id)).scalar_one_or_none()
+    def get_remote(self, remote_id: str) -> GoodreadsPrivateBook | None:
+        return db.session.execute(select(GoodreadsPrivateBook).filter_by(id=remote_id)).scalar_one_or_none()
 
     def get_record(self, record_id: uuid.UUID) -> Record | None:
         return db.session.get(Record, record_id)
@@ -73,7 +73,7 @@ class GoodreadsImporter:
             log.info("Updating existing Goodreads book")
         else:
             log.info("Creating new Goodreads book")
-            remote = GoodreadsBook(id=remote_id)
+            remote = GoodreadsPrivateBook(id=remote_id)
 
         if title:
             remote.title = title

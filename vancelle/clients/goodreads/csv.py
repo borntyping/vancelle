@@ -8,7 +8,7 @@ import structlog
 
 from .common import GoodreadsImporter
 from .types import GoodreadsCsvRow
-from ...models.remote import GoodreadsBook
+from ...models.remote import GoodreadsPrivateBook
 from ...types import Sentinel, sentinel
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -18,16 +18,16 @@ T = typing.TypeVar("T")
 
 
 class GoodreadsCsvImporter(GoodreadsImporter):
-    def load_file(self, path: pathlib.Path) -> list[GoodreadsBook]:
+    def load_file(self, path: pathlib.Path) -> list[GoodreadsPrivateBook]:
         with path.open("r") as f:
             rows = csv.DictReader(f)
             return [self.parse_row(typing.cast(GoodreadsCsvRow, row), filename=path.name) for row in rows]
 
-    def load_stream(self, stream: typing.IO[bytes], filename: str) -> list[GoodreadsBook]:
+    def load_stream(self, stream: typing.IO[bytes], filename: str) -> list[GoodreadsPrivateBook]:
         rows = csv.DictReader((line.decode("utf-8") for line in stream))
         return [self.parse_row(typing.cast(GoodreadsCsvRow, row), filename=filename) for row in rows]
 
-    def parse_row(self, row: GoodreadsCsvRow, *, filename: str) -> GoodreadsBook:
+    def parse_row(self, row: GoodreadsCsvRow, *, filename: str) -> GoodreadsPrivateBook:
         id = self.parse_string(row["Book Id"])
         title = self.parse_string(row["Title"])
         author = self.parse_string(row["Author"])

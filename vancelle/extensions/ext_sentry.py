@@ -4,6 +4,8 @@ import flask
 import sentry_sdk
 import structlog
 
+import vancelle.clients.client
+
 logger = structlog.get_logger(logger_name=__name__)
 
 
@@ -29,6 +31,10 @@ class SentryExtension:
             spotlight=True,
             trace_propagation_targets=[],
             traces_sampler=self.traces_sampler,
+            functions_to_trace=[
+                {"qualified_name": "vancelle.clients.client.RequestsClient.get"},
+                {"qualified_name": "vancelle.clients.client.RequestsClient.request_into_soup"},
+            ],
         )
 
         app.before_request(self.before_request)

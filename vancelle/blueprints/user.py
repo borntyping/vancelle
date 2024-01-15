@@ -124,6 +124,7 @@ def cli_create_user(id: uuid.UUID, username: str, password: str):
 @bp.cli.command("clear")
 @click.option("--username", required=True)
 def cli_clear_user(username: str) -> None:
+    """Delete all works belonging to a user."""
     user = get_user(username)
     for work in user.works:
         db.session.delete(work)

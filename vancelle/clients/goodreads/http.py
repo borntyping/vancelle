@@ -46,8 +46,9 @@ class GoodreadsPublicScraper(RequestsClient):
         soup = self.soup(f"https://www.goodreads.com/book/show/{id}")
 
         page = soup.select_one(".BookPage")
+        series = page.select_one(".BookPageTitleSection h3 a")
         scraped: dict[str, str] = {
-            "series": page.select_one(".BookPageTitleSection h3 a").get_text(" "),
+            "series": series.get_text(" ") if series else None,
             "title": page.select_one(".BookPageTitleSection h1").string,
             "authors": [e.string for e in page.select_one(".ContributorLinksList").select('[data-testid="name"]')],
             "description": page.select_one('[data-testid="description"] span.Formatted').get_text("\n"),

@@ -1,4 +1,5 @@
 @import "bulma/sass/elements/box";
+@import "bulma/sass/utilities/initial-variables";
 
 $spacing: calc($box-padding / 2);
 
@@ -56,7 +57,10 @@ $spacing: calc($box-padding / 2);
     grid-row: 3 / span 1;
     grid-column: 1 / -1;
     border-radius: $box-radius;
-    //padding: $spacing;
+
+    .block:not(:last-child) {
+      margin-bottom: $block-spacing / 2;
+    }
   }
 }
 

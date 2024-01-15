@@ -96,9 +96,11 @@ class Remote(Base, IntoDetails, IntoProperties):
     release_date: Mapped[typing.Optional[datetime.date]] = mapped_column(default=None)
     cover: Mapped[typing.Optional[str]] = mapped_column(default=None)
     background: Mapped[typing.Optional[str]] = mapped_column(default=None)
-    shelf: Mapped[typing.Optional[Shelf]] = mapped_column(ShelfEnum, default=None)
     tags: Mapped[typing.Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
     data: Mapped[typing.Optional[typing.Any]] = mapped_column(JSONB, default=None)
+
+    # The 'shelf' column is vestigial and can be removed. Check for data loss first.
+    shelf: Mapped[typing.Optional[Shelf]] = mapped_column(ShelfEnum, default=None)
 
     work: Mapped["Work"] = relationship(back_populates="remotes", lazy="selectin")
 
@@ -126,7 +128,6 @@ class Remote(Base, IntoDetails, IntoProperties):
             release_date=self.release_date,
             cover=self.url_for_cover(),
             background=self.url_for_background(),
-            shelf=self.shelf,
             tags=self.tags,
             external_url=self.external_url(),
         )

@@ -132,7 +132,6 @@ class Work(Base, IntoDetails, IntoProperties):
             release_date=self.release_date,
             cover=self.url_for_cover(),
             background=self.url_for_background(),
-            shelf=self.shelf,
             tags=self.tags,
             external_url=self.external_url,
         )
@@ -156,7 +155,6 @@ class Work(Base, IntoDetails, IntoProperties):
             cover=next((d.cover for d in details if d.cover), None),
             background=next((d.background for d in details if d.background), None),
             tags=next((d.tags for d in details if d.tags), set()),
-            shelf=self.shelf,
             external_url=next((d.external_url for d in details if d.external_url), None),
         )
 

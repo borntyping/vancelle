@@ -118,7 +118,6 @@ class Details(IntoProperties):
     release_date: datetime.date | None
     cover: str | None
     background: str | None
-    shelf: Shelf | None
     tags: typing.Set[str] | None = dataclasses.field(default_factory=set)
     external_url: str | None
 
@@ -137,7 +136,6 @@ class Details(IntoProperties):
         yield StringProperty("Title", self.title)
         yield StringProperty("Author", self.author)
         yield StringProperty("Release date", self.release_date)
-        yield StringProperty("Shelf", self.shelf.title if self.shelf else None)
         yield IterableProperty("Tags", list(self.tags) if self.tags else ())
         yield ExternalUrlProperty("External URL", self.external_url)
 

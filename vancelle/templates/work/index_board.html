@@ -28,7 +28,7 @@
   <section class="block">
     <div class="x-board" data-work-shelf="{{ work_shelf if work_shelf else 'all' }}" data-work-shelf-group="{{ work_case if work_case else 'all' }}">
       {% for shelf, items in shelves.items() %}
-        {% if items and ((work_case and shelf in work_case.shelves) or (work_shelf and shelf == work_shelf)) or shelf.show_if_empty %}
+        {% if items or (shelf.show_if_empty or shelf in work_case.shelves|default([]) or shelf == work_shelf) %}
           <div class="x-board-item x-board-item-header is-flex is-flex-direction-column is-justify-content-center is-align-items-center has-text-centered" data-shelf="{{ shelf.value }}" data-count="{{ items|length }}">
             <h3 class="title is-4">{{ shelf.title }}</h3>
             <p class="subtitle is-7">{{ shelf.description }}</p>

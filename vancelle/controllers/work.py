@@ -12,6 +12,7 @@ from sqlalchemy import ColumnElement, Select, True_, desc, func, nulls_last, or_
 from sqlalchemy.sql.functions import coalesce
 from werkzeug.exceptions import BadRequest
 
+from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db
 from vancelle.models import Base, User
 from vancelle.models.record import Record
@@ -93,12 +94,27 @@ class WorkQuery:
         return db.session.execute(self._select_statement).unique().scalars().all()
 
     def shelves(self) -> typing.Tuple[typing.Mapping[Shelf, list[Work]], int]:
+        """
+        All shelves in the selection (in 'work_case.shelves' or equal to 'work_shelf') will appear in the result even if empty.
+        Other shelves will only be present in the result if the query somehow returned them.
+        """
         works = self.all()
-        iter_shelves = self.work_case.shelves if self.work_case else Shelf
-        groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in iter_shelves}
+        groups: dict[Shelf, list[Work]] = {shelf: [] for shelf in self._iter_shelves()}
         for work in works:
             groups[work.shelf].append(work)
         return groups, len(works)
+
+    def _iter_shelves(self) -> typing.Tuple[Shelf, ...]:
+        if self.work_shelf and self.work_case and self.work_shelf not in self.work_case.shelves:
+            raise ApplicationError(f"The '{self.work_shelf.title}' shelf is not in the '{self.work_case.title}' group.")
+
+        if self.work_shelf:
+            return (self.work_shelf,)
+
+        if self.work_case is not None:
+            return self.work_case.shelves
+
+        return tuple(Shelf)
 
     def paginate(self) -> flask_sqlalchemy.pagination.Pagination:
         """

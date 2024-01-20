@@ -52,13 +52,13 @@ class Shelf(enum.Enum):
 class Case(enum.Enum):
     """Used to group shelves for display."""
 
-    UPCOMING = ("upcoming", "Upcoming", [Shelf.UPCOMING, Shelf.UNRELEASED, Shelf.UNDECIDED])
-    PLAYING = ("playing", "Playing", [Shelf.PLAYING, Shelf.REPLAYING, Shelf.ONGOING, Shelf.INFINITE])
-    PAUSED = ("paused", "Paused", [Shelf.PAUSED, Shelf.SHELVED])
-    COMPLETED = ("completed", "Completed", [Shelf.COMPLETED, Shelf.ABANDONED])
-    OTHER = ("other", "Other", [Shelf.UNSORTED, Shelf.REFERENCE])
+    UPCOMING = ("upcoming", "Upcoming", (Shelf.UPCOMING, Shelf.UNRELEASED, Shelf.UNDECIDED))
+    PLAYING = ("playing", "Playing", (Shelf.PLAYING, Shelf.REPLAYING, Shelf.ONGOING, Shelf.INFINITE))
+    PAUSED = ("paused", "Paused", (Shelf.PAUSED, Shelf.SHELVED))
+    COMPLETED = ("completed", "Completed", (Shelf.COMPLETED, Shelf.ABANDONED))
+    OTHER = ("other", "Other", (Shelf.UNSORTED, Shelf.REFERENCE))
 
-    def __new__(cls, value: str, title: str, shelves: typing.List[Shelf]):
+    def __new__(cls, value: str, title: str, shelves: typing.Tuple[Shelf, ...]):
         obj = object.__new__(cls)
         obj._value_ = value
         obj.title = title

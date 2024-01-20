@@ -16,6 +16,9 @@ from ..inflect import p
 logger = structlog.get_logger(logger_name=__name__)
 
 
+HtmlClass = str | typing.List[str] | typing.Dict[str, bool] | None
+
+
 def url_with(endpoint: str | None = None, **kwargs):
     """Like url_for(), but keeps parameters from the current request."""
     endpoint = endpoint if endpoint else flask.request.endpoint
@@ -134,21 +137,25 @@ class HtmlExtension:
         parts = urllib.parse.urlparse(url)
         return parts.hostname
 
-    @staticmethod
-    def html_classes(*args: typing.Union[str, typing.List[str], typing.Dict[str, bool]]) -> str:
+    def _html_classes_flatten(self, items: typing.Iterable[HtmlClass]) -> typing.Sequence[str]:
         classes = []
 
-        for arg in args:
-            if isinstance(arg, str):
-                classes.append(arg)
-            elif isinstance(arg, list):
-                classes.extend(arg)
-            elif isinstance(arg, dict):
-                classes.extend([k for k, v in arg.items() if v])
+        for item in items:
+            if isinstance(item, str):
+                classes.append(item)
+            elif isinstance(item, list):
+                classes.extend(self._html_classes_flatten(item))
+            elif isinstance(item, dict):
+                classes.extend([k for k, v in item.items() if v])
+            elif item is None:
+                pass
             else:
                 raise TypeError
 
-        return " ".join(classes)
+        return classes
+
+    def html_classes(self, *classes: HtmlClass) -> str:
+        return " ".join(self._html_classes_flatten(classes))
 
     def html_params(self, **kwargs: typing.Any) -> markupsafe.Markup:
         return markupsafe.Markup(wtforms.widgets.html_params(**kwargs))

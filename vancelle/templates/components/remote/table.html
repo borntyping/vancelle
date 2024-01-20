@@ -20,9 +20,9 @@
             <div class="field is-grouped is-grouped-right">
               {{ control_remote_has_cover(remote=remote, details=details) }}
               {% if work %}
-                {{ control_remote_link_work(remote=remote, work=work, class_="is-info is-small") }}
+                {{ control_remote_link_work(remote=remote, work=work, classes=["is-small"]) }}
               {% else %}
-                {{ control_remote_create_work(remote=remote, class_="is-primary is-small") }}
+                {{ control_remote_create_work(remote=remote, classes=["is-small"]) }}
               {% endif %}
             </div>
           </td>

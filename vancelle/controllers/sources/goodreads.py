@@ -24,5 +24,5 @@ class GoodreadsPublicBookManager(Manager):
         return apis.goodreads.fetch(remote_id)
 
     def search(self, query: str) -> Pagination[GoodreadsPublicBook]:
-        items = apis.goodreads.search(query)
+        items = list(apis.goodreads.search(query))
         return ItemsPagination(page=1, per_page=len(items), items=items, total=len(items), error_out=False)

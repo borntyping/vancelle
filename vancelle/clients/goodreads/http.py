@@ -6,6 +6,7 @@ import typing
 import structlog
 
 from vancelle.clients.client import RequestsClient
+from vancelle.clients.common import parse_date
 from vancelle.models.remote import GoodreadsPublicBook
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -120,9 +121,16 @@ class GoodreadsPublicScraper(RequestsClient):
     @staticmethod
     def parse_date(value: str) -> datetime.date:
         """
-        >>> GoodreadsPublicScraper(...).parse_date("First published September 15, 2022")
+        >>> s = GoodreadsPublicScraper(...)
+        >>> s.parse_date("First published September 15, 2022")
         datetime.date(2022, 9, 15)
-        >>> GoodreadsPublicScraper(...).parse_date("First published January 1, 1900")
-        datetime.date(1900, 1, 1)
+        >>> s.parse_date("Expected publication June 18, 2024")
+        datetime.date(2024, 6, 18)
         """
-        return datetime.datetime.strptime(value, "First published %B %d, %Y").date()
+        return parse_date(
+            value,
+            [
+                "First published %B %d, %Y",
+                "Expected publication %B %d, %Y",
+            ],
+        )

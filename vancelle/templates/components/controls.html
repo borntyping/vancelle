@@ -97,7 +97,7 @@
 
 {% macro control_remote_create_work(remote, classes=None) %}
   {%- set url = url_for("remote.create_work", remote_type=remote.type, remote_id=remote.id) -%}
-  {{- _control_post(url=url, text="Create work", icon="add-outline", classes=['is-primary', classes], title="Create a new work linked to this remote.", tabindex=1) -}}
+  {{- _control_post(url=url, text="Create work", icon="add-outline", classes=['is-primary', classes], title="Create a new work linked to this remote.", tabindex=1, enable_text=True) -}}
 {% endmacro %}
 
 {% macro control_remote_has_cover(remote, details=None) %}

@@ -5,6 +5,7 @@ import flask
 import structlog
 
 from vancelle.clients.client import RequestsClient
+from vancelle.clients.common import parse_date
 from vancelle.clients.openlibrary.types import (
     Author,
     Edition,
@@ -167,16 +168,7 @@ class OpenLibraryAPI(RequestsClient):
 
     @staticmethod
     def parse_date(string: str | None) -> datetime.date | None:
-        if string is None:
-            return None
-
-        for fmt in ("%b %d, %Y", "%Y"):
-            try:
-                return datetime.datetime.strptime(string, fmt).date()
-            except ValueError:
-                pass
-
-        return None
+        return parse_date(string, ("%b %d, %Y", "%Y"))
 
     @staticmethod
     def cover_url(key: KeyType, value: str | int | None, size: Size = "L") -> str | None:

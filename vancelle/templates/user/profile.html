@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% from 'components/layout.html' import title %}
+{% from 'components/layout.html' import header %}
 
 {% macro bulma_file_input(name) %}
   <div class="file has-name is-fullwidth">
@@ -21,7 +21,7 @@
 
 {% block content %}
   <section class="block">
-    {{ title("User profile", "@{} / {}".format(current_user.username, current_user.id)) }}
+    {{ header("User profile", "@{} / {}".format(current_user.username, current_user.id)) }}
     <div class="columns">
       <div class="column">
         <div class="box">

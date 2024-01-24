@@ -1,4 +1,4 @@
-{% from 'components/layout.html' import title %}
+{% from 'components/layout.html' import header %}
 
 {% from 'components/metadata.html' import details_combined_title %}
 
@@ -70,7 +70,7 @@
 
 {% macro steam_search_add(items, query) %}
   <section class="block" id="steam">
-    {{ title("Add Steam game", "Source information about games from the Steam store") }}
+    {{ header("Add Steam game", "Source information about games from the Steam store") }}
     <div class="box">
       {% call(items) steam_search(items=items, query=query, action=url_for('sources.steam.create-work')) %}
         {% call(app) steam_apps_list(items) %}

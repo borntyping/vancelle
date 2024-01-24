@@ -1,6 +1,6 @@
 {% extends 'work/index.html' %}
 
-{% from 'components/layout.html' import title %}
+{% from 'components/layout.html' import header %}
 {% from 'components/pagination.html' import pagination %}
 {% from 'components/work/work.html' import tag_work_type, span_date %}
 {% from 'components/metadata.html' import sources_list, details_title, details_date_and_author, shelf_tag %}
@@ -8,7 +8,7 @@
 
 {% block content %}
   <section class="block">
-    {{ title("Works", p.no('result', works.total)) }}
+    {{ header("Works", p.no('result', works.total)) }}
     <div class="box">
       <table class="table is-fullwidth">
         <colgroup>

@@ -1,12 +1,13 @@
 {% extends 'work/index.html' %}
 
-{% from 'components/layout.html' import section %}
+{% from 'components/layout.html' import title %}
 {% from 'components/pagination.html' import pagination %}
 {% from 'components/work/work.html' import tag_work_type %}
 {% from 'components/metadata.html' import sources_list, details_combined_title, shelf_tag %}
 
 {% block content %}
-  {% call section("Works", p.no('result', works.total), h1=True) %}
+  <section class="block">
+    {{ title("Works", p.no('result', works.total)) }}
     <div class="box">
       <table class="table is-hoverable is-fullwidth">
         <thead>
@@ -35,5 +36,5 @@
       </table>
       {{ pagination(works) }}
     </div>
-  {% endcall %}
+  </section>
 {% endblock %}

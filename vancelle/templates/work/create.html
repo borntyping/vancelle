@@ -1,24 +1,22 @@
 {% extends "base.html" %}
 
-{% from "components/layout.html" import section %}
+{% from "components/layout.html" import header %}
 {% from 'components/work/form.html' import block_edit_work %}
 
+{% set title = ["Create work"] %}
+
 {% block content %}
-  {% call section('Create a new work', 'Manually enter details for a work', h1=True) %}
-    <div class="box">
-      <form
-        id="work"
-        method="post"
-        action=""
-        class="block">
-        {{ form.csrf_token }}
-        {{ block_edit_work(form) }}
-        <div class="block">
-          <div class="field has-text-centered">
-            <button class="button is-primary" type="submit">Create work</button>
-          </div>
-        </div>
-      </form>
-    </div>
-  {% endcall %}
+  <section class="block">
+    {% call header('Create a new work', 'Manually enter details for a work') %}
+      <button class="button is-primary" type="submit" form="work">Create work</button>
+    {% endcall %}
+    <form
+      id="work"
+      method="post"
+      action=""
+      class="block">
+      {{ form.csrf_token }}
+      {{ block_edit_work(form) }}
+    </form>
+  </section>
 {% endblock %}

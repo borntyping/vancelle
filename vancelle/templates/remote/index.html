@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
-{% from 'components/layout.html' import section %}
+{% from 'components/layout.html' import title %}
 {% from 'components/pagination.html' import pagination %}
 {% from 'components/metadata.html' import details_combined_title, source_tag %}
 {% from 'components/remote/id.html' import span_remote_id %}
 
 {% block content %}
-  {% call section("Remote data", "Work details from external sources", h1=True) %}
+  <section class="block">
+    {{ title("Remote data", "Work details from external sources") }}
+
     <div class="box">
       <div class="block">
         {{ remote_type }}
@@ -42,5 +44,5 @@
       </table>
       {{ pagination(remotes) }}
     </div>
-  {% endcall %}
+  </section>
 {% endblock %}

@@ -59,7 +59,7 @@ $spacing: calc($box-padding / 2);
     border-radius: $box-radius;
 
     .block:not(:last-child) {
-      margin-bottom: $block-spacing / 2;
+      margin-bottom: calc($block-spacing / 2);
     }
   }
 }

@@ -1,4 +1,4 @@
-{% from 'components/layout.html' import section %}
+{% from 'components/layout.html' import title %}
 
 {% from 'components/metadata.html' import details_combined_title %}
 
@@ -69,7 +69,8 @@
 {% endmacro %}
 
 {% macro steam_search_add(items, query) %}
-  {% call section("Add Steam game", "Source information about games from the Steam store", id='steam') %}
+  <section class="block" id="steam">
+    {{ title("Add Steam game", "Source information about games from the Steam store") }}
     <div class="box">
       {% call(items) steam_search(items=items, query=query, action=url_for('sources.steam.create-work')) %}
         {% call(app) steam_apps_list(items) %}
@@ -80,7 +81,7 @@
         {% endcall %}
       {% endcall %}
     </div>
-  {% endcall %}
+  </section>
 {% endmacro %}
 
 {# TODO: This should be disabled if the application is already linked to _any_ game. #}

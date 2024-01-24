@@ -2,10 +2,13 @@
  * Footer and logos for external dependencies.
  */
 
-#app-dependency-logos {
-    & img {
-        height: 2em !important;
+#x-dependency-logos {
+    & a {
         margin-left: 0.5em;
         margin-right: 0.5em;
+    }
+
+    & img.x-dependency-logo {
+        height: 2em;
     }
 }

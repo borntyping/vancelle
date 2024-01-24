@@ -1,5 +1,3 @@
-{% from 'components/layout.html' import section %}
-
 {%- macro internal_url(href, text=None) -%}
   <a href="{{ href }}" class="has-text-link is-flex-wrap-nowrap">{{ text if text else href|pretty_url }}</a>
 {%- endmacro -%}

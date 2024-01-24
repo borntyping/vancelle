@@ -1,39 +1,32 @@
 {% extends 'base.html' %}
 
-{% from 'components/layout.html' import section %}
+{% from 'components/layout.html' import title %}
 {% from 'components/work/form.html' import block_edit_work %}
 {% from 'components/controls.html' import control_work_update, control_work_delete, control_work_restore, control_work_permanently_delete %}
 {% from 'components/metadata.html' import details_combined_title %}
 
 {% set details = work.resolve_details() %}
+{% set title = ["Update work", details.title] %}
 
 {% block content %}
-  {% call section("Update work", subtitle=details_combined_title(details, work.url_for()), h1=True) %}
-    <div class="box">
-      <form
-        id="work"
-        method="post"
-        action="{{ url_for('work.update', work_id=work.id) }}"
-        class="block">
-        {{ form.csrf_token }}
-        {{ block_edit_work(form, details=details) }}
-      </form>
-      <div class="block">
-        <div class="field is-grouped">
-          <div class="control">
-            {%- if work.deleted -%}
-              {{ control_work_restore(work, text=True) }}
-              {{ control_work_permanently_delete(work, text=True) }}
-            {%- else -%}
-              {{ control_work_delete(work, True) }}
-            {%- endif -%}
-          </div>
-          <div class="control is-expanded"></div>
-          <div class="control">
-            <button form="work" type="submit" class="button is-link">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  {% endcall %}
+  <section class="block">
+    {% call header("Update work", subtitle=details_combined_title(details, work.url_for())) %}
+      {%- if work.deleted -%}
+        {{ control_work_restore(work, text=True) }}
+        {{ control_work_permanently_delete(work, text=True) }}
+      {%- else -%}
+        {{ control_work_delete(work, True) }}
+      {%- endif -%}
+      <button form="work" type="submit" class="button is-link">Save changes</button>
+    {% endcall %}
+
+    <form
+      id="work"
+      method="post"
+      action="{{ url_for('work.update', work_id=work.id) }}"
+      class="block">
+      {{ form.csrf_token }}
+      {{ block_edit_work(form, details=details) }}
+    </form>
+  </section>
 {% endblock %}

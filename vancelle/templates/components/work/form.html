@@ -1,25 +1,34 @@
+{% from 'components/layout.html' import subheader %}
+
 {% macro block_edit_work(form, details=None) %}
   <div class="block">
-    <div class="columns mb-0">
-      <div class="column">
-        {{ bulma_form_field(form.type, icon_left='bookmark-outline') }}
-      </div>
-      <div class="column">
-        {{ bulma_form_field(form.shelf, icon_left='bookmarks-outline') }}
+    <div class="block">
+      <div class="columns mb-0">
+        <div class="column">{{ bulma_form_field(form.type, icon_left='bookmark-outline') }}</div>
+        <div class="column">{{ bulma_form_field(form.shelf, icon_left='bookmarks-outline') }}</div>
       </div>
     </div>
-    {{ bulma_form_field(form.title, placeholder=details.title if details else None, icon_right='text-outline') }}
-    {{ bulma_form_field(form.author, placeholder=details.author if details else None, icon_right='text-outline') }}
-    {{ bulma_form_field(form.release_date) }}
-    {{ bulma_form_field(form.description, placeholder=details.description if details else None) }}
-    <div class="columns mb-0">
-      <div class="column">
-        {{ bulma_form_field(form.cover, placeholder=details.cover if details else None, icon_right='image-outline') }}
+    <div class="block">
+      {{ subheader("Details", "These details will overwrite any details provided by remote data") }}
+      {{ bulma_form_field(form.title, placeholder=details.title if details else None, icon_right='text-outline') }}
+      <div class="columns mb-0">
+        <div class="column">{{ bulma_form_field(form.author, placeholder=details.author if details else None, icon_right='text-outline') }}</div>
+        <div class="column">{{ bulma_form_field(form.series, placeholder=details.series if details else None, icon_right='text-outline') }}</div>
+        <div class="column">{{ bulma_form_field(form.release_date) }}</div>
       </div>
-      <div class="column">
-        {{ bulma_form_field(form.background, placeholder=details.background if details else None, icon_right='image-outline') }}
+      {{ bulma_form_field(form.description, placeholder=details.description if details else None) }}
+      <div class="columns mb-0">
+        <div class="column">
+          {{ bulma_form_field(form.cover, placeholder=details.cover if details else None, icon_right='image-outline') }}
+        </div>
+        <div class="column">
+          {{ bulma_form_field(form.background, placeholder=details.background if details else None, icon_right='image-outline') }}
+        </div>
+        <div class="column">
+          {{ bulma_form_field(form.external_url, placeholder=details.external_url|default(None), icon_right='link-outline') }}
+        </div>
+        <div class="column">{{ bulma_form_field(form.isbn, icon_right='key-outline') }}</div>
       </div>
     </div>
-    {{ bulma_form_field(form.external_url, placeholder=details.external_url if details else None, icon_right='link-outline') }}
   </div>
 {% endmacro %}

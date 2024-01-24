@@ -48,12 +48,6 @@ class WorkForm(flask_wtf.FlaskForm):
         choices=[(cls.work_type(), cls.info.noun_title) for cls in Work.iter_subclasses()],
         widget=BulmaSelect(),
     )
-    title = wtforms.StringField("Title", validators=[Optional()], filters=[NullFilter()])
-    author = wtforms.StringField("Author", validators=[Optional()], filters=[NullFilter()])
-    release_date = wtforms.DateField("Release Date", validators=[Optional()])
-    description = wtforms.TextAreaField("Description", validators=[Optional()], filters=[NullFilter()])
-    cover = wtforms.URLField("Cover image", validators=[Optional()], filters=[NullFilter()])
-    background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
     shelf = wtforms.SelectField(
         "Shelf",
         choices=SHELF_FORM_CHOICES,
@@ -62,8 +56,20 @@ class WorkForm(flask_wtf.FlaskForm):
         widget=BulmaSelect(),
         validators=[Optional()],
     )
+
+    # Details
+    title = wtforms.StringField("Title", validators=[Optional()], filters=[NullFilter()])
+    author = wtforms.StringField("Author", validators=[Optional()], filters=[NullFilter()])
+    series = wtforms.StringField("Series", validators=[Optional()], filters=[NullFilter()])
+    release_date = wtforms.DateField("Release Date", validators=[Optional()])
+    description = wtforms.TextAreaField("Description", validators=[Optional()], filters=[NullFilter()])
+    cover = wtforms.URLField("Cover image", validators=[Optional()], filters=[NullFilter()])
+    background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
     # tags = wtforms.StringField('tags')
+
+    # Properties
     external_url = wtforms.URLField("External URL", validators=[Optional()], filters=[NullFilter()])
+    isbn = wtforms.StringField("ISBN", validators=[Optional()], filters=[NullFilter()])
 
 
 class WorkIndexForm(flask_wtf.FlaskForm):

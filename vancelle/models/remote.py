@@ -11,14 +11,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .details import (
     Details,
-    ExternalUrlProperty,
-    InternalUrlProperty,
     IntoDetails,
-    IntoProperties,
-    IterableProperty,
-    Property,
-    StringProperty,
 )
+from .properties import ExternalUrlProperty, InternalUrlProperty, IntoProperties, IterableProperty, Property, StringProperty
 from .types import ShelfEnum
 from ..inflect import p
 from ..shelf import Shelf
@@ -92,6 +87,7 @@ class Remote(Base, IntoDetails, IntoProperties):
     id: Mapped[str] = mapped_column(Text(collation="numeric"), default=None, primary_key=True)
     title: Mapped[typing.Optional[str]] = mapped_column(default=None)
     author: Mapped[typing.Optional[str]] = mapped_column(default=None)
+    series: Mapped[typing.Optional[str]] = mapped_column(default=None)
     description: Mapped[typing.Optional[str]] = mapped_column(default=None)
     release_date: Mapped[typing.Optional[datetime.date]] = mapped_column(default=None)
     cover: Mapped[typing.Optional[str]] = mapped_column(default=None)
@@ -124,6 +120,7 @@ class Remote(Base, IntoDetails, IntoProperties):
         return Details(
             title=self.title,
             author=self.author,
+            series=self.series,
             description=self.description,
             release_date=self.release_date,
             cover=self.url_for_cover(),

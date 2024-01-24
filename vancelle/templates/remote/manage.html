@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
-{% from 'components/layout.html' import section %}
-{% from 'components/remote/section.html' import section_remote_index, section_work_index %}
+{% from 'components/layout.html' import title %}
+{% from 'components/remote/controls.html' import section_remote_index, section_work_index %}
+
+{% set title = "" %}
 
 {% block content %}
-  {{ section(source.name) }}
+  {{ title(source.name) }}
   {{ section_remote_index(source=source, items=remotes, subset='all') }}
   {{ section_work_index(source=source, items=works, subset='all') }}
 {% endblock %}

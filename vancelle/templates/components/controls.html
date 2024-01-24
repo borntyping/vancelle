@@ -124,3 +124,22 @@
   {%- set url = url_for("record.permanently_delete", work_id=record.work_id, record_id=record.id) -%}
   {{- _control_post(url=url, text="Permanently delete", icon="trash-outline", classes=["is-danger", "is-light"], title="Delete this record. It will not be possible to recover.", tabindex=4) -}}
 {% endmacro %}
+
+{%- macro controls_remote(remote, candidate_work=None, show_attached_work=True) -%}
+  {% if remote.deleted %}
+    {{ control_remote_permanently_delete(remote=remote) }}
+    {{ control_remote_restore(remote=remote) }}
+  {% elif remote.work %}
+    {% if show_attached_work %}
+      {{ control_remote_work(remote=remote) }}
+    {% endif %}
+    {{ control_remote_refresh(remote=remote) }}
+    {{ control_remote_delete(remote=remote) }}
+  {% elif candidate_work %}
+    {{ control_remote_link_work(remote=remote, work=candidate_work) }}
+  {% else %}
+    {{ control_remote_create_work(remote=remote) }}
+  {% endif %}
+  {{ control_remote_detail(remote=remote) }}
+  {{ control_remote_priority(remote=remote) }}
+{%- endmacro -%}

@@ -37,7 +37,7 @@ class ImportForm(flask_wtf.FlaskForm):
 
 
 @bp.app_errorhandler(werkzeug.exceptions.Unauthorized)
-@bp.route("/user/login", methods={"get", "post"})
+@bp.route("/users/login", methods={"get", "post"})
 def login(exception: werkzeug.exceptions.Unauthorized | None = None):
     form = LoginForm()
 
@@ -59,15 +59,15 @@ def login(exception: werkzeug.exceptions.Unauthorized | None = None):
     return flask.redirect(flask.url_for("work.index"))
 
 
-@bp.route("/user/logout")
+@bp.route("/users/logout")
 @flask_login.login_required
 def logout():
     flask_login.logout_user()
     return flask.redirect(flask.url_for("work.index"))
 
 
-@bp.route("/user/profile")
-@bp.route("/user/import", methods={"post"}, endpoint="import")
+@bp.route("/users/profile")
+@bp.route("/users/import", methods={"post"}, endpoint="import")
 def profile():
     form = ImportForm()
 
@@ -85,7 +85,7 @@ def profile():
     )
 
 
-@bp.route("/user/export")
+@bp.route("/users/export")
 def export():
     data = controller.export_json(user=flask_login.current_user)
     return flask.Response(

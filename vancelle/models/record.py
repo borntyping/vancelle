@@ -6,7 +6,7 @@ from flask import url_for
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .details import StringProperty
+from .properties import StringProperty
 from .base import Base
 
 if typing.TYPE_CHECKING:

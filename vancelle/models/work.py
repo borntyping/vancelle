@@ -11,7 +11,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import coalesce
 
 from .base import Base
-from .details import Details, IntoDetails, IntoProperties, Property, StringProperty, TimeProperty
+from .details import Details, IntoDetails
+from .properties import IntoProperties, Property, StringProperty, TimeProperty
 from .record import Record
 from .remote import Remote
 from .types import ShelfEnum
@@ -65,6 +66,7 @@ class Work(Base, IntoDetails, IntoProperties):
 
     title: Mapped[typing.Optional[str]] = mapped_column(default=None)
     author: Mapped[typing.Optional[str]] = mapped_column(default=None)
+    series: Mapped[typing.Optional[str]] = mapped_column(default=None)
     description: Mapped[typing.Optional[str]] = mapped_column(default=None)
     release_date: Mapped[typing.Optional[datetime.date]] = mapped_column(default=None)
     cover: Mapped[typing.Optional[str]] = mapped_column(default=None)
@@ -128,6 +130,7 @@ class Work(Base, IntoDetails, IntoProperties):
         return Details(
             title=self.title,
             author=self.author,
+            series=self.series,
             description=self.description,
             release_date=self.release_date,
             cover=self.url_for_cover(),
@@ -150,6 +153,7 @@ class Work(Base, IntoDetails, IntoProperties):
         return Details(
             title=next((d.title for d in details if d.title), None),
             author=next((d.author for d in details if d.author), None),
+            series=next((d.series for d in details if d.series), None),
             description=next((d.description for d in details if d.description), None),
             release_date=next((d.release_date for d in details if d.release_date), None),
             cover=next((d.cover for d in details if d.cover), None),

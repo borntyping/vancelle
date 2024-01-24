@@ -41,7 +41,7 @@ def url_is_active(endpoint: str, **kwargs: typing.Any) -> bool:
     """
     return compare_endpoints(
         request_endpoint=flask.request.endpoint,
-        request_args=flask.request.view_args | flask.request.args,
+        request_args=(flask.request.view_args or {}) | flask.request.args,
         other_endpoint=endpoint,
         other_args=kwargs,
     )

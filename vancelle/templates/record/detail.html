@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
 
-{% from 'components/layout.html' import section %}
+{% from 'components/layout.html' import header, subheader %}
 {% from 'components/bulma.html' import bulma_form_field, bulma_checkbox %}
 {% from "components/controls.html" import control_record_delete, control_record_restore, control_record_permanently_delete %}
 
 {% set details = record.work.resolve_details() %}
+{% set title = ["Update record", details.title] %}
+
 {% set section_title = "Update record" %}
 {% set section_subtitle %}
   Record for <a href="{{ url_for('work.detail', work_id=record.work_id) }}">{{ details.title }}</a>
 {% endset %}
-{% set section_controls %}
-  {% if record.deleted %}
-    {{ control_record_permanently_delete(record=record) }}
-    {{ control_record_restore(record=record) }}
-  {% else %}
-    {{ control_record_delete(record=record) }}
-  {% endif %}
-{% endset %}
-{% set title = "{} - Update record".format(details.title) %}
 
 {% block content %}
-  {% call section(section_title, section_subtitle, section_controls) %}
+  <section class="block">
+    {% call header(section_title, section_subtitle) %}
+      {% if record.deleted %}
+        {{ control_record_permanently_delete(record=record) }}
+        {{ control_record_restore(record=record) }}
+      {% else %}
+        {{ control_record_delete(record=record) }}
+      {% endif %}
+    {% endcall %}
     <div class="box">
       <form
         id="record"
@@ -47,5 +48,5 @@
         </div>
       </form>
     </div>
-  {% endcall %}
+  </section>
 {% endblock %}

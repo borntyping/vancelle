@@ -1,13 +1,14 @@
 {% extends 'remote/detail.html' %}
-{% from 'components/layout.html' import section %}
+{% from 'components/layout.html' import header %}
 {% from 'components/remote/table.html' import table_remotes %}
 
 {% block content %}
   {{ super() }}
 
-  {% call section("Editions") %}
+  <section class="block">
+    {{ header("Editions") }}
     <div class="box">
       {{ table_remotes(remotes=editions, work=remote.work) }}
     </div>
-  {% endcall %}
+  </section>
 {% endblock %}

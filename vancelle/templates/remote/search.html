@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from 'components/layout.html' import section %}
+{% from 'components/layout.html' import title %}
 {% from 'components/pagination.html' import pagination %}
 {% from 'components/remote/table.html' import table_remotes %}
 {% from 'components/metadata.html' import details_combined_title %}
@@ -20,12 +20,6 @@
   {% endif %}
 {% endset %}
 
-{% set controls %}
-  {% if work %}
-    <a href="{{ url_with(work_id=None) }}" title="Search without linking to {{ work.resolve_details().title }}" class="delete"></a>
-  {% endif %}
-{% endset %}
-
 {% block content %}
   {% set id = 'search' %}
   {% set id_count = '{}-results-count'.format(id) %}
@@ -35,7 +29,13 @@
   {% set id_submit = '{}-submit'.format(id) %}
   {% set action = url_with(query=None) %}
 
-  {% call section(title=title, subtitle=subtitle, controls=controls, id=id, h1=True) %}
+  <section class="block">
+    {% call header(title=title, subtitle=subtitle) %}
+      {% if work %}
+        <a href="{{ url_with(work_id=None) }}" title="Search without linking to {{ work.resolve_details().title }}" class="delete"></a>
+      {% endif %}
+    {% endcall %}
+
     <div class="box">
       <form
         method="get"
@@ -73,5 +73,5 @@
       </div>
       {{ pagination(items) }}
     </div>
-  {% endcall %}
+  </section>
 {% endblock %}

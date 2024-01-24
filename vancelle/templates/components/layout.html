@@ -1,36 +1,33 @@
-{%- macro _h1(text) -%}
-  <h1 class="title is-3">{{ text }}</h1>
-{%- endmacro -%}
-
-{%- macro _h2(text) -%}
-  <h1 class="title is-4">{{ text }}</h1>
-{%- endmacro -%}
-
-{%- macro _subtitle(text) -%}
-  {%- if text -%}<p class="subtitle">{{ text }}</p>{%- endif -%}
-{%- endmacro -%}
-
-{%- macro _header(title, subtitle=None, h1=False) -%}
+{%- macro _header(title, subtitle=None, controls=None, title_class=None, subtitle_class=None) -%}
   <header class="block">
-    {{ _h1(title) if h1 else _h2(title) }}
-    {{ _subtitle(subtitle) }}
+    <div class="columns">
+      <div class="column">
+        <div>
+          <h1 class="{{ html_classes('title', title_class) }}">{{ title }}</h1>
+          {% if subtitle %}
+            <p class="{{ html_classes('subtitle', subtitle_class) }}">{{ subtitle }}</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="column">
+        {% if caller is defined %}
+          <div class="field is-grouped is-grouped-right">
+            {{ caller() }}
+          </div>
+        {% elif controls %}
+          <div class="field is-grouped is-grouped-right">
+            {{ controls }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
   </header>
 {%- endmacro -%}
 
-{% macro section(title, subtitle=None, controls=None, id='', h1=False) %}
-  <section id="{{ id if id else '' }}" class="block">
-    {% if controls %}
-      <div class="level">
-        <div class="level-left">
-          {{ _header(title, subtitle, h1=h1) }}
-        </div>
-        <div class="level-right">
-          <div class="field is-grouped">{{ controls }}</div>
-        </div>
-      </div>
-    {% else %}
-      {{ _header(title, subtitle, h1=h1) }}
-    {% endif %}
-    {{ caller() if caller is defined else '' }}
-  </section>
-{% endmacro %}
+{%- macro header(title, subtitle=None, controls=None) -%}
+  {{- _header(title=title, subtitle=subtitle, controls=controls, title_class='is-3', subtitle_class='is-5', caller=caller) -}}
+{%- endmacro -%}
+
+{%- macro subheader(title, subtitle=None, controls=None) -%}
+  {{- _header(title=title, subtitle=subtitle, controls=controls, title_class='is-4', subtitle_class='is-6', caller=caller) -}}
+{%- endmacro -%}

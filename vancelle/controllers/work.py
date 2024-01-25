@@ -131,9 +131,11 @@ class WorkQuery:
         return or_(
             Work.title.ilike(other),
             Work.author.ilike(other),
+            Work.series.ilike(other),
             Work.description.ilike(other),
             Remote.title.ilike(other),
             Remote.author.ilike(other),
+            Remote.series.ilike(other),
             Remote.description.ilike(other),
         )
 

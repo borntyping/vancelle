@@ -23,14 +23,13 @@
 {% block content %}
   <section class="block">
     <div class="columns is-centered is-multiline is-mobile">
-      {% for work_type, cls, count in works_count_by_type %}
-
-        <div class="column is-half-mobile">{{ gauge(count, cls.info.plural_title, url_for('work.index', work_type=work_type, remote_type=''), background='primary', text='primary-light') }}</div>
+      {% for cls, count in works_count_by_type.items() %}
+        <div class="column is-half-mobile is-2-tablet">{{ gauge(count, cls.info.plural_title, url_for('work.index', work_type=cls.work_type(), remote_type=''), background='primary', text='primary-light') }}</div>
       {% endfor %}
     </div>
     <div class="columns is-centered is-multiline is-mobile">
-      {% for remote_type, cls, count in remote_count_by_type %}
-        <div class="column is-half-mobile">{{ gauge(count, cls.info.noun_full_plural, url_for('work.index', work_type='', remote_type=remote_type), background=cls.info.colour, text='%s-invert' % cls.info.colour) }}</div>
+      {% for cls, count in remote_count_by_type.items() %}
+        <div class="column is-half-mobile is-2-tablet">{{ gauge(count, cls.info.noun_full_plural, url_for('work.index', work_type='', remote_type=cls.remote_type()), background=cls.info.colour, text='%s-invert' % cls.info.colour) }}</div>
       {% endfor %}
     </div>
   </section>

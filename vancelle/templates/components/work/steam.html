@@ -27,7 +27,7 @@
   </div>
 {% endmacro %}
 
-{% macro steam_apps_list(apps, empty = "No Steam applications found.") %}
+{% macro steam_apps_list(apps, empty = "No Steam apps found.") %}
   {%- if apps is not none -%}
     <div class="x-steam-appdetails-list">
       {%- for app in apps|select -%}

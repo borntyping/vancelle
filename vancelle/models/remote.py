@@ -287,7 +287,7 @@ class SteamApplication(Remote):
     info = RemoteInfo(
         colour="steam",
         source="Steam",
-        noun="application",
+        noun="app",
         priority=100,
     )
 

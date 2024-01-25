@@ -80,7 +80,7 @@
 {%- endmacro -%}
 
 {% macro _section_search_remotes() %}
-  {% set subclasses = Remote.iter_subclasses(can_search=True) %}
+  {% set subclasses = Remote.filter_subclasses(can_search=True) %}
   <section class="block">
     {{ subheader('Search external sources for metadata', n('available source', subclasses|length)) }}
     <div class="columns is-multiline is-centered">

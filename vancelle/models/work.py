@@ -1,16 +1,15 @@
 import dataclasses
 import datetime
-import math
 import typing
 import uuid
 
 from flask import url_for
-from sqlalchemy import Enum, ForeignKey, String, asc, desc, func, nulls_last
+from sqlalchemy import ForeignKey, String, asc, func, nulls_last
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.functions import coalesce
 
-from .base import Base
+from .base import PolymorphicBase
 from .details import Details, IntoDetails
 from .properties import IntoProperties, Property, StringProperty, TimeProperty
 from .record import Record
@@ -48,7 +47,7 @@ class WorkInfo:
         self.priority = priority
 
 
-class Work(Base, IntoDetails, IntoProperties):
+class Work(PolymorphicBase, IntoDetails, IntoProperties):
     __tablename__ = "work"
     __mapper_args__ = {"polymorphic_on": "type"}
 
@@ -164,44 +163,34 @@ class Work(Base, IntoDetails, IntoProperties):
 
     @classmethod
     def work_type(cls) -> str:
-        assert cls.__mapper__.polymorphic_identity is not None
-        return cls.__mapper__.polymorphic_identity
-
-    @classmethod
-    def iter_subclasses(cls) -> typing.Sequence[typing.Type["Work"]]:
-        return list(
-            sorted(
-                (mapper.class_ for mapper in cls.__mapper__.polymorphic_map.values()),
-                key=lambda c: c.info.priority,
-            )
-        )
+        return cls.polymorphic_identity()
 
 
 class Book(Work):
     __mapper_args__ = {"polymorphic_identity": "book"}
-    info = WorkInfo(slug="books", noun="book", priority=1)
+    info = WorkInfo(slug="books", noun="book", priority=10)
 
 
 class Game(Work):
     __mapper_args__ = {"polymorphic_identity": "game"}
-    info = WorkInfo(slug="games", noun="game", priority=2)
+    info = WorkInfo(slug="games", noun="game", priority=9)
 
 
 class Film(Work):
     __mapper_args__ = {"polymorphic_identity": "film"}
-    info = WorkInfo(slug="films", noun="film", priority=3)
+    info = WorkInfo(slug="films", noun="film", priority=8)
 
 
 class Show(Work):
     __mapper_args__ = {"polymorphic_identity": "show"}
-    info = WorkInfo(slug="shows", noun="show", priority=4)
+    info = WorkInfo(slug="shows", noun="show", priority=7)
 
 
 class Music(Work):
     __mapper_args__ = {"polymorphic_identity": "music"}
-    info = WorkInfo(slug="music", noun="music", plural="music", priority=5)
+    info = WorkInfo(slug="music", noun="music", plural="music", priority=6)
 
 
 class TabletopGame(Work):
     __mapper_args__ = {"polymorphic_identity": "boardgame"}
-    info = WorkInfo(slug="tabletop-games", noun="tabletop game", noun_title="Tabletop game", priority=6)
+    info = WorkInfo(slug="tabletop-games", noun="tabletop game", noun_title="Tabletop game", priority=5)

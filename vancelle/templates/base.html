@@ -48,7 +48,7 @@
             {% call navbar_group('Add new work') %}
               {{ navbar_item('Create new work', 'work.create') }}
               {{ navbar_divider() }}
-              {% for cls in Remote.iter_subclasses(can_search=True) %}
+              {% for cls in Remote.filter_subclasses(can_search=True) %}
                 {{ navbar_item(cls.info.noun_full, 'remote.search_source', remote_type=cls.remote_type()) }}
               {% endfor %}
             {% endcall %}

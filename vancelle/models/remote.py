@@ -8,7 +8,7 @@ from sqlalchemy import ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from .base import Base, PolymorphicBase
 from .details import (
     Details,
     IntoDetails,
@@ -71,7 +71,7 @@ class RemoteInfo:
         return f"{self.source} {self.noun_plural or p.plural(self.noun)}"
 
 
-class Remote(Base, IntoDetails, IntoProperties):
+class Remote(PolymorphicBase, IntoDetails, IntoProperties):
     __tablename__ = "remote"
     __mapper_args__ = {"polymorphic_on": "type"}
 
@@ -136,21 +136,13 @@ class Remote(Base, IntoDetails, IntoProperties):
 
     @classmethod
     def remote_type(cls) -> str:
-        assert cls.__mapper__.polymorphic_identity is not None
-        return cls.__mapper__.polymorphic_identity
+        return cls.polymorphic_identity()
 
     @classmethod
-    def subclasses(cls) -> typing.Mapping[str, typing.Type["Remote"]]:
-        return {remote_type: mapper.class_ for remote_type, mapper in cls.__mapper__.polymorphic_map.items()}
-
-    @classmethod
-    def iter_subclasses(cls, can_search: bool | None = None) -> typing.Sequence[typing.Type["Remote"]]:
-        subclasses = (subclass.class_ for subclass in cls.__mapper__.polymorphic_map.values())
-        subclasses = sorted(subclasses, key=lambda subclass: subclass.info.priority, reverse=True)
-
+    def filter_subclasses(cls, can_search: bool | None = None) -> typing.Sequence[typing.Type[typing.Self]]:
+        subclasses = cls.iter_subclasses()
         if can_search is not None:
             subclasses = (s for s in subclasses if s.info.can_search)
-
         return list(subclasses)
 
     @classmethod

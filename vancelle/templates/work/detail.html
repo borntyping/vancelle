@@ -64,11 +64,11 @@
   </section>
 {% endmacro %}
 
-{%- macro _section_remote(remote, candidate_work=None) -%}
+{%- macro _section_remote(remote) -%}
   {% set remote_details = remote.into_details() %}
   <section class="block">
     {%- call subheader(remote_details.title, "{} {}".format(remote.info.noun_full, remote.id)) -%}
-      {{ controls_remote(remote, candidate_work=candidate_work, show_attached_work=False) }}
+      {{ controls_remote(remote, candidate_work=None, show_attached_work=False) }}
     {% endcall %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">

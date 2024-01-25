@@ -10,7 +10,7 @@
 {% block content %}
   <section class="block">
     {%- call header(details.title, "{} {}".format(remote.info.noun_full, remote.id)) -%}
-      {{ controls_remote(remote, candidate_work=candidate_work) }}
+      {{ controls_remote(remote, candidate_work=work) }}
     {% endcall %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">

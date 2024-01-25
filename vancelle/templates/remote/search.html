@@ -4,21 +4,11 @@
 {% from 'components/remote/table.html' import table_remotes %}
 {% from 'components/metadata.html' import details_combined_title %}
 
-{% set title %}
-  {% if work %}
-    Link {{ p.a(remote_info.noun_full) }}
-  {% else %}
-    Search {{ remote_info.source }} for {{ p.a(remote_info.noun) }}
-  {% endif %}
-{% endset %}
-
-{% set subtitle %}
-  {% if work %}
-    The {{ remote_info.noun }} will be linked to {{ details_combined_title(work.resolve_details(), work.url_for()) }}
-  {% else %}
-    Create a new work by importing details from {{ remote_info.source }}
-  {% endif %}
-{% endset %}
+{% if work %}
+  {% set title = ["Link {}".format(p.a(remote_info.noun_full))] %}
+{% else %}
+  {% set title = ["Search {}".format(remote_info.source)] %}
+{% endif %}
 
 {% block content %}
   {% set id = 'search' %}
@@ -28,6 +18,22 @@
   {% set id_input = '{}-input'.format(id) %}
   {% set id_submit = '{}-submit'.format(id) %}
   {% set action = url_with(query=None) %}
+
+  {% set title %}
+    {% if work %}
+      Link {{ p.a(remote_info.noun_full) }}
+    {% else %}
+      Search {{ remote_info.source }} for {{ p.a(remote_info.noun) }}
+    {% endif %}
+  {% endset %}
+
+  {% set subtitle %}
+    {% if work %}
+      The {{ remote_info.noun }} will be linked to {{ details_combined_title(work.resolve_details(), work.url_for()) }}
+    {% else %}
+      Create a new work by importing details from {{ remote_info.source }}
+    {% endif %}
+  {% endset %}
 
   <section class="block">
     {% call header(title=title, subtitle=subtitle) %}

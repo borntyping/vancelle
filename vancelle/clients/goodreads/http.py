@@ -62,10 +62,10 @@ class GoodreadsPublicScraper(RequestsClient):
             "genres": [
                 e.string for e in page.select('[data-testid="genresList"] span.BookPageMetadataSection__genreButton span')
             ],
-            "pagesFormat": page.select_one('[data-testid="pagesFormat"]').string,
-            "publicationInfo": page.select_one(
+            "pagesFormat": self.parse_string(page.select_one('[data-testid="pagesFormat"]')),
+            "publicationInfo": self.parse_string(page.select_one(
                 '[data-testid="publicationInfo"]'
-            ).string,  ## crashes on missing data: https://www.goodreads.com/book/show/202985240
+            )),
         }
 
         release_date = self.parse_date(scraped["publicationInfo"])
@@ -103,6 +103,9 @@ class GoodreadsPublicScraper(RequestsClient):
             )
 
     RE_PUBLISHED = re.compile(r"published\s+(\d{4})")
+
+    def parse_string(self, element) -> str:
+        return element.string if element else None
 
     def parse_published(self, *strings: str) -> typing.Optional[datetime.date]:
         """

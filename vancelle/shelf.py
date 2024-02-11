@@ -33,6 +33,7 @@ class Shelf(enum.Enum):
 
     COMPLETED = ("completed", "Completed", "A completed work.", "Completed", True)
     ABANDONED = ("abandoned", "Abandoned", "Gave up on.", "Completed")
+    UNTOUCHED = ("untouched", "Untouched", "Never started.", "Completed")
 
     title: str
     description: str

@@ -15,31 +15,31 @@ class Shelf(enum.Enum):
     'Not assigned to a shelf yet'
     """
 
-    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", "Undecided", False)
-    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", "Undecided", False)
-    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", "Undecided")
+    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", "Undecided")
+    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", "Undecided")
+    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", "Undecided", True)
 
-    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", "Upcoming")
-    RETURNING = ("returning", "Returning", "A repeat of a completed work", "Upcoming", False)
+    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", "Upcoming", True)
+    RETURNING = ("returning", "Returning", "A repeat of a completed work", "Upcoming")
 
-    PLAYING = ("playing", "Playing", "Currently reading/playing/watching", "Playing")
-    REPLAYING = ("replaying", "Replaying", "Returning to a completed work", "Playing", False)
-    ONGOING = ("ongoing", "Ongoing", "A long-term or incomplete work", "Playing", False)
-    INFINITE = ("infinite", "Infinite", "A work that won't be completed", "Playing", False)
+    PLAYING = ("playing", "Playing", "Currently reading/playing/watching", "Playing", True)
+    REPLAYING = ("replaying", "Replaying", "Returning to a completed work", "Playing")
+    ONGOING = ("ongoing", "Ongoing", "A long-term or incomplete work", "Playing")
+    INFINITE = ("infinite", "Infinite", "A work that won't be completed", "Playing")
 
-    PAUSED = ("paused", "Paused", "Might continue soon", "Paused")
-    SHELVED = ("shelved", "Shelved", "Might continue one day", "Paused", False)
-    REFERENCE = ("reference", "Reference", "Reference material with no status", "Paused", False)
+    PAUSED = ("paused", "Paused", "Might continue soon", "Paused", True)
+    SHELVED = ("shelved", "Shelved", "Might continue one day", "Paused")
+    REFERENCE = ("reference", "Reference", "Reference material with no status", "Paused")
 
-    COMPLETED = ("completed", "Completed", "A completed work - well done!", "Completed")
-    ABANDONED = ("abandoned", "Abandoned", "Gave up on", "Completed", False)
+    COMPLETED = ("completed", "Completed", "A completed work - well done!", "Completed", True)
+    ABANDONED = ("abandoned", "Abandoned", "Gave up on", "Completed")
 
     title: str
     description: str
     group: str
     show_if_empty: bool
 
-    def __new__(cls, value: str, title: str, description: str, group: str, show_if_empty: bool = True):
+    def __new__(cls, value: str, title: str, description: str, group: str, show_if_empty: bool = False):
         obj = object.__new__(cls)
         obj._value_ = value
         obj.title = title

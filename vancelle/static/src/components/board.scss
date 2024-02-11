@@ -65,8 +65,10 @@ $x-board-card-cover: 2fr;
         &[data-shelf="unreleased"],
         &[data-shelf="undecided"],
         &[data-shelf="upcoming"],
+        &[data-shelf="returning"],
         &[data-shelf="reference"],
-        &[data-shelf="abandoned"] {
+        &[data-shelf="abandoned"],
+        &[data-shelf="untouched"] {
           grid-column: 1;
         }
 
@@ -76,7 +78,7 @@ $x-board-card-cover: 2fr;
         &[data-shelf="infinite"],
         &[data-shelf="paused"],
         &[data-shelf="shelved"],
-        &[data-shelf="completed"],
+        &[data-shelf="completed"]
         {
           grid-column: 2;
         }
@@ -96,7 +98,8 @@ $x-board-card-cover: 2fr;
           grid-column: 1;
         }
 
-        &[data-shelf="upcoming"] {
+        &[data-shelf="upcoming"],
+        &[data-shelf="returning"] {
           grid-column: 2;
         }
 
@@ -118,7 +121,8 @@ $x-board-card-cover: 2fr;
         }
 
         &[data-shelf="completed"],
-        &[data-shelf="abandoned"] {
+        &[data-shelf="abandoned"],
+        &[data-shelf="untouched"] {
           grid-column: 5;
         }
       }

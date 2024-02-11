@@ -15,24 +15,24 @@ class Shelf(enum.Enum):
     'Not assigned to a shelf yet'
     """
 
-    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet", "Undecided")
-    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release", "Undecided")
-    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", "Undecided", True)
+    UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet.", "Undecided")
+    UNRELEASED = ("unreleased", "Unreleased", "Waiting for release.", "Undecided")
+    UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future.", "Undecided", True)
 
-    UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", "Upcoming", True)
-    RETURNING = ("returning", "Returning", "A repeat of a completed work", "Upcoming")
+    UPCOMING = ("upcoming", "Upcoming", "Coming up next.", "Upcoming", True)
+    RETURNING = ("returning", "Returning", "A repeat of a completed work.", "Upcoming")
 
-    PLAYING = ("playing", "Playing", "Currently reading/playing/watching", "Playing", True)
-    REPLAYING = ("replaying", "Replaying", "Returning to a completed work", "Playing")
-    ONGOING = ("ongoing", "Ongoing", "A long-term or incomplete work", "Playing")
-    INFINITE = ("infinite", "Infinite", "A work that won't be completed", "Playing")
+    PLAYING = ("playing", "Playing", "Currently reading/playing/watching.", "Playing", True)
+    REPLAYING = ("replaying", "Replaying", "Returning to a completed work.", "Playing")
+    ONGOING = ("ongoing", "Ongoing", "A long-term or incomplete work.", "Playing")
+    INFINITE = ("infinite", "Infinite", "A work that won't be completed.", "Playing")
 
-    PAUSED = ("paused", "Paused", "Might continue soon", "Paused", True)
-    SHELVED = ("shelved", "Shelved", "Might continue one day", "Paused")
-    REFERENCE = ("reference", "Reference", "Reference material with no status", "Paused")
+    PAUSED = ("paused", "Paused", "Might continue soon.", "Paused", True)
+    SHELVED = ("shelved", "Shelved", "Might continue one day.", "Paused")
+    REFERENCE = ("reference", "Reference", "Reference material with no status.", "Paused")
 
-    COMPLETED = ("completed", "Completed", "A completed work - well done!", "Completed", True)
-    ABANDONED = ("abandoned", "Abandoned", "Gave up on", "Completed")
+    COMPLETED = ("completed", "Completed", "A completed work.", "Completed", True)
+    ABANDONED = ("abandoned", "Abandoned", "Gave up on.", "Completed")
 
     title: str
     description: str

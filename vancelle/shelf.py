@@ -20,6 +20,7 @@ class Shelf(enum.Enum):
     UNDECIDED = ("undecided", "Undecided", "Might read/play/watch in the future", "Undecided")
 
     UPCOMING = ("upcoming", "Upcoming", "Might read/play/watch next", "Upcoming")
+    RETURNING = ("returning", "Returning", "A repeat of a completed work", "Upcoming", False)
 
     PLAYING = ("playing", "Playing", "Currently reading/playing/watching", "Playing")
     REPLAYING = ("replaying", "Replaying", "Returning to a completed work", "Playing", False)

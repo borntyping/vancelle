@@ -5,6 +5,8 @@ import typing
 import requests_cache
 import structlog
 
+from ..common import parse_date
+
 logger = structlog.get_logger(logger_name=__name__)
 
 
@@ -112,10 +114,15 @@ class SteamStoreAPI:
 
     @staticmethod
     def parse_release_date(release_date: AppDetailsReleaseDate) -> datetime.date | None:
-        if release_date["coming_soon"]:
+        """
+        >>> SteamStoreAPI(...).parse_release_date({"coming_soon": True, "date": "Coming soon"}) is None
+        True
+        >>> SteamStoreAPI(...).parse_release_date({"coming_soon": True, "date": "13 Feb, 2024"})
+        datetime.date(2024, 2, 13)
+        >>> SteamStoreAPI(...).parse_release_date({"coming_soon": False, "date": "20 Jan, 2021"})
+        datetime.date(2021, 1, 20)
+        """
+        if release_date["date"] == "Coming soon":
             return None
 
-        try:
-            return datetime.datetime.strptime(release_date["date"], "%d %b, %Y").date()
-        except ValueError:
-            return None
+        return parse_date(release_date["date"], ["%d %b, %Y"])

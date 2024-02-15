@@ -63,9 +63,7 @@ class GoodreadsPublicScraper(RequestsClient):
                 e.string for e in page.select('[data-testid="genresList"] span.BookPageMetadataSection__genreButton span')
             ],
             "pagesFormat": self.parse_string(page.select_one('[data-testid="pagesFormat"]')),
-            "publicationInfo": self.parse_string(page.select_one(
-                '[data-testid="publicationInfo"]'
-            )),
+            "publicationInfo": self.parse_string(page.select_one('[data-testid="publicationInfo"]')),
         }
 
         release_date = self.parse_date(scraped["publicationInfo"])

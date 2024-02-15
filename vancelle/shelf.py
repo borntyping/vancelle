@@ -12,7 +12,7 @@ class Shelf(enum.Enum):
     >>> Shelf.UNSORTED.title
     'Unsorted'
     >>> Shelf.UNSORTED.description
-    'Not assigned to a shelf yet'
+    'Not assigned to a shelf yet.'
     """
 
     UNSORTED = ("unsorted", "Unsorted", "Not assigned to a shelf yet.", "Undecided")

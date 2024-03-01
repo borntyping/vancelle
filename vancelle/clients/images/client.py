@@ -1,16 +1,24 @@
 import hashlib
 import pathlib
+import typing
 
 import flask
+import hishel
 import httpx
 import structlog
+import svcs
 
-from vancelle.clients.client import ApiClient
+from vancelle.clients.client import HttpClient, HttpClientBuilder
 
 logger = structlog.get_logger(logger_name=__name__)
 
 
-class ImageCache(ApiClient):
+class ImageCache(HttpClient):
+    @classmethod
+    def factory(cls, svcs_container: svcs.Container) -> typing.Self:
+        app, builder = svcs_container.get(flask.Flask, HttpClientBuilder)
+        return cls(client=hishel.CacheClient(storage=builder.filesystem_storage_for(cls)))
+
     def as_response(self, url: str) -> flask.Response:
         response = self.get(url)
 

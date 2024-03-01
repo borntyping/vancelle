@@ -3,9 +3,11 @@ import datetime
 import functools
 import typing
 
-import httpx
+import flask
+import hishel
+import svcs
 
-from vancelle.clients.client import ApiClient
+from vancelle.clients.client import HttpClient, HttpClientBuilder
 from vancelle.ext.httpx import BearerAuth
 
 
@@ -162,7 +164,20 @@ class SearchTvResults(typing.TypedDict):
     total_results: int
 
 
-class TmdbAPI(ApiClient):
+@dataclasses.dataclass()
+class TmdbAPI(HttpClient):
+    client: hishel.CacheClient
+
+    @classmethod
+    def factory(cls, svcs_container: svcs.Container) -> typing.Self:
+        app, builder = svcs_container.get(flask.Flask, HttpClientBuilder)
+        return cls(
+            client=hishel.CacheClient(
+                storage=builder.sqlite_storage_for(cls),
+                auth=BearerAuth(app.config["TMDB_READ_ACCESS_TOKEN"]),
+            ),
+        )
+
     @functools.cached_property
     def configuration(self) -> Configuration:
         response = self.get(

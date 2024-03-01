@@ -1,10 +1,13 @@
 import dataclasses
 import datetime
+import typing
 
 import flask
+import hishel
 import structlog
+import svcs
 
-from vancelle.clients.client import ApiClient
+from vancelle.clients.client import HttpClient, HttpClientBuilder
 from vancelle.clients.common import parse_date
 from vancelle.clients.openlibrary.types import (
     Author,
@@ -21,7 +24,12 @@ from vancelle.models.remote import OpenlibraryEdition, OpenlibraryWork
 logger = structlog.get_logger(logger_name=__name__)
 
 
-class OpenLibraryAPI(ApiClient):
+class OpenLibraryAPI(HttpClient):
+    @classmethod
+    def factory(cls, svcs_container: svcs.Container) -> typing.Self:
+        builder = svcs_container.get(HttpClientBuilder)
+        return cls(client=hishel.CacheClient(storage=builder.sqlite_storage_for(cls)))
+
     def search(self, q: str) -> list[OpenlibraryWork]:
         """
         Open Library Search API.

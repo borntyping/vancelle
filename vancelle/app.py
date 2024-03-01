@@ -2,9 +2,10 @@ import os
 import typing
 
 import flask
+import svcs.flask
 
-from .blueprints.cache import bp as bp_admin
 from .blueprints.bulma import bp as bp_bulma
+from .blueprints.cache import bp as bp_admin
 from .blueprints.data import bp as bp_data
 from .blueprints.errors import bp as bp_errors
 from .blueprints.health import bp as bp_health
@@ -13,8 +14,16 @@ from .blueprints.record import bp as bp_record
 from .blueprints.remote import bp as bp_remote
 from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
+from .clients.client import HttpClientBuilder
+from .clients.goodreads.http import GoodreadsPublicScraper
+from .clients.images.client import ImageCache
+from .clients.openlibrary.client import OpenLibraryAPI
+from .clients.royalroad.client import RoyalRoadScraper
+from .clients.steam.client_store_api import SteamStoreAPI
+from .clients.steam.client_web_api import SteamWebAPI
+from .clients.tmdb.client import TmdbAPI
 from .ext.structlog import configure_logging
-from .extensions import apis, cors, db, debug_toolbar, html, htmx, login_manager, migrate, sentry
+from .extensions import cors, db, debug_toolbar, html, htmx, login_manager, migrate, sentry
 from .shelf import Shelf
 
 
@@ -27,6 +36,18 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app.config.from_mapping(config)
     app.config.from_prefixed_env("VANCELLE")
 
+    svcs.flask.init_app(app)
+
+    svcs.flask.register_value(app, flask.Flask, app)
+    svcs.flask.register_factory(app, HttpClientBuilder, HttpClientBuilder.factory)
+    svcs.flask.register_factory(app, GoodreadsPublicScraper, GoodreadsPublicScraper.factory)
+    svcs.flask.register_factory(app, ImageCache, ImageCache.factory)
+    svcs.flask.register_factory(app, OpenLibraryAPI, OpenLibraryAPI.factory)
+    svcs.flask.register_factory(app, RoyalRoadScraper, RoyalRoadScraper.factory)
+    svcs.flask.register_factory(app, SteamStoreAPI, SteamStoreAPI.factory)
+    svcs.flask.register_factory(app, SteamWebAPI, SteamWebAPI.factory)
+    svcs.flask.register_factory(app, TmdbAPI, TmdbAPI.factory)
+
     cors.init_app(app)
     db.init_app(app)
     debug_toolbar.init_app(app)
@@ -34,7 +55,6 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     migrate.init_app(app, db)
     sentry.init_app(app)
 
-    apis.init_app(app)
     html.init_app(app)
     htmx.init_app(app)
 

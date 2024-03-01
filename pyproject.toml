@@ -29,6 +29,7 @@ sentry-sdk = {extras = ["flask", "sqlalchemy"], version = "^1.38.0"}
 setuptools = "^69.0.2"
 sqlalchemy = "^2.0.23"
 structlog = "^23.2.0"
+svcs = "^24.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"

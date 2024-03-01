@@ -1,12 +1,15 @@
 import structlog
+import svcs
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import desc, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Manager
+from ...clients.steam.client_store_api import SteamStoreAPI
+from ...clients.steam.client_web_api import SteamWebAPI
 from ...ext.flask_sqlalchemy import EmptyPagination, SelectAndTransformPagination
-from ...extensions import apis, db
+from ...extensions import db
 from ...inflect import p
 from ...models import Base
 from ...models.remote import SteamApplication
@@ -27,13 +30,15 @@ class SteamApplicationManager(Manager):
     work_type = Game
 
     def fetch(self, remote_id: str) -> SteamApplication:
-        appdetails = apis.steam_store_api.appdetails(remote_id)
+        api = svcs.flask.get(SteamStoreAPI)
+
+        appdetails = api.appdetails(remote_id)
 
         if appdetails is None:
             return SteamApplication(id=remote_id, data={})
 
-        release_date = apis.steam_store_api.parse_release_date(appdetails["release_date"])
-        vertical_capsule = apis.steam_store_api.vertical_capsule(appdetails, check=True)
+        release_date = api.parse_release_date(appdetails["release_date"])
+        vertical_capsule = api.vertical_capsule(appdetails, check=True)
         author = p.join(appdetails["developers"] if appdetails["developers"] else [])
 
         return SteamApplication(
@@ -80,13 +85,12 @@ class SteamApplicationManager(Manager):
     @staticmethod
     def reload_appid_cache() -> None:
         logger.warning("Reloading Steam application cache")
-        apps = apis.steam_web_api.ISteamApps_GetAppList()
+        api = svcs.flask.get(SteamWebAPI)
+        apps = api.ISteamApps_GetAppList()
 
         logger.debug("Inserting Steam appid cache")
-
         stmt = insert(SteamAppID)
         stmt = stmt.on_conflict_do_update(index_elements=[SteamAppID.appid], set_={"name": stmt.excluded.name})
-
         db.session.execute(stmt, apps)
         db.session.commit()
 

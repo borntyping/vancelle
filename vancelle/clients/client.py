@@ -1,16 +1,47 @@
 import dataclasses
+import pathlib
+import sqlite3
 import typing
 
 import bs4
+import flask
 import hishel
 import httpx
+import platformdirs
 import structlog
+import svcs
 
 logger = structlog.get_logger(logger_name=__name__)
 
 
+@dataclasses.dataclass
+class HttpClientBuilder:
+    cache_directory: pathlib.Path
+
+    @classmethod
+    def factory(cls, svcs_container: svcs.Container) -> typing.Self:
+        app = svcs_container.get(flask.Flask)
+        key = "CACHE_PATH"
+
+        default = platformdirs.user_cache_path(appname=app.name, appauthor="borntyping").as_posix()
+        app.config.setdefault(key, default)
+
+        path = pathlib.Path(app.config[key])
+        path.mkdir(exist_ok=True)
+        app.logger.info(f"Outgoing requests will be cached in {path}")
+
+        return cls(path)
+
+    def sqlite_storage_for(self, cls: typing.Type) -> hishel.SQLiteStorage:
+        connection = sqlite3.connect(self.cache_directory / f"{cls.__name__}.sqlite")
+        return hishel.SQLiteStorage(connection=connection)
+
+    def filesystem_storage_for(self, cls: typing.Type) -> hishel.FileStorage:
+        return hishel.FileStorage(base_path=self.cache_directory / cls.__name__)
+
+
 @dataclasses.dataclass()
-class ApiClient:
+class HttpClient:
     client: hishel.CacheClient
 
     def get(

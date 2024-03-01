@@ -2,15 +2,22 @@ import pathlib
 import typing
 
 import bs4
+import hishel
 import structlog
+import svcs
 
-from vancelle.clients.client import ApiClient
+from vancelle.clients.client import HttpClient, HttpClientBuilder
 from vancelle.models.remote import RoyalroadFiction
 
 logger = structlog.get_logger(logger_name=__name__)
 
 
-class RoyalRoadScraper(ApiClient):
+class RoyalRoadScraper(HttpClient):
+    @classmethod
+    def factory(cls, svcs_container: svcs.Container) -> typing.Self:
+        builder = svcs_container.get(HttpClientBuilder)
+        return cls(client=hishel.CacheClient(storage=builder.sqlite_storage_for(cls)))
+
     def fiction(self, remote_id: str) -> RoyalroadFiction:
         response = self.get(f"https://www.royalroad.com/fiction/{remote_id}")
         soup = bs4.BeautifulSoup(response.text, features="html.parser")

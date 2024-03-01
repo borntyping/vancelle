@@ -65,6 +65,25 @@ files = [
 anyio = ">3.4.0"
 
 [[package]]
+name = "attrs"
+version = "23.2.0"
+description = "Classes Without Boilerplate"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "attrs-23.2.0-py3-none-any.whl", hash = "sha256:99b87a485a5820b23b879f04c2305b44b951b502fd64be915879d77a7e8fc6f1"},
+    {file = "attrs-23.2.0.tar.gz", hash = "sha256:935dc3b529c262f6cf76e50877d35a4bd3c1de194fd41f47a2b7ae8f19971f30"},
+]
+
+[package.extras]
+cov = ["attrs[tests]", "coverage[toml] (>=5.3)"]
+dev = ["attrs[tests]", "pre-commit"]
+docs = ["furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier", "zope-interface"]
+tests = ["attrs[tests-no-zope]", "zope-interface"]
+tests-mypy = ["mypy (>=1.6)", "pytest-mypy-plugins"]
+tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "pytest (>=4.3.0)", "pytest-xdist[psutil]"]
+
+[[package]]
 name = "beautifulsoup4"
 version = "4.12.3"
 description = "Screen-scraping library"
@@ -1221,6 +1240,26 @@ tests = ["freezegun (>=0.2.8)", "pretend", "pytest (>=6.0)", "pytest-asyncio (>=
 typing = ["mypy (>=1.4)", "rich", "twisted"]
 
 [[package]]
+name = "svcs"
+version = "24.1.0"
+description = "A Flexible Service Locator"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "svcs-24.1.0-py3-none-any.whl", hash = "sha256:f050f4a6fcf163aa3a5d5e17b66bbf5efa3ed2164018aebecd70fc27794ecf6b"},
+    {file = "svcs-24.1.0.tar.gz", hash = "sha256:7419980475dd6b8e256e072c895c84cfe40d4da1ee944145f98724f2985dfd1f"},
+]
+
+[package.dependencies]
+attrs = ">=21.3.0"
+
+[package.extras]
+dev = ["httpx", "svcs[tests,typing]", "tox (>4)"]
+docs = ["aiohttp", "fastapi", "flask", "furo (>=2023.8.17)", "httpx", "myst-parser", "pyramid", "pytest", "sphinx (>=7.2.2)", "sphinx-copybutton", "sphinx-design", "sphinx-notfound-page", "sphinxext-opengraph", "sqlalchemy", "starlette", "sybil"]
+tests = ["pytest", "pytest-asyncio", "sybil (>=6)", "typing-extensions"]
+typing = ["aiohttp", "fastapi", "flask", "mypy (>=1.4)", "pyramid", "starlette"]
+
+[[package]]
 name = "types-requests"
 version = "2.31.0.20240218"
 description = "Typing stubs for requests"
@@ -1310,4 +1349,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "fdd70b01b020670b3db552291686d67945e31fbd7b2583a3b470673eb0857cd1"
+content-hash = "ca049030c7256c4bc64953c0717b07cf6c8fe64dcda2c9aa426b031def38da95"

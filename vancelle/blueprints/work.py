@@ -5,15 +5,17 @@ import flask.sansio.blueprints
 import flask_login
 import flask_wtf
 import structlog
+import svcs
 import wtforms
 import werkzeug.exceptions
 from wtforms.validators import DataRequired, Optional
 
 from vancelle.blueprints.bulma import BulmaSelect
+from vancelle.clients.images.client import ImageCache
 from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NullFilter
-from vancelle.extensions import apis, db, htmx
+from vancelle.extensions import db, htmx
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -241,18 +243,20 @@ def detail(work_id: uuid.UUID):
 
 @bp.route("/works/<uuid:work_id>/cover")
 def cover(work_id: uuid.UUID):
+    images = svcs.flask.get(ImageCache)
     work = controller.get_or_404(id=work_id)
     if not work.cover:
         raise werkzeug.exceptions.NotFound("Work has no cover image.")
-    return apis.images.as_response(work.cover)
+    return images.as_response(work.cover)
 
 
 @bp.route("/works/<uuid:work_id>/background")
 def background(work_id: uuid.UUID):
+    images = svcs.flask.get(ImageCache)
     work = controller.get_or_404(id=work_id)
     if not work.background:
         raise werkzeug.exceptions.NotFound("Work has no background image.")
-    return apis.images.as_response(work.background)
+    return images.as_response(work.background)
 
 
 @bp.route("/works/<uuid:work_id>/-/shelve", methods={"get", "post"})

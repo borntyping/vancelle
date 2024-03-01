@@ -3,9 +3,12 @@ import json
 import re
 import typing
 
+import flask
+import hishel
 import structlog
+import svcs.flask
 
-from vancelle.clients.client import ApiClient
+from vancelle.clients.client import HttpClient, HttpClientBuilder
 from vancelle.clients.common import parse_date
 from vancelle.models.remote import GoodreadsPublicBook
 
@@ -47,7 +50,12 @@ GoodreadsBookSchema = typing.TypedDict(
 )
 
 
-class GoodreadsPublicScraper(ApiClient):
+class GoodreadsPublicScraper(HttpClient):
+    @classmethod
+    def factory(cls, svcs_container: svcs.Container) -> typing.Self:
+        app, builder = svcs_container.get(flask.Flask, HttpClientBuilder)
+        return cls(client=hishel.CacheClient(storage=builder.filesystem_storage_for(cls)))
+
     def fetch(self, id: str) -> GoodreadsPublicBook:
         soup = self.soup(f"https://www.goodreads.com/book/show/{id}")
 

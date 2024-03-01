@@ -1,10 +1,12 @@
 import datetime
 import typing
 
+import hishel
 import httpx
 import structlog
+import svcs
 
-from ..client import ApiClient
+from ..client import HttpClient, HttpClientBuilder
 from ..common import parse_date
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -61,7 +63,12 @@ class AppDetailsWrapper(typing.TypedDict):
 AppDetailsContainer = typing.NewType("AppDetailsContainer", dict[str, AppDetailsWrapper])
 
 
-class SteamStoreAPI(ApiClient):
+class SteamStoreAPI(HttpClient):
+    @classmethod
+    def factory(cls, svcs_container: svcs.Container) -> typing.Self:
+        builder = svcs_container.get(HttpClientBuilder)
+        return cls(client=hishel.CacheClient(storage=builder.sqlite_storage_for(cls)))
+
     def appdetails(self, appid: str) -> AppDetails | None:
         url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
         response = self.get(url)

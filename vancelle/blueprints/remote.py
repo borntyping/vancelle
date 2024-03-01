@@ -2,10 +2,12 @@ import uuid
 
 import flask
 import flask_login
+import svcs
 from werkzeug.exceptions import NotFound
 
+from ..clients.images.client import ImageCache
 from ..controllers.remote import RemotesController
-from ..extensions import apis, htmx
+from ..extensions import htmx
 from ..extensions.ext_html import Toggle
 from ..models.remote import Remote
 
@@ -38,18 +40,20 @@ def detail(remote_type: str, remote_id: str):
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>/cover")
 def cover(remote_type: str, remote_id: str):
+    images = svcs.flask.get(ImageCache)
     remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
     if not remote.cover:
         raise NotFound("Remote has no cover image.")
-    return apis.images.as_response(remote.cover)
+    return images.as_response(remote.cover)
 
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>/background")
 def background(remote_type: str, remote_id: str):
+    images = svcs.flask.get(ImageCache)
     remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
     if not remote.background:
         raise NotFound("Remote has no background image.")
-    return apis.images.as_response(remote.background)
+    return images.as_response(remote.background)
 
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/create-work", methods={"post"})

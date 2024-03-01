@@ -6,7 +6,6 @@ import flask_login
 import flask_migrate
 import flask_sqlalchemy
 
-from .ext_apis import ClientsExtension
 from .ext_html import HtmlExtension
 from .ext_htmx import HtmxExtension
 from .ext_sentry import SentryExtension
@@ -32,6 +31,5 @@ migrate = flask_migrate.Migrate(
 )
 sentry = SentryExtension()
 
-apis = ClientsExtension()
 html = HtmlExtension()
 htmx = HtmxExtension()

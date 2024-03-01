@@ -1,6 +1,8 @@
+import svcs
+
 from .base import Manager
+from ...clients.goodreads.http import GoodreadsPublicScraper
 from ...ext.flask_sqlalchemy import ItemsPagination, Pagination
-from ...extensions import apis
 from ...models.remote import GoodreadsPrivateBook, GoodreadsPublicBook
 from ...models.work import Book
 
@@ -21,8 +23,10 @@ class GoodreadsPublicBookManager(Manager):
     work_type = Book
 
     def fetch(self, remote_id: str) -> GoodreadsPublicBook:
-        return apis.goodreads.fetch(remote_id)
+        goodreads = svcs.flask.get(GoodreadsPublicScraper)
+        return goodreads.fetch(remote_id)
 
     def search(self, query: str) -> Pagination[GoodreadsPublicBook]:
-        items = list(apis.goodreads.search(query))
+        goodreads = svcs.flask.get(GoodreadsPublicScraper)
+        items = list(goodreads.search(query))
         return ItemsPagination(page=1, per_page=len(items), items=items, total=len(items), error_out=False)

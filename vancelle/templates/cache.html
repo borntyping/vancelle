@@ -12,10 +12,6 @@
 
 {% block content %}
   <div class="tile is-ancestor">
-    {% call tile('Requests cache', 'Vancelle caches all HTTP requests to external services.') %}
-      <a href="{{ url_for('.clear_request_cache') }}" class="button">Clear</a>
-    {% endcall %}
-
     {% call tile('Steam', 'Vancelle caches a copy of the Steam AppID list to power searching for Steam apps.') %}
       <form method="post" action="{{ url_for('.reload_steam_cache') }}">
         <button class="button" type="submit">Reload</button>

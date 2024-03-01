@@ -5,7 +5,7 @@ import typing
 
 import structlog
 
-from vancelle.clients.client import RequestsClient
+from vancelle.clients.client import ApiClient
 from vancelle.clients.common import parse_date
 from vancelle.models.remote import GoodreadsPublicBook
 
@@ -47,7 +47,7 @@ GoodreadsBookSchema = typing.TypedDict(
 )
 
 
-class GoodreadsPublicScraper(RequestsClient):
+class GoodreadsPublicScraper(ApiClient):
     def fetch(self, id: str) -> GoodreadsPublicBook:
         soup = self.soup(f"https://www.goodreads.com/book/show/{id}")
 

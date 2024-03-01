@@ -3,9 +3,10 @@ import datetime
 import functools
 import typing
 
-import requests
+import httpx
 
-from vancelle.ext.requests import HTTPBearerAuth
+from vancelle.clients.client import ApiClient
+from vancelle.ext.httpx import BearerAuth
 
 
 class ConfigurationImages(typing.TypedDict):
@@ -161,49 +162,51 @@ class SearchTvResults(typing.TypedDict):
     total_results: int
 
 
-@dataclasses.dataclass(frozen=True)
-class TmdbAPI:
-    session: requests.Session
-
-    @classmethod
-    def create(cls, dedicated_session, token):
-        dedicated_session.auth = HTTPBearerAuth(token)
-        dedicated_session.headers["Accept"] = "application/json"
-        return cls(dedicated_session)
-
+class TmdbAPI(ApiClient):
     @functools.cached_property
     def configuration(self) -> Configuration:
-        response = self.session.get("https://api.themoviedb.org/3/configuration")
+        response = self.get(
+            "https://api.themoviedb.org/3/configuration",
+            headers={"Accept": "application/json"},
+        )
         response.raise_for_status()
         return response.json()
 
     def search_movies(self, query: str, page: int) -> SearchMovieResults:
         """https://developer.themoviedb.org/reference/search-movie"""
-        response = self.session.get(
+        response = self.get(
             "https://api.themoviedb.org/3/search/movie",
             params={"query": query, "include_adult": "false", "language": "en-GB", "page": str(page)},
+            headers={"Accept": "application/json"},
         )
         response.raise_for_status()
         return response.json()
 
     def movie(self, movie_id: str) -> MovieDetails:
         """https://developer.themoviedb.org/reference/movie-details"""
-        response = self.session.get(f"https://api.themoviedb.org/3/movie/{movie_id}")
+        response = self.get(
+            f"https://api.themoviedb.org/3/movie/{movie_id}",
+            headers={"Accept": "application/json"},
+        )
         response.raise_for_status()
         return response.json()
 
     def search_tv(self, query: str, page: int) -> SearchTvResults:
         """https://developer.themoviedb.org/reference/search-tv"""
-        response = self.session.get(
+        response = self.get(
             "https://api.themoviedb.org/3/search/tv",
             params={"query": query, "include_adult": "false", "language": "en-GB", "page": str(page)},
+            headers={"Accept": "application/json"},
         )
         response.raise_for_status()
         return response.json()
 
     def tv(self, tv_id: str) -> TvDetails:
         """https://developer.themoviedb.org/reference/tv-series-details"""
-        response = self.session.get(f"https://api.themoviedb.org/3/tv/{tv_id}")
+        response = self.get(
+            f"https://api.themoviedb.org/3/tv/{tv_id}",
+            headers={"Accept": "application/json"},
+        )
         response.raise_for_status()
         return response.json()
 

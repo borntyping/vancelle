@@ -32,8 +32,8 @@ class SentryExtension:
             trace_propagation_targets=[],
             traces_sampler=self.traces_sampler,
             functions_to_trace=[
-                {"qualified_name": "vancelle.clients.client.RequestsClient.get"},
-                {"qualified_name": "vancelle.clients.client.RequestsClient.request_into_soup"},
+                {"qualified_name": "vancelle.clients.client.ApiClient.get"},
+                {"qualified_name": "vancelle.clients.client.ApiClient.request_into_soup"},
             ],
         )
 

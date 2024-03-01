@@ -1,8 +1,9 @@
 import dataclasses
 import typing
 
-import requests_cache
 import structlog
+
+from vancelle.clients.client import ApiClient
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -20,11 +21,7 @@ class ISteamApps_GetAppList(typing.TypedDict):
     applist: ISteamApps_GetAppList_Apps
 
 
-@dataclasses.dataclass()
-class SteamWebAPI:
-    session: requests_cache.CachedSession
-    api_key: str = dataclasses.field()
-
+class SteamWebAPI(ApiClient):
     def ISteamApps_GetAppList(self) -> list[ISteamApps_GetAppList_Apps_App]:
         """
         https://steamapi.xpaw.me/#ISteamApps/GetAppList
@@ -36,14 +33,11 @@ class SteamWebAPI:
         logger.info("Fetching Steam appid list")
 
         url = f"https://api.steampowered.com/ISteamApps/GetAppList/v2/"
-        response = self.session.get(url, params={"key": self.api_key})
+        response = self.get(url)
         response.raise_for_status()
+
         data: ISteamApps_GetAppList = response.json()
+        apps = data["applist"]["apps"]
 
-        logger.info(
-            "Fetched Steam appid list",
-            count=len(data["applist"]["apps"]),
-            from_cache=response.from_cache,
-        )
-
-        return data["applist"]["apps"]
+        logger.info("Fetched Steam appid list", count=len(apps))
+        return apps

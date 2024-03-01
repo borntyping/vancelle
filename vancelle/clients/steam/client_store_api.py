@@ -1,10 +1,10 @@
-import dataclasses
 import datetime
 import typing
 
-import requests_cache
+import httpx
 import structlog
 
+from ..client import ApiClient
 from ..common import parse_date
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -61,13 +61,10 @@ class AppDetailsWrapper(typing.TypedDict):
 AppDetailsContainer = typing.NewType("AppDetailsContainer", dict[str, AppDetailsWrapper])
 
 
-@dataclasses.dataclass()
-class SteamStoreAPI:
-    session: requests_cache.CachedSession
-
+class SteamStoreAPI(ApiClient):
     def appdetails(self, appid: str) -> AppDetails | None:
         url = f"https://store.steampowered.com/api/appdetails?appids={appid}"
-        response = self.session.get(url)
+        response = self.get(url)
         response.raise_for_status()
         data: AppDetailsContainer = response.json()
 
@@ -76,13 +73,6 @@ class SteamStoreAPI:
             logger.warning(f"Steam appdetails request failed", appid=appid, data=data)
             return None
 
-        logger.info(
-            "Fetched appdetails from Steam store",
-            appid=appid,
-            url=response.url,
-            status_code=response.status_code,
-            from_cache=response.from_cache,
-        )
         return wrapper["data"]
 
     def vertical_capsule(self, app: AppDetails, check: bool = True) -> str | None:
@@ -99,15 +89,9 @@ class SteamStoreAPI:
         url = f"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/library_600x900_2x.jpg"
 
         if check:
-            response = self.session.get(url)
-            logger.debug(
-                "Fetched Steam vertical capsule image",
-                appid=appid,
-                url=response.request.url,
-                status_code=response.status_code,
-                from_cache=response.from_cache,
-            )
-            if not response.ok:
+            try:
+                self.head(url)
+            except httpx.HTTPStatusError:
                 return None
 
         return url

@@ -1,10 +1,12 @@
 import dataclasses
 import pathlib
+import sqlite3
 import typing
 
 import flask
+import httpx
 import platformdirs
-import requests_cache
+import hishel
 import structlog
 
 from ..clients.goodreads.http import GoodreadsPublicScraper
@@ -14,6 +16,7 @@ from ..clients.royalroad.client import RoyalRoadScraper
 from ..clients.steam.client_store_api import SteamStoreAPI
 from ..clients.steam.client_web_api import SteamWebAPI
 from ..clients.tmdb.client import TmdbAPI
+from ..ext.httpx import BearerAuth
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -37,49 +40,82 @@ class ClientsExtension:
         default_cache_path = platformdirs.user_cache_path(appname=app.name, appauthor="borntyping").as_posix()
         app.config.setdefault(self.CACHE_PATH_KEY, default_cache_path)
 
-        cache_path = pathlib.Path(app.config[self.CACHE_PATH_KEY])
-        cache_path.mkdir(exist_ok=True)
+        directory = pathlib.Path(app.config[self.CACHE_PATH_KEY])
+        directory.mkdir(exist_ok=True)
+        app.logger.info(f"Outgoing requests will be cached in {directory}")
 
         app.extensions[self.EXTENSION_NAME] = Clients(
             goodreads=GoodreadsPublicScraper(
-                session=self._session(cache_path, "goodreads", backend="filesystem"),
+                client=hishel.CacheClient(
+                    storage=hishel.FileStorage(
+                        base_path=directory / "goodreads",
+                    ),
+                ),
             ),
             images=ImageCache(
-                session=self._session(cache_path, "images", backend="filesystem"),
+                client=hishel.CacheClient(
+                    follow_redirects=True,
+                    storage=hishel.FileStorage(
+                        base_path=directory / "images",
+                    ),
+                ),
             ),
             openlibrary=CachedOpenLibraryClient(
-                session=self._session(cache_path, "openlibrary.sqlite"),
+                client=hishel.CacheClient(
+                    storage=hishel.SQLiteStorage(
+                        connection=sqlite3.connect(directory / "openlibrary.sqlite"),
+                    ),
+                ),
             ),
             royalroad=RoyalRoadScraper(
-                session=self._session(cache_path, "royalroad.sqlite"),
+                client=hishel.CacheClient(
+                    storage=hishel.SQLiteStorage(
+                        connection=sqlite3.connect(directory / "royalroad.sqlite"),
+                    ),
+                ),
             ),
             steam_store=SteamStoreAPI(
-                session=self._session(cache_path, "steam_store.sqlite"),
+                client=hishel.CacheClient(
+                    storage=hishel.SQLiteStorage(
+                        connection=sqlite3.connect(directory / "steam_store.sqlite"),
+                    ),
+                ),
             ),
             steam_web=SteamWebAPI(
-                session=self._session(cache_path, "steam_web.sqlite"),
-                api_key=app.config["STEAM_WEB_API_KEY"],
+                client=hishel.CacheClient(
+                    storage=hishel.SQLiteStorage(
+                        connection=sqlite3.connect(directory / "steam_web.sqlite"),
+                    ),
+                    headers={"key": app.config["STEAM_WEB_API_KEY"]},
+                ),
             ),
-            tmdb=TmdbAPI.create(
-                dedicated_session=self._session(cache_path, "tmdb.sqlite"),
-                token=app.config["TMDB_READ_ACCESS_TOKEN"],
+            tmdb=TmdbAPI(
+                client=hishel.CacheClient(
+                    storage=hishel.SQLiteStorage(
+                        connection=sqlite3.connect(directory / "tmdb.sqlite"),
+                    ),
+                    auth=BearerAuth(app.config["TMDB_READ_ACCESS_TOKEN"]),
+                ),
             ),
         )
 
-        app.logger.info(f"Outgoing requests will be cached in {cache_path}")
-
-    def _session(
+    def _client(
         self,
         cache_path: pathlib.Path,
-        name: str,
-        backend: requests_cache.BackendSpecifier = "sqlite",
-    ) -> requests_cache.CachedSession:
-        return requests_cache.CachedSession(
-            cache_name=str(cache_path / name),
-            cache_control=True,
-            backend=backend,
-            expire_after=requests_cache.NEVER_EXPIRE,
-            stale_if_error=True,
+        auth: httpx.Auth | None = None,
+        params: dict[str, str] | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> hishel.CacheClient:
+        return hishel.CacheClient(
+            auth=auth,
+            params=params,
+            headers=headers,
+            controller=hishel.Controller(
+                allow_stale=True,
+            ),
+            storage=hishel.SQLiteStorage(
+                connection=sqlite3.connect(cache_path),
+            ),
         )
 
     def _state(self) -> Clients:

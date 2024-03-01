@@ -4,7 +4,7 @@ import datetime
 import flask
 import structlog
 
-from vancelle.clients.client import RequestsClient
+from vancelle.clients.client import ApiClient
 from vancelle.clients.common import parse_date
 from vancelle.clients.openlibrary.types import (
     Author,
@@ -21,7 +21,7 @@ from vancelle.models.remote import OpenlibraryEdition, OpenlibraryWork
 logger = structlog.get_logger(logger_name=__name__)
 
 
-class OpenLibraryAPI(RequestsClient):
+class OpenLibraryAPI(ApiClient):
     def search(self, q: str) -> list[OpenlibraryWork]:
         """
         Open Library Search API.
@@ -91,7 +91,7 @@ class OpenLibraryAPI(RequestsClient):
         editions: WorkEditions = response.json()
 
         logger.info("Fetched editions from Open Library", entries=len(editions["entries"]))
-        return [self._edition(edition, url=response.url) for edition in editions["entries"]]
+        return [self._edition(edition, url=str(response.url)) for edition in editions["entries"]]
 
     def edition(self, id: str) -> OpenlibraryEdition:
         """
@@ -105,7 +105,7 @@ class OpenLibraryAPI(RequestsClient):
         edition: Edition = response.json()
 
         logger.info("Fetched edition from Open Library", url=response.request.url)
-        return self._edition(edition, url=response.url)
+        return self._edition(edition, url=str(response.url))
 
     def _edition(self, edition: Edition, *, url: str | None = None) -> OpenlibraryEdition:
         if len(edition["works"]) != 1:

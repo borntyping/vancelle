@@ -4,13 +4,13 @@ import typing
 import bs4
 import structlog
 
-from vancelle.clients.client import RequestsClient
+from vancelle.clients.client import ApiClient
 from vancelle.models.remote import RoyalroadFiction
 
 logger = structlog.get_logger(logger_name=__name__)
 
 
-class RoyalRoadScraper(RequestsClient):
+class RoyalRoadScraper(ApiClient):
     def fiction(self, remote_id: str) -> RoyalroadFiction:
         response = self.get(f"https://www.royalroad.com/fiction/{remote_id}")
         soup = bs4.BeautifulSoup(response.text, features="html.parser")

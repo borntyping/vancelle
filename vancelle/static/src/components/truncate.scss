@@ -1,0 +1,10 @@
+.x-truncate {
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.x-truncate:not(.x-truncate-expand) {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}

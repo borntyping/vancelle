@@ -1,3 +1,5 @@
+{% from 'components/truncate.html' import truncate %}
+
 {%- macro internal_url(href, text=None) -%}
   <a href="{{ href }}" class="has-text-link is-flex-wrap-nowrap">{{ text if text else href|pretty_url }}</a>
 {%- endmacro -%}
@@ -130,10 +132,11 @@
       </div>
       <div class="x-tab-content x-tab-description p-3">
         {% if details.description %}
-          {# TODO: Should descriptions be stored as a list? #}
-          {% for line in details.description.split('\n') %}
-            <p class="block">{{ line }}</p>
-          {% endfor %}
+          {% call truncate() %}
+            {% for line in details.description.split('\n') %}
+              <p class="block">{{ line }}</p>
+            {% endfor %}
+          {% endcall %}
         {% else %}
           <p>{{ absent }}</p>
         {% endif %}

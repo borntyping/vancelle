@@ -85,14 +85,20 @@
 
 {% macro panel_details_partial(details, title, colour="primary") %}
   <div class="panel is-{{ colour }}">
-    <div class="panel-heading x-background" {{ _style_background_image(details) }}>{{ title }}</div>
+    <div class="panel-heading has-text-centered x-background" {{ _style_background_image(details) }}>{{ title }}</div>
     <div>{{ caller() }}</div>
   </div>
 {% endmacro %}
 
-{% macro panel_details(id, details, properties, data, colour="primary") %}
+{% macro panel_details(id, details, properties, data, colour="primary", controls=None) %}
   <div id="{{ id }}" class="panel is-{{ colour }} x-details">
-    <div class="panel-heading x-background" {{ _style_background_image(details) }}></div>
+    <div class="panel-heading x-background" {{ _style_background_image(details) }}>
+      {% if controls %}
+        <div class="field is-grouped is-grouped-right">
+          {{ controls }}
+        </div>
+      {% endif %}
+    </div>
     <figure class="x-cover has-background-{{ colour }}-dark">
       {%- if details.cover -%}
         <img src="{{ details.cover }}" alt="" loading="lazy" referrerpolicy="no-referrer">
@@ -154,4 +160,18 @@
       {% endif %}
     </div>
   </div>
+{% endmacro %}
+
+{% from "components/controls.html" import controls_work, controls_remote %}
+
+{% macro remote_details_panel(remote) %}
+  {% call panel_details(id=remote.id, details=remote.into_details(), properties=remote.into_properties(), data=remote.data, colour=remote.info.colour, controls=controls_remote(remote, candidate_work=None, show_attached_work=False)) %}
+    {{ remote.info.noun_full }} {{ remote.id }}
+  {% endcall %}
+{% endmacro %}
+
+{% macro work_details_panel(work) %}
+  {% call panel_details(id=work.id, details=work.into_details(), properties=work.into_properties(), data=None, controls=controls_work(work)) %}
+    Work {{ work.id }}
+  {% endcall %}
 {% endmacro %}

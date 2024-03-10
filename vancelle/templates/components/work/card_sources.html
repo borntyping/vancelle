@@ -1,0 +1,18 @@
+{% from "components/metadata.html" import panel_details_partial %}
+
+{% macro card_sources(work, work_details) %}
+  {% set subclasses = Remote.filter_subclasses(can_search=True) %}
+  {% call panel_details_partial(work_details, title="Search external sources") %}
+    <p class="panel-block has-text-grey">
+      Search external sources for "{{ work_details.title }}".
+    </p>
+    {% for cls in subclasses %}
+      <a href="{{ url_for('remote.search_source', remote_type=cls.remote_type(), work_id=work.id) }}" class="panel-block is-{{ cls.info.colour }}">
+        <span class="panel-icon">
+          <ion-icon name="search"></ion-icon>
+        </span>
+        Search {{ cls.info.full_plural }}
+      </a>
+    {% endfor %}
+  {% endcall %}
+{% endmacro %}

@@ -26,8 +26,6 @@ class BulmaSelect(wtforms.widgets.Select):
         wtforms `render_field` calls `clean_key()` even though it will be called
         again by `html_params` later.
         """
-        logger.debug("BulmaSelect", field=field, kwargs=kwargs)
-
         class_: str = kwargs.pop("class", "select is-fullwidth")
         input_class_: str | False = kwargs.pop("input_class", False)
 

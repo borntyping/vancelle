@@ -1,13 +1,24 @@
 @import "bulma/sass/elements/box";
+@import "bulma/sass/components/panel";
 @import "bulma/sass/utilities/initial-variables";
 
 $spacing: calc($box-padding / 2);
+$panel-heading-padding-x: 0.75em;
+$panel-heading-height: $panel-heading-size + ($panel-heading-padding-x * 2);
 
 .panel {
   overflow: clip;
 
   .panel-heading {
     background-size: cover;
+
+    // Add 5px to the line-height to fit a .button.is-small perfectly,
+    // and remove that 5px from the top and bottom padding.
+    $offset: 5px;
+    $line-height: calc(1.25em + $offset);
+    $padding: calc(0.75em - ($offset / 2));
+    line-height: $line-height;
+    padding: $padding $padding $padding $padding;
   }
 
   .panel-block {
@@ -19,7 +30,7 @@ $spacing: calc($box-padding / 2);
 
 .x-details {
   display: grid;
-  grid-template-rows: calc(55px - $spacing) min-content;
+  grid-template-rows: $panel-heading-height min-content;
   grid-template-columns: max-content 1fr;
   grid-auto-rows: min-content;
 

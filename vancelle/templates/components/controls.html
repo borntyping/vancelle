@@ -5,7 +5,7 @@
 
 {% macro _control_post(url, icon, text, title, enable_text = False, classes=None, tabindex=0) %}
   <form action="{{ url }}" method="post" class="control" title="{{ title }}">
-    <button type="submit" hx-post="{{ url }}" class="{{ html_classes('button', classes) }}" tabindex="{{ tabindex }}">
+    <button type="submit" hx-post="{{ url }}" class="{{ html_classes('button', 'is-small', classes) }}" tabindex="{{ tabindex }}">
       {{- _ion_icon(icon=icon, text=text, enable_text=enable_text) -}}
     </button>
   </form>
@@ -13,7 +13,7 @@
 
 {% macro _control_link(url, icon, text, title, enable_text = False, classes=None) %}
   <div class="control" title="{{ title }}">
-    <a href="{{ url }}" class="{{ html_classes('button', classes) }}">
+    <a href="{{ url }}" class="{{ html_classes('button', 'is-small', classes) }}">
       {{- _ion_icon(icon=icon, text=text, enable_text=enable_text) -}}
     </a>
   </div>
@@ -21,7 +21,7 @@
 
 {% macro _control_static(icon, text, title, enable_text = False, classes=None) %}
   <div class="control" title="{{ title }}">
-    <span class="{{ html_classes('button', 'is-static', classes) }}">
+    <span class="{{ html_classes('button', 'is-small', 'is-static', classes) }}">
       {{- _ion_icon(icon=icon, text=text, enable_text=enable_text) -}}
     </span>
   </div>
@@ -29,7 +29,7 @@
 
 {% macro _control_static_text(text, title, enable_text = False, classes=None) %}
   <div class="control" title="{{ title }}">
-    <span class="{{ html_classes('button', 'is-static', classes) }}">
+    <span class="{{ html_classes('button', 'is-small', 'is-static', classes) }}">
       <span class="icon">
         {{- text -}}
       </span>
@@ -37,8 +37,12 @@
   </div>
 {% endmacro %}
 
+{% macro control_work_detail(work) %}
+  {{- _control_link(url=work.url_for(), text="View work", icon="document-text-outline", title="View this work.") -}}
+{% endmacro %}
+
 {% macro control_work_update(work, text = True) %}
-  {{- _control_link(url=url_for('work.update', work_id=work.id), text="Edit", enable_text=text, icon="pencil-outline", title="Edit details of this work.") -}}
+  {{- _control_link(url=url_for('work.update', work_id=work.id), text="Edit", enable_text=text, icon="pencil-outline", title="Manually edit details of this work.") -}}
 {% endmacro %}
 
 {% macro control_work_restore(work, text = True) %}
@@ -46,11 +50,11 @@
 {% endmacro %}
 
 {% macro control_work_delete(work, text = True) %}
-  {{- _control_post(url=url_for('work.delete', work_id=work.id), text="Delete", enable_text=text, icon="trash-outline", title="Delete this work. Confirmation will be required before any data is permanently deleted.", tabindex=3) -}}
+  {{- _control_post(url=url_for('work.delete', work_id=work.id), text="Delete", enable_text=text, icon="trash-outline", title="Delete this work and any attached records and remotes. Confirmation will be required before any data is permanently deleted.", classes=["is-light", "is-danger"], tabindex=3) -}}
 {% endmacro %}
 
 {% macro control_work_permanently_delete(work, text = True) %}
-  {{- _control_post(url=url_for('work.permanently_delete', work_id=work.id), text="Permanently delete", enable_text=text, icon="trash-outline", title="Permanently delete this work. It will not be possible to recover any details or records of this work.", classes=["is-danger", "is-light"], tabindex=4) -}}
+  {{- _control_post(url=url_for('work.permanently_delete', work_id=work.id), text="Permanently delete", enable_text=text, icon="trash-outline", title="Permanently delete this work and any attached records and remotes. It will not be possible to recover any details or records of this work.", classes=["is-danger", "is-light"], tabindex=4) -}}
 {% endmacro %}
 
 {% macro control_remote_detail(remote) %}
@@ -143,3 +147,15 @@
   {{ control_remote_detail(remote=remote) }}
   {{ control_remote_priority(remote=remote) }}
 {%- endmacro -%}
+
+{% macro controls_work(work) %}
+  {% if work.deleted %}
+    {{ control_work_permanently_delete(work, False) }}
+    {{ control_work_restore(work, False) }}
+  {% else %}
+    {{ control_work_update(work, False) }}
+    {{ control_work_delete(work, False) }}
+  {% endif %}
+  {{ control_work_detail(work) }}
+  {{ _control_static_text(text="∞", title="Priority for manually provided details") }}
+{% endmacro %}

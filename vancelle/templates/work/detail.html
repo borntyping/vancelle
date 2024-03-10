@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% from "components/controls.html" import control_work_update, control_work_delete, control_work_restore, control_work_permanently_delete, controls_remote %}
+{% from "components/controls.html" import controls_work, controls_remote %}
 {% from "components/bulma.html" import search_field %}
 {% from "components/layout.html" import header, subheader %}
-{% from "components/metadata.html" import panel_details, sources_list %}
+{% from "components/metadata.html" import panel_details, sources_list, remote_details_panel, work_details_panel %}
 {% from "components/record/library_card.html" import panel_library_card %}
+{% from "components/work/card_sources.html" import card_sources %}
 
 {% set details = work.resolve_details() %}
 {% set title = ["Remote", details.title] %}
@@ -46,13 +47,7 @@
   <section class="block">
     {% call header(details.title, subtitle) %}
       {{ _control_change_shelf(work, details) }}
-      {% if work.deleted %}
-        {{ control_work_permanently_delete(work, False) }}
-        {{ control_work_restore(work, False) }}
-      {% else %}
-        {{ control_work_update(work, False) }}
-        {{ control_work_delete(work, False) }}
-      {% endif %}
+
     {% endcall %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
@@ -64,43 +59,39 @@
   </section>
 {% endmacro %}
 
-{%- macro _section_remote(remote) -%}
-  {% set remote_details = remote.into_details() %}
-  <section class="block">
-    {%- call subheader(remote_details.title, "{} {}".format(remote.info.noun_full, remote.id)) -%}
-      {{ controls_remote(remote, candidate_work=None, show_attached_work=False) }}
-    {% endcall %}
-    <div class="columns x-has-fullheight-containers">
-      <div class="column">
-        {% call panel_details(id=remote.id, details=remote.into_details(), properties=remote.into_properties(), data=remote.data, colour=remote.info.colour) %}
-        {% endcall %}
-      </div>
-    </div>
-  </section>
-{%- endmacro -%}
 
-{% macro _section_search_remotes() %}
-  {% set subclasses = Remote.filter_subclasses(can_search=True) %}
-  <section class="block">
-    {{ subheader('Search external sources for metadata', n('available source', subclasses|length)) }}
-    <div class="columns is-multiline is-centered">
-      {% for cls in subclasses %}
-        <div class="column is-4 has-text-centered">
-          <a href="{{ url_for('remote.search_source', remote_type=cls.remote_type(), work_id=work.id) }}" class="button is-{{ cls.info.colour }} is-fullwidth">
-            Search {{ cls.info.full_plural }}
-          </a>
-        </div>
-      {% endfor %}
-    </div>
-  </section>
-{% endmacro %}
+{% set work_details = work.into_details() %}
+{% set work_remotes = work.iter_remotes()|list %}
 
 {% block content %}
   {{ _section_work(work, details) }}
 
-  {% for remote in work.iter_remotes() %}
-    {{ _section_remote(remote) }}
-  {% endfor %}
+  <section class="block">
+    {% set subtitle %}
+      Details sourced from {{ n('remote', work_remotes|length) }}
+      {% if work_details %}
+        and manually entered metadata
+      {% endif %}
+    {% endset %}
 
-  {{ _section_search_remotes() }}
+    {{ subheader('Details', subtitle) }}
+
+    <div class="columns is-multiline x-has-fullheight-containers">
+      {% if work_details %}
+        <div class="column is-half">
+          {{ work_details_panel(work) }}
+        </div>
+      {% endif %}
+
+      {% for remote in work_remotes %}
+        <div class="column is-half">
+          {{ remote_details_panel(remote) }}
+        </div>
+      {% endfor %}
+
+      <div class="column is-half">
+        {{ card_sources(work, details) }}
+      </div>
+    </div>
+  </section>
 {% endblock %}

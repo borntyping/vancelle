@@ -280,7 +280,7 @@ class SteamApplication(Remote):
         colour="steam",
         source="Steam",
         noun="app",
-        priority=100,
+        priority=99,
     )
 
     def external_url(self) -> str | None:

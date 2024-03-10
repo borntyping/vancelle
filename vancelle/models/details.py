@@ -23,6 +23,9 @@ class Details(IntoProperties):
     tags: typing.Set[str] | None = dataclasses.field(default_factory=set)
     external_url: str | None
 
+    def __bool__(self) -> bool:
+        return any(dataclasses.astuple(self))
+
     def __str__(self) -> str:
         d = f"{self.title}"
 

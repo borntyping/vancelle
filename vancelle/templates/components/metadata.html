@@ -83,15 +83,15 @@
   </table>
 {% endmacro %}
 
-{% macro panel_details_partial(details, title, colour="primary") %}
+{% macro generic_panel(details, title, colour="primary") %}
   <div class="panel is-{{ colour }}">
     <div class="panel-heading has-text-centered x-background" {{ _style_background_image(details) }}>{{ title }}</div>
     <div>{{ caller() }}</div>
   </div>
 {% endmacro %}
 
-{% macro panel_details(id, details, properties, data, colour="primary", controls=None) %}
-  <div id="{{ id }}" class="panel is-{{ colour }} x-details">
+{% macro metadata_panel(details, properties, data, controls, subtitle, colour) %}
+  <div class="panel is-{{ colour }} x-details">
     <div class="panel-heading x-background" {{ _style_background_image(details) }}>
       {% if controls %}
         <div class="field is-grouped is-grouped-right">
@@ -107,6 +107,9 @@
     <div class="x-title">
       <h3 class="title is-4">{{ details_title(details) }}</h3>
       <p class="subtitle is-6">{{ details_date_and_author(details) }}</p>
+      {% if subtitle %}
+        <p class="subtitle is-6">{{ subtitle }}</p>
+      {% endif %}
       <p class="block">
         {% if details.tags %}
           {% for tag in details.tags|default([], True) %}
@@ -164,14 +167,14 @@
 
 {% from "components/controls.html" import controls_work, controls_remote %}
 
-{% macro remote_details_panel(remote) %}
-  {% call panel_details(id=remote.id, details=remote.into_details(), properties=remote.into_properties(), data=remote.data, colour=remote.info.colour, controls=controls_remote(remote, candidate_work=None, show_attached_work=False)) %}
-    {{ remote.info.noun_full }} {{ remote.id }}
-  {% endcall %}
+{% macro remote_panel(remote, candidate_work=None) %}
+  {{ metadata_panel(details=remote.into_details(), properties=remote.into_properties(), data=remote.data, controls=controls_remote(remote, candidate_work=candidate_work, show_attached_work=False), subtitle="{} {}".format(remote.info.noun_full, remote.id), colour=remote.info.colour) }}
 {% endmacro %}
 
-{% macro work_details_panel(work) %}
-  {% call panel_details(id=work.id, details=work.into_details(), properties=work.into_properties(), data=None, controls=controls_work(work)) %}
-    Work {{ work.id }}
-  {% endcall %}
+{% macro work_panel(work) %}
+  {{ metadata_panel(details=work.into_details(), properties=work.into_properties(), data=None, controls=controls_work(work), subtitle="Work {}".format(work.id), colour="primary") }}
+{% endmacro %}
+
+{% macro resolved_work_panel(details, properties) %}
+  {{ metadata_panel(details=details, properties=properties, data=None, controls=None, subtitle=None, colour="primary") }}
 {% endmacro %}

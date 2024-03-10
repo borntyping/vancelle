@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% from "components/layout.html" import header %}
-{% from "components/metadata.html" import panel_details %}
+{% from "components/metadata.html" import remote_panel %}
 {% from "components/controls.html" import controls_remote %}
 
 {% set details = remote.into_details() %}
@@ -9,13 +9,10 @@
 
 {% block content %}
   <section class="block">
-    {%- call header(details.title, "{} {}".format(remote.info.noun_full, remote.id)) -%}
-      {{ controls_remote(remote, candidate_work=work) }}
-    {% endcall %}
+    {{ header(details.title, "{} {}".format(remote.info.noun_full, remote.id)) }}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
-        {% call panel_details(id=remote.id, details=remote.into_details(), properties=remote.into_properties(), data=remote.data, colour=remote.info.colour) %}
-        {% endcall %}
+        {{ remote_panel(remote) }}
       </div>
     </div>
   </section>

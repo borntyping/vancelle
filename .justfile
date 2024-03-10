@@ -7,6 +7,9 @@ sass *flags:
 test:
   pytest
 
+lint:
+  mypy .
+
 docker-build:
   docker build -t vancelle .
 

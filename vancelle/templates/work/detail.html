@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 
-{% from "components/controls.html" import controls_work, controls_remote %}
 {% from "components/bulma.html" import search_field %}
 {% from "components/layout.html" import header, subheader %}
-{% from "components/metadata.html" import panel_details, sources_list, remote_details_panel, work_details_panel %}
-{% from "components/record/library_card.html" import panel_library_card %}
-{% from "components/work/card_sources.html" import card_sources %}
+{% from "components/metadata.html" import remote_panel, work_panel, resolved_work_panel %}
+{% from "components/work/records.html" import library_card_panel %}
+{% from "components/work/sources.html" import external_sources_panel %}
 
 {% set details = work.resolve_details() %}
 {% set title = ["Remote", details.title] %}
+
+{% set work_details = work.into_details() %}
+{% set work_remotes = work.iter_remotes()|list %}
 
 {% macro _control_change_shelf(work, details) %}
   <form
@@ -39,7 +41,9 @@
   </form>
 {% endmacro %}
 
-{% macro _section_work(work, details) %}
+
+
+{% block content %}
   {% set subtitle %}
     {{ work.info.noun_title }} with details from {{ p.no('remote', work.remotes|length) }}
   {% endset %}
@@ -51,46 +55,37 @@
     {% endcall %}
     <div class="columns x-has-fullheight-containers">
       <div class="column">
-        {% call panel_details(id=work.id, details=details, properties=work.into_properties(), data=None) %}
-        {% endcall %}
+        {{ resolved_work_panel(details=details, properties=work.into_properties()) }}
       </div>
-      <div class="column">{{ panel_library_card(work=work) }}</div>
+      <div class="column">{{ library_card_panel(work=work) }}</div>
     </div>
   </section>
-{% endmacro %}
-
-
-{% set work_details = work.into_details() %}
-{% set work_remotes = work.iter_remotes()|list %}
-
-{% block content %}
-  {{ _section_work(work, details) }}
 
   <section class="block">
-    {% set subtitle %}
+    {% set details_subtitle %}
       Details sourced from {{ n('remote', work_remotes|length) }}
       {% if work_details %}
         and manually entered metadata
       {% endif %}
     {% endset %}
 
-    {{ subheader('Details', subtitle) }}
+    {{ subheader('Details', details_subtitle) }}
 
     <div class="columns is-multiline x-has-fullheight-containers">
       {% if work_details %}
         <div class="column is-half">
-          {{ work_details_panel(work) }}
+          {{ work_panel(work) }}
         </div>
       {% endif %}
 
       {% for remote in work_remotes %}
         <div class="column is-half">
-          {{ remote_details_panel(remote) }}
+          {{ remote_panel(remote) }}
         </div>
       {% endfor %}
 
       <div class="column is-half">
-        {{ card_sources(work, details) }}
+        {{ external_sources_panel(work, details) }}
       </div>
     </div>
   </section>

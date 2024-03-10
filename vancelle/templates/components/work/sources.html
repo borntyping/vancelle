@@ -1,8 +1,8 @@
-{% from "components/metadata.html" import panel_details_partial %}
+{% from "components/metadata.html" import generic_panel %}
 
-{% macro card_sources(work, work_details) %}
+{% macro external_sources_panel(work, work_details) %}
   {% set subclasses = Remote.filter_subclasses(can_search=True) %}
-  {% call panel_details_partial(work_details, title="Search external sources") %}
+  {% call generic_panel(work_details, title="Search external sources") %}
     <p class="panel-block has-text-grey">
       Search external sources for "{{ work_details.title }}".
     </p>

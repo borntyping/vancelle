@@ -1,6 +1,6 @@
-{% from "components/metadata.html" import panel_details_partial %}
+{% from "components/metadata.html" import generic_panel %}
 
-{% macro button(a_href, button_title, ion_icon, button_class = 'is-text', button_text = None, ion_icon_class = '') %}
+{% macro _button(a_href, button_title, ion_icon, button_class = 'is-text', button_text = None, ion_icon_class = '') %}
   <a href="{{ a_href }}" title="{{ button_title }}" class="button is-small is-outlined {{ button_class }}">
     {% if ion_icon %}
       <span class="icon {{ ion_icon_class }}">
@@ -13,7 +13,7 @@
   </a>
 {% endmacro %}
 
-{% macro form_button(form_action, button_title, ion_icon, button_class = 'is-text', button_text = None, ion_icon_class = '') %}
+{% macro _form_button(form_action, button_title, ion_icon, button_class = 'is-text', button_text = None, ion_icon_class = '') %}
   <button class="button is-small is-outlined {{ button_class }}" type="submit" formmethod="post" formaction="{{ form_action }}" title="{{ button_title }}">
     {% if ion_icon %}
       <span class="icon {{ ion_icon_class }}">
@@ -26,9 +26,9 @@
   </button>
 {% endmacro %}
 
-{% macro panel_library_card(work, max_empty_rows=0) %}
+{% macro library_card_panel(work, max_empty_rows=0) %}
   {% set details = work.resolve_details() %}
-  {% call panel_details_partial(details, title="Library card") %}
+  {% call generic_panel(details, title="Library card") %}
     <table class="table is-narrow is-striped is-hoverable is-fullwidth x-is-fixed x-has-fixed-row-height">
       <tbody>
         <tr><!-- A really terrible way to make strips start on odd numbers. --></tr>
@@ -39,7 +39,7 @@
                 {{ record.date_started|exact_date }}
               {% else %}
                 <form action="">
-                  {{ form_button(url_for("record.start_today", work_id=work.id, record_id=record.id), button_title="Set the started date on this record to today", button_class="is-ghost has-text-grey", ion_icon="calendar-outline", button_text="Started today") }}
+                  {{ _form_button(url_for("record.start_today", work_id=work.id, record_id=record.id), button_title="Set the started date on this record to today", button_class="is-ghost has-text-grey", ion_icon="calendar-outline", button_text="Started today") }}
                 </form>
               {% endif %}
             </td>
@@ -48,7 +48,7 @@
                 {{ record.date_stopped|exact_date }}
               {% else %}
                 <form action="">
-                  {{ form_button(url_for("record.stop_today", work_id=work.id, record_id=record.id), button_title="Set the stopped date on this record to today", button_class="is-ghost has-text-grey", ion_icon="calendar-outline", button_text="Stopped today") }}
+                  {{ _form_button(url_for("record.stop_today", work_id=work.id, record_id=record.id), button_title="Set the stopped date on this record to today", button_class="is-ghost has-text-grey", ion_icon="calendar-outline", button_text="Stopped today") }}
                 </form>
               {% endif %}
             </td>
@@ -63,11 +63,11 @@
 
                   <div class="control">
                     {% if not record.deleted %}
-                      {{ form_button(url_for("record.delete", work_id=work.id, record_id=record.id), button_title="Delete this record. You'll be able to restore it.", ion_icon="trash-outline", ion_icon_class="has-text-grey") }}
-                      {{ button(url_for("record.detail", work_id=work.id, record_id=record.id), button_title="Edit this record.", ion_icon="pencil-outline") }}
+                      {{ _form_button(url_for("record.delete", work_id=work.id, record_id=record.id), button_title="Delete this record. You'll be able to restore it.", ion_icon="trash-outline", ion_icon_class="has-text-grey") }}
+                      {{ _button(url_for("record.detail", work_id=work.id, record_id=record.id), button_title="Edit this record.", ion_icon="pencil-outline") }}
                     {% else %}
-                      {{ form_button(url_for("record.restore", work_id=work.id, record_id=record.id), button_title="Restore this record.", ion_icon="arrow-undo-outline", ion_icon_class="has-text-success") }}
-                      {{ form_button(url_for("record.permanently_delete", work_id=work.id, record_id=record.id), button_title="Permanently delete record. You won't be able to restore it.", ion_icon="trash-outline", ion_icon_class="has-text-danger") }}
+                      {{ _form_button(url_for("record.restore", work_id=work.id, record_id=record.id), button_title="Restore this record.", ion_icon="arrow-undo-outline", ion_icon_class="has-text-success") }}
+                      {{ _form_button(url_for("record.permanently_delete", work_id=work.id, record_id=record.id), button_title="Permanently delete record. You won't be able to restore it.", ion_icon="trash-outline", ion_icon_class="has-text-danger") }}
                     {% endif %}
                   </div>
                 </div>
@@ -78,17 +78,17 @@
         <tr>
           <td class="has-text-centered">
             <form>
-              {{ form_button(url_for('record.new_started_today', work_id=work.id), button_title='Create a new record, with a start date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Started today') }}
+              {{ _form_button(url_for('record.new_started_today', work_id=work.id), button_title='Create a new record, with a start date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Started today') }}
             </form>
           </td>
           <td class="has-text-centered">
             <form>
-              {{ form_button(url_for('record.new_stopped_today', work_id=work.id), button_title='Create a new record, with a stopped date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Stopped today') }}
+              {{ _form_button(url_for('record.new_stopped_today', work_id=work.id), button_title='Create a new record, with a stopped date of today', button_class='is-ghost has-text-grey', ion_icon='add-outline', button_text='Stopped today') }}
             </form>
           </td>
           <td class="has-text-right">
             <form>
-              {{ form_button(url_for('record.new', work_id=work.id), button_title='Create a new record', ion_icon='add-outline') }}
+              {{ _form_button(url_for('record.new', work_id=work.id), button_title='Create a new record', ion_icon='add-outline') }}
             </form>
           </td>
         </tr>

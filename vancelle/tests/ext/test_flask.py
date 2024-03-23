@@ -1,7 +1,6 @@
-import flask
 import pytest
 
-from vancelle.extensions.ext_html import compare_endpoints
+from vancelle.ext.flask import compare_endpoints
 
 
 @pytest.mark.parametrize(

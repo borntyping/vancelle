@@ -1,3 +1,5 @@
+@use "bulma/sass" as bulma;
+
 .x-is-collapsible {
   max-height: 0;
   overflow-y: hidden;

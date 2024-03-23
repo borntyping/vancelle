@@ -1,21 +1,9 @@
-@use 'sass:list';
-@import "../../../../node_modules/bulma/bulma";
+@use "bulma/sass" as bulma;
+@use "bulma/sass/utilities/mixins";
 
 /**
  * Toast messages
  */
-
-:root {
-  /* https://bulma.io/documentation/helpers/spacing-helpers/ */
-  --bulma-spacing-0: 0;
-  --bulma-spacing-1: 0.25rem;
-  --bulma-spacing-2: 0.5rem;
-  --bulma-spacing-3: 0.75rem;
-  --bulma-spacing-4: 1rem;
-  --bulma-spacing-5: 1.5rem;
-  --bulma-spacing-6: 3rem;
-}
-
 
 #app-toasts {
   position: fixed;
@@ -31,21 +19,21 @@
     }
   }
 
-  @include touch {
+  @include mixins.touch {
     bottom: 0;
     left: 0;
     right: 0;
     width: unset;
   }
 
-  @include desktop {
+  @include mixins.desktop {
     bottom: 0;
     left: 0;
     right: unset;
     width: 20%;
   }
 
-  @include widescreen {
+  @include mixins.widescreen {
     width: 10%;
     min-width: 20em;
   }

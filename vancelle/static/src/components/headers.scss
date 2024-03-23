@@ -1,3 +1,5 @@
+@use "bulma/sass" as bulma;
+
 .app-count-h3 {
   counter-reset: app-h3;
 }

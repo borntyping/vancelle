@@ -1,5 +1,4 @@
-@import "bulma/sass/components/panel";
-@import "bulma/sass/utilities/derived-variables";
+@use "bulma/sass" as bulma;
 
 .x-properties-grid {
   display: grid;
@@ -18,7 +17,7 @@
     display: contents;
 
     .panel-block {
-      border-bottom: $panel-item-border;
+      border-bottom: bulma.$panel-item-border;
     }
 
     summary {
@@ -30,8 +29,8 @@
     grid-column: span 2;
 
     pre {
-      background: $white-bis;
-      font-size: $size-small;
+      background: bulma.$white-bis;
+      font-size: bulma.$size-small;
       //padding: 0.5em 0.75em;
     }
   }

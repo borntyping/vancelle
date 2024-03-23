@@ -1,0 +1,10 @@
+@media (prefers-color-scheme: light) {
+  .x-theme-toggle-light {
+    display: none;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .x-theme-toggle-dark {
+    display: none;
+  }
+}

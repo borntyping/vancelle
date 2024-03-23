@@ -1,3 +1,5 @@
+@use "bulma/sass" as bulma;
+
 .x-record-notes {
   overflow: hidden;
   text-overflow: ellipsis;

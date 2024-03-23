@@ -1,0 +1,46 @@
+@use "bulma/sass" as bulma;
+@use "../theme";
+
+/**
+ * Footer and logos for external dependencies.
+ */
+
+#x-dependency-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & a {
+    display: inline-block;
+    margin: 0 0.5em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+
+    img {
+      display: block;
+      width: 8em;
+      height: 2em;
+      object-fit: contain;
+    }
+  }
+}
+
+@mixin light { }
+
+@mixin dark { }
+
+@media (prefers-color-scheme: light) {
+  @include light;
+}
+
+[data-theme="light"] {
+  @include light;
+}
+
+@media (prefers-color-scheme: dark) {
+  @include dark;
+}
+
+[data-theme="dark"] {
+  @include dark;
+}

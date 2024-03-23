@@ -25,8 +25,8 @@ class WorkInfo:
     slug: str
     noun: str
     noun_title: str
-    plural: str
-    plural_title: str
+    noun_plural: str
+    noun_plural_title: str
     priority: int
 
     def __init__(
@@ -42,9 +42,15 @@ class WorkInfo:
         self.slug = slug
         self.noun = noun
         self.noun_title = noun_title or self.noun.title()
-        self.plural = plural or p.plural(self.noun)
-        self.plural_title = plural_title or self.plural.title()
+        self.noun_plural = plural or p.plural(self.noun)
+        self.noun_plural_title = plural_title or self.noun_plural.title()
         self.priority = priority
+
+    def plural(self, count: int) -> str:
+        return self.noun if count == 1 else self.noun_plural
+
+    def plural_title(self, count: int) -> str:
+        return self.noun_title if count == 1 else self.noun_plural_title
 
 
 class Work(PolymorphicBase, IntoDetails, IntoProperties):

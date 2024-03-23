@@ -70,6 +70,10 @@ class RemoteInfo:
     def full_plural(self) -> str:
         return f"{self.source} {self.noun_plural or p.plural(self.noun)}"
 
+    @property
+    def colour_invert(self) -> str:
+        return f"{self.colour}-invert"
+
 
 class Remote(PolymorphicBase, IntoDetails, IntoProperties):
     __tablename__ = "remote"
@@ -266,7 +270,7 @@ class RoyalroadFiction(Remote):
         colour="royalroad",
         source="Royal Road",
         noun="fiction",
-        noun_plural="fiction",
+        noun_plural="fictions",
         priority=20,
     )
 

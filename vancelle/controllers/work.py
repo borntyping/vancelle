@@ -4,6 +4,7 @@ import functools
 import typing
 import uuid
 
+import flask
 import flask_login
 import flask_sqlalchemy.pagination
 import sqlalchemy
@@ -14,6 +15,7 @@ from werkzeug.exceptions import BadRequest
 
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db
+from vancelle.inflect import p
 from vancelle.models import Base, User
 from vancelle.models.record import Record
 from vancelle.models.remote import ImportedWork, Remote
@@ -166,6 +168,14 @@ class WorkQuery:
 
 
 @dataclasses.dataclass()
+class Gauge:
+    count: int
+    title: str
+    href: str
+    classnames: list[str]
+
+
+@dataclasses.dataclass()
 class WorkController:
     def get_or_404(self, *, user: User = flask_login.current_user, id: uuid.UUID) -> Work:
         return db.one_or_404(select(Work).filter_by(user_id=user.id, id=id))
@@ -192,6 +202,15 @@ class WorkController:
     def count(self, table: typing.Type[Base], **kwargs: typing.Any) -> int:
         return db.session.execute(select(func.count()).select_from(table).filter_by(**kwargs)).scalar_one()
 
+    def count_works(self) -> int:
+        return self.count(Work)
+
+    def count_remotes(self) -> int:
+        return self.count(Remote)
+
+    def count_users(self) -> int:
+        return self.count(User)
+
     def count_works_by_type(self) -> dict[typing.Type[Work], int]:
         return self._count_by_type(Work, Work.iter_subclasses())
 
@@ -208,3 +227,49 @@ class WorkController:
 
         results = {t: c for t, c in db.session.execute(stmt)}
         return {s: results[s.__mapper__.polymorphic_identity] for s in subclasses}
+
+    def work_types(self) -> typing.Sequence[str]:
+        return [cls.info.noun_plural for cls in Work.iter_subclasses()]
+
+    def _gauges(self) -> typing.Sequence[Gauge]:
+        works = self.count_works()
+        remotes = self.count_remotes()
+        users = self.count_users()
+
+        yield Gauge(
+            works,
+            p.plural("work", works),
+            flask.url_for("work.index"),
+            ["has-background-link", "has-text-link-light"],
+        )
+        yield Gauge(
+            remotes,
+            p.plural("remote", remotes),
+            flask.url_for("remote.index"),
+            ["has-background-link", "has-text-link-light"],
+        )
+        yield Gauge(
+            users,
+            p.plural("user", users),
+            flask.url_for("user.index"),
+            ["has-background-link", "has-text-link-light"],
+        )
+
+        for cls, count in self.count_works_by_type().items():
+            yield Gauge(
+                count,
+                cls.info.noun_plural_title,
+                flask.url_for("work.index", work_type=cls.work_type()),
+                ["has-background-primary", "has-text-primary-light"],
+            )
+
+        for cls, count in self.count_remotes_by_type().items():
+            yield Gauge(
+                count,
+                cls.info.noun_full_plural,
+                flask.url_for("work.index", remote_type=cls.remote_type()),
+                [f"has-background-{cls.info.colour}", f"has-text-{cls.info.colour_invert}"],
+            )
+
+    def gauges(self) -> typing.Sequence[Gauge]:
+        return sorted(self._gauges(), key=lambda g: g.count, reverse=True)

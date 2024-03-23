@@ -1,14 +1,10 @@
-@import "bulma/sass/utilities/mixins";
-@import "bulma/sass/elements/box";
+@use "bulma/sass" as bulma;
+@use "bulma/sass/utilities/mixins";
 
 $x-board-card-text: 3fr;
 $x-board-card-cover: 2fr;
 
 .x-board-card {
-  @extend .box;
-  @extend .p-0;
-  @extend .m-0;
-
   display: grid !important;
   grid-template-columns: $x-board-card-text $x-board-card-cover;
   overflow: hidden;
@@ -53,7 +49,7 @@ $x-board-card-cover: 2fr;
   &[data-work-shelf="all"][data-work-shelf-group="all"] {
     grid-auto-flow: column;
 
-    @include until-widescreen {
+    @include mixins.until-widescreen {
       grid-template-columns: 1fr 1fr;
       grid-template-rows: none;
       grid-auto-rows: minmax(0, 1fr);
@@ -84,7 +80,7 @@ $x-board-card-cover: 2fr;
         }
       }
     }
-    @include widescreen {
+    @include mixins.widescreen {
       grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
       grid-template-rows: none;
       grid-auto-rows: minmax(0, 1fr);

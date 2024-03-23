@@ -4,10 +4,11 @@ import uuid
 import flask.sansio.blueprints
 import flask_login
 import flask_wtf
+import hotmetal
 import structlog
 import svcs
-import wtforms
 import werkzeug.exceptions
+import wtforms
 from wtforms.validators import DataRequired, Optional
 
 from vancelle.blueprints.bulma import BulmaSelect
@@ -16,10 +17,10 @@ from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
-from vancelle.models import User
+from vancelle.html.vancelle.pages.home import home_page
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
-from vancelle.shelf import Shelf, Case
+from vancelle.shelf import Case, Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -87,7 +88,7 @@ class WorkIndexForm(flask_wtf.FlaskForm):
     )
     work_type = wtforms.SelectField(
         label="Work type",
-        choices=[("", "All works")] + [(cls.work_type(), cls.info.plural_title) for cls in Work.iter_subclasses()],
+        choices=[("", "All works")] + [(cls.work_type(), cls.info.noun_plural_title) for cls in Work.iter_subclasses()],
         default="",
         widget=BulmaSelect(),
         validators=[Optional()],
@@ -157,14 +158,11 @@ def before_request():
 
 @bp.route("/")
 def home():
-    return flask.render_template(
-        "work/home.html",
-        categories=[cls.info.plural for cls in Work.iter_subclasses()],
-        works_count=controller.count(Work),
-        remotes_count=controller.count(Remote),
-        users_count=controller.count(User),
-        works_count_by_type=controller.count_works_by_type(),
-        remote_count_by_type=controller.count_remotes_by_type(),
+    return hotmetal.render(
+        home_page(
+            categories=controller.work_types(),
+            gauges=controller.gauges(),
+        )
     )
 
 

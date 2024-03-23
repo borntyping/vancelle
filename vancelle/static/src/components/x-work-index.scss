@@ -1,8 +1,8 @@
-@import "bulma/sass/grid/columns";
-@import "bulma/sass/utilities/mixins";
+@use "bulma/sass" as bulma;
+@use "bulma/sass/utilities/mixins";
 
 #x-work-index {
-  @include mobile() {
+  @include mixins.mobile {
     .columns {
       margin-top: 0;
       margin-bottom: 0;

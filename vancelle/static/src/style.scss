@@ -1,27 +1,56 @@
-@charset "utf-8";
+@use "vancelle/theme" as theme;
+@use "ext/bulma/utilities/initial-variables" as iv;
 
-@import "colours";
-@import "htmx";
-@import "layout";
-@import "typography";
+@use "bulma/sass" as bulma with (
+  $primary: theme.$primary,
+  $code: iv.$grey-dark,
+  $custom-colors: (
+    // Shelves
+    "unsorted": iv.$white-bis,
+    "unreleased": iv.$red,
+    "undecided": iv.$orange,
+    "upcoming": iv.$yellow,
+    "returning": iv.$yellow,
+    "playing": iv.$green,
+    "replaying": iv.$turquoise,
+    "ongoing": iv.$turquoise,
+    "infinite": iv.$turquoise,
+    "paused": iv.$cyan,
+    "shelved": iv.$blue,
+    "completed": iv.$purple,
+    "abandoned": iv.$white-bis,
+    "untouched": iv.$white-bis,
+    // Remotes
+    "imported": iv.$grey-lighter,
+    "steam": (theme.$steam-dark, theme.$steam-light, theme.$steam-dark, theme.$steam-light),
+    "tmdb-movie": (theme.$tmdb-primary, theme.$tmdb-secondary),
+    "tmdb-tv": (theme.$tmdb-primary, theme.$tmdb-tertiary),
+    "royalroad": (theme.$royalroad-dark, theme.$royalroad-light),
+    "openlibrary": (theme.$openlibrary-primary, theme.$openlibrary-secondary),
+    "goodreads": (theme.$goodreads-dark, theme.$goodreads-light),
+  ),
+);
 
-@import "grid/columns";
+@use "layout";
+@use "typography";
 
-@import "elements/button";
-@import "elements/code";
-@import "elements/form";
-@import "elements/table";
+@use "elements/button";
+@use "elements/form";
+@use "elements/table";
 
-@import "components/board";
-@import "components/details-box";
-@import "components/footer";
-@import "components/headers";
-@import "components/panel-library-card";
-@import "components/panel";
-@import "components/steam";
-@import "components/toasts";
-@import "components/truncate";
+@use "components/x-theme-toggle";
+@use "components/board";
+@use "components/details-box";
+@use "vancelle/components/footer";
+@use "components/headers";
+@use "components/panel-library-card";
+@use "components/panel";
+@use "components/steam";
+@use "components/toasts";
+@use "components/truncate";
+@use "components/x-work-index";
 
-@import "helpers/collapsible";
+@use "ext/bulma/grid/fixed-grid";
+@use "vancelle/components/gauge";
 
-@import "bulma/bulma";
+@use "components/collapsible";

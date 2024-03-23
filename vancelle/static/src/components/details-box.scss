@@ -1,10 +1,13 @@
-@import "bulma/sass/elements/box";
-@import "bulma/sass/components/panel";
-@import "bulma/sass/utilities/initial-variables";
+@use "sass:math";
+@use "bulma/sass" as bulma;
 
-$spacing: calc($box-padding / 2);
+@use "bulma/sass/elements/box";
+@use "bulma/sass/components/panel";
+@use "bulma/sass/utilities/initial-variables";
+
+$spacing: math.div(box.$box-padding, 2);
 $panel-heading-padding-x: 0.75em;
-$panel-heading-height: $panel-heading-size + ($panel-heading-padding-x * 2);
+$panel-heading-height: panel.$panel-heading-size + ($panel-heading-padding-x * 2);
 
 .panel {
   overflow: clip;
@@ -67,10 +70,10 @@ $panel-heading-height: $panel-heading-size + ($panel-heading-padding-x * 2);
   .x-description {
     grid-row: 3 / span 1;
     grid-column: 1 / -1;
-    border-radius: $box-radius;
+    border-radius: box.$box-radius;
 
     .block:not(:last-child) {
-      margin-bottom: calc($block-spacing / 2);
+      margin-bottom: math.div(initial-variables.$block-spacing, 2);
     }
   }
 }
@@ -81,5 +84,5 @@ $panel-heading-height: $panel-heading-size + ($panel-heading-padding-x * 2);
 
 .x-cover {
   overflow: clip;
-  border-radius: $box-radius;
+  border-radius: box.$box-radius;
 }

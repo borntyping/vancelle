@@ -1,6 +1,6 @@
-@import "bulma/sass/helpers/spacing";
+@use "bulma/sass" as bulma;
 
-@each $property, $value in $spacing-values {
+@each $property, $value in bulma.$spacing-values {
   .x-gap-#{$property} {
     gap: $value;
   }

@@ -20,8 +20,8 @@ def home_page_hero(categories: typing.Sequence[str]) -> Hotmetal:
                 [
                     ("h1", {"class": "title is-2"}, "Vancelle"),
                     ("p", {"class": "subtitle is-4"}, f"Track {p.join(categories)}"),
-                    ("a", {"class": "button is-large is-link mx-3", "href": flask.url_for("work.home")}, ["View works"]),
-                    ("a", {"class": "button is-large is-link mx-3", "href": flask.url_for("work.home")}, ["Add work"]),
+                    ("a", {"class": "button is-large is-link mx-3", "href": flask.url_for("work.index")}, ["View works"]),
+                    ("a", {"class": "button is-large is-link mx-3", "href": flask.url_for("work.create")}, ["Add work"]),
                 ],
             )
         ],

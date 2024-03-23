@@ -66,9 +66,11 @@ class RemoteInfo:
     def __str__(self) -> str:
         return self.noun_full
 
-    @property
-    def full_plural(self) -> str:
-        return f"{self.source} {self.noun_plural or p.plural(self.noun)}"
+    def plural(self, count: int) -> str:
+        return self.noun if count == 1 else self.noun_plural
+
+    def plural_full(self, count: int) -> str:
+        return f"{self.source} {self.plural(count)}"
 
     @property
     def colour_invert(self) -> str:

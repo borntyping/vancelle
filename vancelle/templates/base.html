@@ -40,7 +40,7 @@
               {{ navbar_item('All', 'work.index', work_type=None) }}
               {{ navbar_divider() }}
               {% for cls in Work.iter_subclasses() %}
-                {{ navbar_item(cls.info.plural_title, 'work.index', work_type=cls.work_type()) }}
+                {{ navbar_item(cls.info.noun_plural_title, 'work.index', work_type=cls.work_type()) }}
               {% endfor %}
             {% endcall %}
             {% call navbar_group('Add new work') %}

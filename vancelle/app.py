@@ -23,7 +23,7 @@ from .clients.steam.client_store_api import SteamStoreAPI
 from .clients.steam.client_web_api import SteamWebAPI
 from .clients.tmdb.client import TmdbAPI
 from .ext.structlog import configure_logging
-from .extensions import cors, db, debug_toolbar, html, htmx, login_manager, migrate, sentry
+from .extensions import cors, db, debug_toolbar, html, htmx, login_manager, migrate
 from .shelf import Shelf
 
 

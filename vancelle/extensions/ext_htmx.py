@@ -1,7 +1,6 @@
 import dataclasses
 
 import flask
-import sentry_sdk
 import werkzeug.wrappers.response
 
 

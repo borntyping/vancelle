@@ -1,11 +1,6 @@
 import typing
 
-import hotmetal
-import starlette.responses
-
-from vancelle.html.types import ClassNames, Hotmetal
-
-type AttributeValue = str | int | starlette.responses.URL
+from vancelle.html.types import ClassNames
 
 
 def _classnames_flatten(items: typing.Iterable[ClassNames]) -> typing.Iterable[str]:
@@ -29,16 +24,14 @@ def html_classes(*names: ClassNames) -> str:
     return " ".join(_classnames_flatten(names))
 
 
-def _attr_value(key: str, value: AttributeValue) -> str:
+def _attr_value(key: str, value: str) -> str:
     if isinstance(value, str):
         return value
-    elif isinstance(value, int):
-        return str(value)
-    elif isinstance(value, starlette.responses.URL):
-        return str(value)
+    # elif isinstance(value, int):
+    #     return str(value)
 
     raise TypeError(f"Attribute value can't be converted to a string: {key}={value!r}")
 
 
-def filter_empty_attributes(attributes: dict[str, AttributeValue | None]) -> dict[str, str]:
+def filter_empty_attributes(attributes: dict[str, str | None]) -> dict[str, str]:
     return {k: _attr_value(k, v) for k, v in attributes.items() if v is not None}

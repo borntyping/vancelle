@@ -1,7 +1,7 @@
 import typing
 
 from vancelle.html.helpers import html_classes
-from vancelle.html.types import Hotmetal, Href
+from vancelle.html.types import Hotmetal
 
 
 def navbar(brand: Hotmetal, menu: Hotmetal) -> Hotmetal:
@@ -21,12 +21,12 @@ def navbar(brand: Hotmetal, menu: Hotmetal) -> Hotmetal:
     )
 
 
-def navbar_brand(name: str, href: Href) -> Hotmetal:
+def navbar_brand(name: str, href: str) -> Hotmetal:
     return (
         "div",
         {"class": "navbar-brand"},
         [
-            ("a", {"class": "navbar-item has-text-weight-bold", "href": str(href)}, [name]),
+            ("a", {"class": "navbar-item has-text-weight-bold", "href": href}, [name]),
             navbar_burger(),
         ],
     )
@@ -55,8 +55,8 @@ def navbar_menu(start: typing.Iterable[Hotmetal], end: typing.Iterable[Hotmetal]
     )
 
 
-def navbar_item(title: str, href: Href, active: bool = False) -> Hotmetal:
-    return ("a", {"class": html_classes("navbar-item", {"is-active": active}), "href": str(href)}, [title])
+def navbar_item(title: str, href: str, active: bool = False) -> Hotmetal:
+    return ("a", {"class": html_classes("navbar-item", {"is-active": active}), "href": href}, [title])
 
 
 def navbar_item_dropdown(name: str, items: typing.Iterable[Hotmetal]) -> Hotmetal:

@@ -1,7 +1,7 @@
 import flask
 
 from vancelle.html.document import a, img, whitespace
-from vancelle.html.types import Hotmetal, HotmetalAttributes, Href
+from vancelle.html.types import Hotmetal, HotmetalAttributes
 from vancelle.html.vancelle.elements.picture import light_dark_img
 
 
@@ -24,7 +24,7 @@ def tmdb_notice() -> Hotmetal:
     return ("span", {}, ["This product uses the TMDB API but is not endorsed or certified by TMDB."])
 
 
-def dependency_logo(name: str, *, id: str, href: Href, src: Href) -> Hotmetal:
+def dependency_logo(name: str, *, id: str, href: str, src: str) -> Hotmetal:
     return a(
         img(
             src=src,

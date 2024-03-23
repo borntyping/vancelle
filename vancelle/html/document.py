@@ -1,12 +1,10 @@
-import typing
-
 import hotmetal
 
-from .types import Hotmetal, Href
+from .types import Hotmetal
 from .helpers import filter_empty_attributes
 
 
-def meta(name: str, content: Href) -> Hotmetal:
+def meta(name: str, content: str) -> Hotmetal:
     return ("meta", {"name": name, "content": str(content)}, ())
 
 
@@ -14,8 +12,8 @@ def title(*parts: str) -> Hotmetal:
     return ("title", {}, [" - ".join(["Vancelle", *parts])])
 
 
-def link(rel: str, href: Href, **attrs: str | None) -> Hotmetal:
-    return ("link", filter_empty_attributes({"rel": rel, **attrs, "href": str(href)}), ())
+def link(rel: str, href: str, **attrs: str | None) -> Hotmetal:
+    return ("link", filter_empty_attributes({"rel": rel, **attrs, "href": href}), ())
 
 
 def document(*children: Hotmetal) -> Hotmetal:
@@ -24,7 +22,7 @@ def document(*children: Hotmetal) -> Hotmetal:
 
 def a(
     *children: Hotmetal,
-    href: Href,
+    href: str,
     id: str | None = None,
     title: str | None = None,
 ) -> Hotmetal:
@@ -32,7 +30,7 @@ def a(
 
 
 def img(
-    src: Href,
+    src: str,
     id: str | None = None,
     alt: str | None = None,
     width: str | int | None = None,
@@ -43,8 +41,8 @@ def img(
     return ("img", attrs, ())
 
 
-def script(src: Href, crossorigin: str = "anonymous", type: str | None = None) -> Hotmetal:
-    return ("script", filter_empty_attributes({"src": str(src), "crossorigin": crossorigin, "type": type}), [])
+def script(src: str, crossorigin: str = "anonymous", type: str | None = None) -> Hotmetal:
+    return ("script", filter_empty_attributes({"src": src, "crossorigin": crossorigin, "type": type}), [])
 
 
 def whitespace() -> str:

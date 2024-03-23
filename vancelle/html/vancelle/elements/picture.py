@@ -1,10 +1,10 @@
 from ...helpers import filter_empty_attributes
-from ...types import Href, Hotmetal
+from ...types import Hotmetal
 
 
 def light_dark_img(
-    light: Href,
-    dark: Href,
+    light: str,
+    dark: str,
     id: str | None = None,
     alt: str | None = None,
     width: int | None = None,

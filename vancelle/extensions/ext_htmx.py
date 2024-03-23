@@ -83,9 +83,3 @@ class HtmxExtension:
             return flask.redirect(url)
 
         return flask.Response(status=204, headers={"HX-Redirect": url})
-
-    def headers(self) -> dict[str, str]:
-        return {
-            "sentry-trace": sentry_sdk.get_traceparent(),
-            "baggage": sentry_sdk.get_baggage(),
-        }

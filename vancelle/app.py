@@ -53,7 +53,6 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     debug_toolbar.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
-    sentry.init_app(app)
 
     html.init_app(app)
     htmx.init_app(app)

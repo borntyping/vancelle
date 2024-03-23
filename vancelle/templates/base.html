@@ -22,10 +22,8 @@
     <meta name="msapplication-config" content="{{ url_for('static', filename='browserconfig.xml') }}">
     <meta name="theme-color" content="#485fc7">
     <meta name="htmx-config" content='{"requestClass": "is-loading"}'>
-    <meta name="sentry-trace" content="{{ sentry_sdk.get_traceparent() }}">
-    <meta name="baggage" content="{{ sentry_sdk.get_baggage() }}">
   </head>
-  <body hx-ext="loading-states" hx-headers='{{ htmx.headers()|tojson }}'>
+  <body hx-ext="loading-states">
     <nav class="navbar is-primary">
       <div class="container">
         <div class="navbar-brand">
@@ -132,29 +130,6 @@
 
       <!-- https://ionic.io/ionicons -->
       <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js" crossorigin="anonymous"></script>
-
-      {% if sentry.sentry_enabled() %}
-        <!-- https://sentry.io -->
-        <script src="https://browser.sentry-cdn.com/7.86.0/bundle.tracing.min.js" crossorigin="anonymous"></script>
-        <script>
-          Sentry.init({
-            spotlight: true,
-            release: "{{ sentry.release() }}",
-            integrations: [new Sentry.BrowserTracing({})],
-            tracesSampleRate: 1.0,
-          })
-        </script>
-      {% endif %}
-
-      {% if sentry.spotlight_enabled() %}
-        <!-- https://spotlightjs.com -->
-        <script>window.process = { env: { NODE_ENV: 'development' } };</script>
-        <script type="module" src="https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js" crossorigin="anonymous"></script>
-        <script type="module">
-          import * as Spotlight from 'https://unpkg.com/@spotlightjs/overlay@latest/dist/sentry-spotlight.js';
-          Spotlight.init({});
-        </script>
-      {% endif %}
     {% endblock %}
   </body>
 </html>

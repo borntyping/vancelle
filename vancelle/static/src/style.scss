@@ -4,31 +4,31 @@
 @use "bulma/sass" as bulma with (
   $primary: theme.$primary,
   $code: iv.$grey-dark,
-  $custom-colors: (
-    // Shelves
-    "unsorted": iv.$white-bis,
-    "unreleased": iv.$red,
-    "undecided": iv.$orange,
-    "upcoming": iv.$yellow,
-    "returning": iv.$yellow,
-    "playing": iv.$green,
-    "replaying": iv.$turquoise,
-    "ongoing": iv.$turquoise,
-    "infinite": iv.$turquoise,
-    "paused": iv.$cyan,
-    "shelved": iv.$blue,
-    "completed": iv.$purple,
-    "abandoned": iv.$white-bis,
-    "untouched": iv.$white-bis,
-    // Remotes
-    "imported": iv.$grey-lighter,
-    "steam": (theme.$steam-dark, theme.$steam-light, theme.$steam-dark, theme.$steam-light),
-    "tmdb-movie": (theme.$tmdb-primary, theme.$tmdb-secondary),
-    "tmdb-tv": (theme.$tmdb-primary, theme.$tmdb-tertiary),
-    "royalroad": (theme.$royalroad-dark, theme.$royalroad-light),
-    "openlibrary": (theme.$openlibrary-primary, theme.$openlibrary-secondary),
-    "goodreads": (theme.$goodreads-dark, theme.$goodreads-light),
-  ),
+  //$custom-colors: (
+  //  // Shelves
+  //  "unsorted": iv.$white-bis,
+  //  "unreleased": iv.$red,
+  //  "undecided": iv.$orange,
+  //  "upcoming": iv.$yellow,
+  //  "returning": iv.$yellow,
+  //  "playing": iv.$green,
+  //  "replaying": iv.$turquoise,
+  //  "ongoing": iv.$turquoise,
+  //  "infinite": iv.$turquoise,
+  //  "paused": iv.$cyan,
+  //  "shelved": iv.$blue,
+  //  "completed": iv.$purple,
+  //  "abandoned": iv.$white-bis,
+  //  "untouched": iv.$white-bis,
+  //  // Remotes
+  //  "imported": iv.$grey-lighter,
+  //  "steam": (theme.$steam-dark, theme.$steam-light),
+  //  "tmdb-movie": (theme.$tmdb-primary, theme.$tmdb-secondary),
+  //  "tmdb-tv": (theme.$tmdb-primary, theme.$tmdb-tertiary),
+  //  "royalroad": (theme.$royalroad-dark, theme.$royalroad-light),
+  //  "openlibrary": (theme.$openlibrary-primary, theme.$openlibrary-secondary),
+  //  "goodreads": (theme.$goodreads-dark, theme.$goodreads-light),
+  //),
 );
 
 @use "layout";

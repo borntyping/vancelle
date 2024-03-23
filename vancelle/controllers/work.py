@@ -172,7 +172,7 @@ class Gauge:
     count: int
     title: str
     href: str
-    classnames: list[str]
+    colour: str
 
 
 @dataclasses.dataclass()
@@ -236,40 +236,17 @@ class WorkController:
         remotes = self.count_remotes()
         users = self.count_users()
 
-        yield Gauge(
-            works,
-            p.plural("work", works),
-            flask.url_for("work.index"),
-            ["has-background-link", "has-text-link-light"],
-        )
-        yield Gauge(
-            remotes,
-            p.plural("remote", remotes),
-            flask.url_for("remote.index"),
-            ["has-background-link", "has-text-link-light"],
-        )
-        yield Gauge(
-            users,
-            p.plural("user", users),
-            flask.url_for("user.index"),
-            ["has-background-link", "has-text-link-light"],
-        )
+        yield Gauge(works, p.plural("Work", works), flask.url_for("work.index"), "primary")
+        yield Gauge(remotes, p.plural("Remote", remotes), flask.url_for("remote.index"), "primary")
+        yield Gauge(users, p.plural("User", users), flask.url_for("user.index"), "primary")
 
         for cls, count in self.count_works_by_type().items():
-            yield Gauge(
-                count,
-                cls.info.noun_plural_title,
-                flask.url_for("work.index", work_type=cls.work_type()),
-                ["has-background-primary", "has-text-primary-light"],
-            )
+            url = flask.url_for("work.index", work_type=cls.work_type())
+            yield Gauge(count, cls.info.noun_plural_title, url, "link")
 
         for cls, count in self.count_remotes_by_type().items():
-            yield Gauge(
-                count,
-                cls.info.noun_full_plural,
-                flask.url_for("work.index", remote_type=cls.remote_type()),
-                [f"has-background-{cls.info.colour}", f"has-text-{cls.info.colour_invert}"],
-            )
+            url = flask.url_for("work.index", remote_type=cls.remote_type())
+            yield Gauge(count, cls.info.noun_full_plural, url, cls.info.colour)
 
     def gauges(self) -> typing.Sequence[Gauge]:
         return sorted(self._gauges(), key=lambda g: g.count, reverse=True)

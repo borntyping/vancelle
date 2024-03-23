@@ -163,7 +163,7 @@ class ImportedWorkAttributes(typing.TypedDict):
 class ImportedWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "imported"}
     info = RemoteInfo(
-        colour="imported",
+        colour="text",
         source="Imported",
         noun="work",
         priority=-1,
@@ -184,7 +184,7 @@ class GoodreadsPrivateBook(Remote):
 
     __mapper_args__ = {"polymorphic_identity": "goodreads.book"}
     info = RemoteInfo(
-        colour="goodreads",
+        colour="success",
         source="Goodreads",
         noun="imported book",
         noun_full="Imported Goodreads book",
@@ -211,7 +211,7 @@ class GoodreadsPublicBook(Remote):
 
     __mapper_args__ = {"polymorphic_identity": "goodreads.book.public"}
     info = RemoteInfo(
-        colour="goodreads",
+        colour="success",
         source="Goodreads",
         noun="book",
         noun_full="Goodreads book",
@@ -236,7 +236,7 @@ class GoodreadsPublicBook(Remote):
 class OpenlibraryWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.work"}
     info = RemoteInfo(
-        colour="openlibrary",
+        colour="success",
         source="Open Library",
         noun="work",
         priority=11,
@@ -249,7 +249,7 @@ class OpenlibraryWork(Remote):
 class OpenlibraryEdition(Remote):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.edition"}
     info = RemoteInfo(
-        colour="openlibrary",
+        colour="success",
         source="Open Library",
         noun="edition",
         priority=12,
@@ -269,7 +269,7 @@ class OpenlibraryEdition(Remote):
 class RoyalroadFiction(Remote):
     __mapper_args__ = {"polymorphic_identity": "royalroad.fiction"}
     info = RemoteInfo(
-        colour="royalroad",
+        colour="success",
         source="Royal Road",
         noun="fiction",
         noun_plural="fictions",
@@ -283,7 +283,7 @@ class RoyalroadFiction(Remote):
 class SteamApplication(Remote):
     __mapper_args__ = {"polymorphic_identity": "steam.application"}
     info = RemoteInfo(
-        colour="steam",
+        colour="danger",
         source="Steam",
         noun="app",
         priority=99,
@@ -319,7 +319,7 @@ class SteamApplication(Remote):
 class TmdbMovie(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.movie"}
     info = RemoteInfo(
-        colour="tmdb-movie",
+        colour="info",
         source="TMDB",
         noun="movie",
         priority=40,
@@ -332,7 +332,7 @@ class TmdbMovie(Remote):
 class TmdbTvSeries(Remote):
     __mapper_args__ = {"polymorphic_identity": "tmdb.tv"}
     info = RemoteInfo(
-        colour="tmdb-tv",
+        colour="info",
         source="TMDB",
         noun="series",
         priority=31,

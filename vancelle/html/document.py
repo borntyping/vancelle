@@ -1,3 +1,6 @@
+import functools
+import typing
+
 import hotmetal
 
 from .types import Hotmetal
@@ -47,3 +50,12 @@ def script(src: str, crossorigin: str = "anonymous", type: str | None = None) ->
 
 def whitespace() -> str:
     return " "
+
+
+def element(tag: str, attrs: typing.Mapping[str, str | None], children: typing.Iterable[Hotmetal]) -> Hotmetal:
+    return (tag, filter_empty_attributes(attrs), list(children))
+
+
+div = functools.partial(element, "div")
+section = functools.partial(element, "section")
+p = functools.partial(element, "p")

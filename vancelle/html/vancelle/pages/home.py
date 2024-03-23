@@ -39,7 +39,14 @@ def home_page_gauges(gauges: typing.Sequence[Gauge]) -> Hotmetal:
                 [
                     (
                         "a",
-                        {"href": gauge.href, "class": html_classes("x-gauge", gauge.classnames)},
+                        {
+                            "href": gauge.href,
+                            "class": html_classes(
+                                "x-gauge",
+                                f"has-background-{gauge.colour}-soft",
+                                f"has-text-{gauge.colour}-bold",
+                            ),
+                        },
                         [
                             ("div", {"class": "is-size-1"}, [str(gauge.count)]),
                             ("div", {"class": ""}, [gauge.title]),

@@ -33,5 +33,5 @@ def _attr_value(key: str, value: str) -> str:
     raise TypeError(f"Attribute value can't be converted to a string: {key}={value!r}")
 
 
-def filter_empty_attributes(attributes: dict[str, str | None]) -> dict[str, str]:
+def filter_empty_attributes(attributes: typing.Mapping[str, str | None]) -> dict[str, str]:
     return {k: _attr_value(k, v) for k, v in attributes.items() if v is not None}

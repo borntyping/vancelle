@@ -3,7 +3,6 @@
     <toRun name="Flask" type="Python.FlaskServer" />
     <toRun name="pytest" type="tests" />
     <toRun name="Sass" type="ShConfigurationType" />
-    <toRun name="spotlight" type="ShConfigurationType" />
     <method v="2" />
   </configuration>
 </component>

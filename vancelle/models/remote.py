@@ -186,8 +186,9 @@ class GoodreadsPrivateBook(Remote):
     info = RemoteInfo(
         colour="success",
         source="Goodreads",
-        noun="imported book",
-        noun_full="Imported Goodreads book",
+        noun="book (imported)",
+        noun_full="Goodreads book (imported)",
+        noun_full_plural="Goodreads books (imported)",
         priority=10,
         can_search=False,
     )

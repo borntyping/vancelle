@@ -215,15 +215,6 @@ def index():
                 works=works,
                 total=works.total,
             )
-        case "table":
-            works = query.paginate()
-            page = flask.render_template(
-                "work/index_table.html",
-                form=form,
-                layout=form.layout.data,
-                works=works,
-                total=works.total,
-            )
         case _:
             raise werkzeug.exceptions.BadRequest(f"Unknown layout {form.layout.data!r}")
 

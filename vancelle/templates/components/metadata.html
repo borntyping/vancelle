@@ -55,7 +55,11 @@
 {%- endmacro -%}
 
 {% macro _property_name(property) %}
-  <span class="has-text-weight-bold">{{ property.name }}</span>
+  {% if property.description %}
+    <abbr class="has-text-weight-bold" title="{{ property.description }}">{{ property.name }}</abbr>
+  {% else %}
+    <span class="has-text-weight-bold">{{ property.name }}</span>
+  {% endif %}
 {% endmacro %}
 
 {% macro _property_value(property) %}

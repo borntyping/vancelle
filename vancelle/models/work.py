@@ -155,8 +155,8 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
         yield TimeProperty("Created", self.time_created)
         yield TimeProperty("Updated", self.time_updated)
         yield TimeProperty("Deleted", self.time_deleted)
-        yield TimeProperty("Started", self.date_first)
-        yield TimeProperty("Stopped", self.date_last)
+        yield TimeProperty("Started", self.date_first, description="First date in this work's records.")
+        yield TimeProperty("Stopped", self.date_last, description="Date stopped for this work's most recent record.")
 
     def resolve_details(self) -> Details:
         """Collapse the chain into a single Details instance, including details from the work."""

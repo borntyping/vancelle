@@ -16,6 +16,7 @@ logger = structlog.get_logger(logger_name=__name__)
 
 class Property:
     name: str
+    description: str | None
 
     def __bool__(self) -> bool:
         raise NotImplementedError
@@ -39,6 +40,7 @@ class Property:
 class StringProperty(Property):
     name: str
     value: str | typing.Any
+    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.value)
@@ -51,6 +53,7 @@ class StringProperty(Property):
 class TimeProperty(Property):
     name: str
     value: datetime.datetime | datetime.date | typing.Any
+    description: str | None = None
 
     def __bool__(self) -> bool:
         return self.value is not None
@@ -64,6 +67,7 @@ class InternalUrlProperty(Property):
     name: str
     link: str | None
     text: str | None = None
+    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
@@ -77,6 +81,7 @@ class ExternalUrlProperty(Property):
     name: str
     link: str | None
     text: str | None = None
+    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
@@ -90,6 +95,7 @@ class IterableProperty(Property):
     name: str
     items: typing.Iterable[typing.Any] = ()
     sorted: bool = False
+    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.items)

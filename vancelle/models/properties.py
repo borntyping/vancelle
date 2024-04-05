@@ -7,7 +7,7 @@ import hotmetal
 import structlog
 
 from vancelle.html.document import span
-from vancelle.html.types import Hotmetal
+from vancelle.html.hotmetal import Hotmetal
 from vancelle.html.vancelle.components.metadata import absent, external_url, internal_url
 from vancelle.inflect import p
 

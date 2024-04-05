@@ -3,9 +3,9 @@ import typing
 import flask
 
 from vancelle.controllers.work import Gauge
-from vancelle.html.types import Hotmetal
+from vancelle.html.hotmetal import Hotmetal
 from vancelle.inflect import p
-from .base import base
+from .base import page
 from ...helpers import html_classes
 
 
@@ -59,4 +59,4 @@ def _gauges(gauges: typing.Sequence[Gauge]) -> Hotmetal:
 
 
 def home_page(categories: typing.Sequence[str], gauges: typing.Sequence[Gauge]) -> Hotmetal:
-    return base(before=home_page_hero(categories), content=_gauges(gauges))
+    return page(before=home_page_hero(categories), content=_gauges(gauges))

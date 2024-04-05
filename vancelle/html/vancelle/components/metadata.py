@@ -1,7 +1,7 @@
 from vancelle.extensions import html
 from vancelle.html.bulma.elements.icon import icon
 from vancelle.html.document import a, span
-from vancelle.html.types import Hotmetal
+from vancelle.html.hotmetal import Hotmetal
 
 
 def absent() -> Hotmetal:

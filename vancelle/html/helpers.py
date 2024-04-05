@@ -1,6 +1,9 @@
 import typing
 
-from vancelle.html.types import HtmlClasses
+from vancelle.html.hotmetal import HotmetalAttrs
+from vancelle.inflect import p
+
+HtmlClasses = str | typing.Mapping[str, bool] | typing.Iterable[str] | None
 
 
 def _classnames_flatten(items: typing.Iterable[HtmlClasses]) -> typing.Iterable[str]:
@@ -24,14 +27,10 @@ def html_classes(*names: HtmlClasses) -> str:
     return " ".join(_classnames_flatten(names))
 
 
-def _attr_value(key: str, value: str) -> str:
-    if isinstance(value, str):
-        return value
-    # elif isinstance(value, int):
-    #     return str(value)
+def merge_attrs(a: HotmetalAttrs, b: HotmetalAttrs) -> HotmetalAttrs:
+    merged = {"class": html_classes(a.get("class", None), b.get("class", None))}
 
-    raise TypeError(f"Attribute value can't be converted to a string: {key}={value!r}")
+    if duplicates := set(a.keys() - {"class"}) & set(b.keys() - {"class"}):
+        raise Exception(f"Duplicate attributes: {p.join(list(duplicates))}")
 
-
-def filter_empty_attributes(attributes: typing.Mapping[str, str | None]) -> dict[str, str]:
-    return {k: _attr_value(k, v) for k, v in attributes.items() if v is not None}
+    return a | b | merged

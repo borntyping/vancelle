@@ -1,5 +1,4 @@
-from ...helpers import filter_empty_attributes
-from ...types import Hotmetal
+from ...hotmetal import Hotmetal, element
 
 
 def light_dark_img(
@@ -11,22 +10,20 @@ def light_dark_img(
     height: int | None = None,
     style: str | None = None,
 ) -> Hotmetal:
-    attrs = filter_empty_attributes(
-        {
-            "id": id,
-            "src": light,
-            "alt": alt,
-            "width": str(width) if str else None,
-            "height": str(height) if str else None,
-            "style": style,
-        }
-    )
-    return (
+    img_attrs = {
+        "id": id,
+        "src": light,
+        "alt": alt,
+        "width": str(width) if str else None,
+        "height": str(height) if str else None,
+        "style": style,
+    }
+    return element(
         "picture",
         {},
         [
-            ("source", {"srcset": light, "media": "(prefers-color-scheme: light)"}, ()),
-            ("source", {"srcset": dark, "media": "(prefers-color-scheme: dark)"}, ()),
-            ("img", attrs, ()),
+            element("source", {"srcset": light, "media": "(prefers-color-scheme: light)"}, ()),
+            element("source", {"srcset": dark, "media": "(prefers-color-scheme: dark)"}, ()),
+            element("img", img_attrs, ()),
         ],
     )

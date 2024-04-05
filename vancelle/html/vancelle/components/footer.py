@@ -1,11 +1,11 @@
 import flask
 
 from vancelle.html.document import a, img, whitespace
-from vancelle.html.types import Hotmetal, HotmetalAttributes
+from vancelle.html.hotmetal import Hotmetal, HotmetalAttrs
 from vancelle.html.vancelle.elements.picture import light_dark_img
 
 
-def toggle_theme(attributes: HotmetalAttributes) -> Hotmetal:
+def toggle_theme(attributes: HotmetalAttrs) -> Hotmetal:
     return ("a", {**attributes, "data-theme-toggle": ""}, [f"Toggle light/dark mode."])
 
 

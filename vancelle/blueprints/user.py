@@ -16,7 +16,7 @@ from vancelle.controllers.user import UserController
 from vancelle.ext.flask_login import get_user
 from vancelle.extensions import db, login_manager
 from vancelle.forms.user import ImportForm, LoginForm
-from vancelle.html.vancelle.pages.user import login_page
+from vancelle.html.vancelle.pages.user import login_page, ProfilePage
 from vancelle.models import User
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -69,6 +69,13 @@ def profile():
         return flask.redirect(flask.url_for("user.profile"))
 
     work_count = flask_login.current_user.works.count()
+    return hotmetal.render(
+        ProfilePage(
+            import_form=form,
+            work_count=work_count,
+            filename=BACKUP_FILENAME,
+        )
+    )
     return flask.render_template(
         "user/profile.html",
         form=form,

@@ -10,12 +10,12 @@ def toggle_theme(attributes: HotmetalAttributes) -> Hotmetal:
 
 
 def created_by() -> Hotmetal:
-    author = a("@borntyping", href="https://borntyping.co.uk")
+    author = a({"href": "https://borntyping.co.uk"}, "@borntyping")
     return ("span", {}, ["Created by ", author, ". "])
 
 
 def source_code() -> Hotmetal:
-    source = a("github.com/borntyping/vancelle", href="https://github.com/borntyping/vancelle")
+    source = a({"href": "https://github.com/borntyping/vancelle"}, "github.com/borntyping/vancelle")
     return ("span", {}, ["Source code at ", source, "."])
 
 
@@ -25,16 +25,7 @@ def tmdb_notice() -> Hotmetal:
 
 
 def dependency_logo(name: str, *, id: str, href: str, src: str) -> Hotmetal:
-    return a(
-        img(
-            src=src,
-            alt=name,
-            style="height: 2em !important",
-        ),
-        id=id,
-        href=href,
-        title=name,
-    )
+    return a({"href": href, "id": id, "title": name}, [img(src=src, alt=name, style="height: 2em !important")])
 
 
 def page_footer() -> Hotmetal:
@@ -64,34 +55,28 @@ def page_footer() -> Hotmetal:
                         {"id": "x-dependency-logos"},
                         [
                             a(
-                                light_dark_img(
-                                    light="https://bulma.io/assets/images/made-with-bulma.png",
-                                    dark="https://bulma.io/assets/images/made-with-bulma--dark.png",
-                                    alt="Bulma",
-                                    width=124,
-                                    height=24,
-                                ),
-                                id="bulma",
-                                href="https://bulma.io",
-                                title="Made with Bulma",
+                                {"id": "bulma", "href": "https://bulma.io", "title": "Made with Bulma"},
+                                [
+                                    light_dark_img(
+                                        light="https://bulma.io/assets/images/made-with-bulma.png",
+                                        dark="https://bulma.io/assets/images/made-with-bulma--dark.png",
+                                        alt="Bulma",
+                                        width=124,
+                                        height=24,
+                                    )
+                                ],
                             ),
                             a(
-                                img(src=flask.url_for("static", filename="img/openlibrary.svg"), alt="Open Library"),
-                                id="openlibrary",
-                                href="https://openlibrary.org",
-                                title="Open Library",
+                                {"id": "openlibrary", "href": "https://openlibrary.org", "title": "Open Library"},
+                                [img(src=flask.url_for("static", filename="img/openlibrary.svg"), alt="Open Library")],
                             ),
                             a(
-                                img(src=flask.url_for("static", filename="img/tmdb.svg"), alt="The Movie Database"),
-                                id="tmdb",
-                                href="https://www.themoviedb.org",
-                                title="The Movie Database",
+                                {"id": "tmdb", "href": "https://www.themoviedb.org", "title": "The Movie Database"},
+                                [img(src=flask.url_for("static", filename="img/tmdb.svg"), alt="The Movie Database")],
                             ),
                             a(
-                                img(src=flask.url_for("static", filename="img/steam.svg"), alt="Steam"),
-                                id="steam",
-                                href="https://store.steampowered.com",
-                                title="Steam",
+                                {"id": "steam", "href": "https://store.steampowered.com", "title": "Steam"},
+                                [img(src=flask.url_for("static", filename="img/steam.svg"), alt="Steam")],
                             ),
                         ],
                     ),

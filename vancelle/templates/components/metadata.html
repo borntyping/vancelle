@@ -54,14 +54,6 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{%- macro list_property(property) -%}
-  {{ p.join(property.items|map('string')|list) if property else absent }}
-{%- endmacro -%}
-
-{%- macro time_property(property) -%}
-  {{ property.value if property else absent }}
-{%- endmacro -%}
-
 {% macro _property_name(property) %}
   <span class="has-text-weight-bold">{{ property.name }}</span>
 {% endmacro %}

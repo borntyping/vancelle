@@ -3,7 +3,13 @@ import datetime
 import typing
 
 import flask
+import hotmetal
 import structlog
+
+from vancelle.html.document import span
+from vancelle.html.types import Hotmetal
+from vancelle.html.vancelle.components.metadata import absent, external_url, internal_url
+from vancelle.inflect import p
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -15,10 +21,13 @@ class Property:
         raise NotImplementedError
 
     def __str__(self) -> str:
-        raise NotImplementedError
+        if not self:
+            return hotmetal.render(absent())
 
-    def absent(self) -> str:
-        return flask.render_template_string("{{ absent }}")
+        return hotmetal.render(self.html())
+
+    def html(self) -> Hotmetal:
+        raise NotImplementedError
 
     @staticmethod
     def macro(attribute: str, **context: typing.Any) -> str:
@@ -34,8 +43,8 @@ class StringProperty(Property):
     def __bool__(self) -> bool:
         return bool(self.value)
 
-    def __str__(self) -> str:
-        return str(self.value) if self else self.absent()
+    def html(self) -> Hotmetal:
+        return span({}, str(self.value))
 
 
 @dataclasses.dataclass()
@@ -46,8 +55,8 @@ class TimeProperty(Property):
     def __bool__(self) -> bool:
         return self.value is not None
 
-    def __str__(self) -> str:
-        return self.macro("time_property", property=self)
+    def html(self) -> Hotmetal:
+        return span({}, str(self.value))
 
 
 @dataclasses.dataclass()
@@ -59,11 +68,8 @@ class InternalUrlProperty(Property):
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
 
-    def __str__(self) -> str:
-        if not self:
-            return self.absent()
-
-        return self.macro("internal_url", href=self.link, text=self.text)
+    def html(self) -> Hotmetal:
+        return internal_url(href=self.link, text=self.text)
 
 
 @dataclasses.dataclass()
@@ -75,11 +81,8 @@ class ExternalUrlProperty(Property):
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
 
-    def __str__(self) -> str:
-        if not self:
-            return self.absent()
-
-        return self.macro("external_url", href=self.link, text=self.text)
+    def html(self) -> Hotmetal:
+        return external_url(href=self.link, text=self.text)
 
 
 @dataclasses.dataclass()
@@ -94,8 +97,8 @@ class IterableProperty(Property):
     def __iter__(self):
         return sorted(self.items) if self.sorted else iter(self.items)
 
-    def __str__(self) -> str:
-        return self.macro("list_property", property=self)
+    def html(self) -> Hotmetal:
+        return span({}, p.join([str(item) for item in self]))
 
 
 class IntoProperties:

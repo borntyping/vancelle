@@ -3,8 +3,8 @@ import typing
 
 import hotmetal
 
-from .types import Hotmetal
 from .helpers import filter_empty_attributes
+from .types import Hotmetal
 
 
 def meta(name: str, content: str) -> Hotmetal:
@@ -21,15 +21,6 @@ def link(rel: str, href: str, **attrs: str | None) -> Hotmetal:
 
 def document(*children: Hotmetal) -> Hotmetal:
     return ("", {}, [hotmetal.safe("<!DOCTYPE html>"), ("html", {"lang": "en"}, children)])
-
-
-def a(
-    *children: Hotmetal,
-    href: str,
-    id: str | None = None,
-    title: str | None = None,
-) -> Hotmetal:
-    return ("a", filter_empty_attributes({"id": id, "href": href, "title": title}), list(children))
 
 
 def img(
@@ -57,5 +48,7 @@ def element(tag: str, attrs: typing.Mapping[str, str | None], children: typing.I
 
 
 div = functools.partial(element, "div")
-section = functools.partial(element, "section")
 p = functools.partial(element, "p")
+a = functools.partial(element, "a")
+section = functools.partial(element, "section")
+span = functools.partial(element, "span")

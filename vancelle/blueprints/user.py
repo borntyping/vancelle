@@ -4,18 +4,19 @@ import uuid
 import click
 import flask
 import flask_login
-import flask_wtf.file
+import hotmetal
 import sqlalchemy
 import sqlalchemy.exc
 import sqlalchemy.orm
 import structlog
 import werkzeug.security
 import werkzeug.exceptions
-import wtforms
 
 from vancelle.controllers.user import UserController
 from vancelle.ext.flask_login import get_user
 from vancelle.extensions import db, login_manager
+from vancelle.forms.user import ImportForm, LoginForm
+from vancelle.html.vancelle.pages.user import login_page
 from vancelle.models import User
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -27,32 +28,23 @@ bp = flask.Blueprint("user", __name__)
 bp.cli.short_help = "Manage users."
 
 
-class LoginForm(flask_wtf.FlaskForm):
-    username = wtforms.StringField("Username")
-    password = wtforms.PasswordField("Password")
-
-
-class ImportForm(flask_wtf.FlaskForm):
-    backup = flask_wtf.file.FileField("Backup", validators=[flask_wtf.file.FileRequired()])
-
-
 @bp.app_errorhandler(werkzeug.exceptions.Unauthorized)
 @bp.route("/users/login", methods={"get", "post"})
 def login(exception: werkzeug.exceptions.Unauthorized | None = None):
     form = LoginForm()
 
     if not form.validate_on_submit():
-        return flask.render_template("login.html", form=form, exception=exception)
+        return hotmetal.render(login_page(login_form=form))
 
     try:
         user = db.session.execute(sqlalchemy.select(User).filter_by(username=form.username.data)).scalar_one()
     except sqlalchemy.exc.NoResultFound:
         form.username.errors.append("Unknown username")
-        return flask.render_template("login.html", form=form, exception=exception)
+        return hotmetal.render(login_page(login_form=form))
 
     if not werkzeug.security.check_password_hash(user.password, form.password.data):
         form.password.errors.append("Incorrect password")
-        return flask.render_template("login.html", form=form, exception=exception)
+        return hotmetal.render(login_page(login_form=form))
 
     flask_login.login_user(user, remember=True)
     flask.flash(f"Logged in as {user.username}", "Logged in")

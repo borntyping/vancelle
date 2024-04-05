@@ -10,8 +10,9 @@ from vancelle.html.vancelle.components.navbar import page_navbar
 
 
 def base(
+    content: Hotmetal,
+    *,
     before: Hotmetal | None = None,
-    content: Hotmetal | None = None,
     after: Hotmetal | None = None,
 ) -> Hotmetal:
     head = [

@@ -1,9 +1,9 @@
 import typing
 
-from vancelle.html.types import ClassNames
+from vancelle.html.types import HtmlClasses
 
 
-def _classnames_flatten(items: typing.Iterable[ClassNames]) -> typing.Iterable[str]:
+def _classnames_flatten(items: typing.Iterable[HtmlClasses]) -> typing.Iterable[str]:
     for item in items:
         if isinstance(item, str):
             yield item
@@ -17,7 +17,7 @@ def _classnames_flatten(items: typing.Iterable[ClassNames]) -> typing.Iterable[s
             raise TypeError(item)
 
 
-def html_classes(*names: ClassNames) -> str:
+def html_classes(*names: HtmlClasses) -> str:
     """
     Hotmetal implements something very similar in hotmetal.utils:classnames. This impl
     """

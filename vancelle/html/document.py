@@ -47,8 +47,10 @@ def element(tag: str, attrs: typing.Mapping[str, str | None], children: typing.I
     return (tag, filter_empty_attributes(attrs), list(children))
 
 
-div = functools.partial(element, "div")
-p = functools.partial(element, "p")
 a = functools.partial(element, "a")
+div = functools.partial(element, "div")
+form = functools.partial(element, "form")
+p = functools.partial(element, "p")
 section = functools.partial(element, "section")
 span = functools.partial(element, "span")
+button = functools.partial(element, "button")

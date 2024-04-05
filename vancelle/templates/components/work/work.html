@@ -2,16 +2,16 @@
   <span class="tag is-light">{{ work.info.noun_title }}</span>
 {% endmacro %}
 
-{% macro span_date(started, stopped) %}
-  {% if started == stopped and started and stopped %}
-    {{ started|date }}
+{% macro span_date(start, stop) %}
+  {% if start == stop and start and stop %}
+    {{ start|date }}
   {% else %}
-    {%- if started -%}
-      {{ started|date }}
+    {%- if start -%}
+      {{ start|date }}
     {%- endif -%}
     <span>&mdash;</span>
-    {%- if stopped -%}
-      {{ stopped|date }}
+    {%- if stop -%}
+      {{ stop|date }}
     {%- endif -%}
   {% endif %}
 {% endmacro %}

@@ -104,16 +104,21 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
     def record(self) -> typing.Optional["Record"]:
         return self.get_record() or Record(work=self)
 
+    def iter_records(self) -> typing.Iterable["Record"]:
+        for record in self.records:
+            if not record.deleted:
+                yield record
+
     @property
-    def date_started(self) -> datetime.date | None:
-        if records := [r for r in self.records if r.date_started and not r.deleted]:
-            return records[0].date_started
+    def date_first(self) -> datetime.date | None:
+        if dates := [d for r in self.iter_records() for d in (r.date_started, r.date_stopped) if d]:
+            return min(dates)
         return None
 
     @property
-    def date_stopped(self) -> datetime.date | None:
-        if records := [r for r in self.records if r.date_stopped and not r.deleted]:
-            return records[-1].date_stopped
+    def date_last(self) -> datetime.date | None:
+        if dates := [r.date_stopped for r in self.iter_records()]:
+            return dates[-1]
         return None
 
     def url_for(self) -> str:
@@ -150,6 +155,8 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
         yield TimeProperty("Created", self.time_created)
         yield TimeProperty("Updated", self.time_updated)
         yield TimeProperty("Deleted", self.time_deleted)
+        yield TimeProperty("Started", self.date_first)
+        yield TimeProperty("Stopped", self.date_last)
 
     def resolve_details(self) -> Details:
         """Collapse the chain into a single Details instance, including details from the work."""

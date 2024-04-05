@@ -107,13 +107,13 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
     @property
     def date_started(self) -> datetime.date | None:
         if records := [r for r in self.records if r.date_started and not r.deleted]:
-            return min(r.date_started for r in records)
+            return records[0].date_started
         return None
 
     @property
     def date_stopped(self) -> datetime.date | None:
         if records := [r for r in self.records if r.date_stopped and not r.deleted]:
-            return max(r.date_stopped for r in records)
+            return records[-1].date_stopped
         return None
 
     def url_for(self) -> str:

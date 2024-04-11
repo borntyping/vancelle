@@ -46,7 +46,8 @@ FROM base as final
 WORKDIR /opt/app
 ENTRYPOINT ["poetry", "run"]
 ENV FLASK_APP="vancelle.app:create_personal_app()" \
-    VANCELLE_CACHE_PATH="/var/cache/vancelle"
+    VANCELLE_CACHE_PATH="/var/cache/vancelle" \
+    SCRIPT_NAME="/vancelle"
 CMD gunicorn "vancelle.app:create_personal_app()" --access-logfile=- --bind="0.0.0.0:8000"
 EXPOSE 8000
 VOLUME '/var/cache/vancelle'

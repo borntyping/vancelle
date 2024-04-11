@@ -1,5 +1,6 @@
 import os
 import typing
+import wsgiref.types
 
 import flask
 import svcs.flask
@@ -77,7 +78,7 @@ def create_app_once(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     return create_app(config)
 
 
-def create_personal_app() -> flask.Flask:
+def create_personal_app() -> wsgiref.types.WSGIApplication:
     config: dict[str, typing.Any] = {
         "GOODREADS_SHELF_MAPPING": {
             "currently-reading": Shelf.PLAYING,
@@ -91,6 +92,7 @@ def create_personal_app() -> flask.Flask:
         },
         "SENTRY_ENABLED": True,
         "SPOTLIGHT_ENABLED": True,
+        "APPLICATION_ROOT": "/vancelle",
     }
 
     if database_url := os.environ.get("DATABASE_URL"):

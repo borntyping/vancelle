@@ -44,14 +44,15 @@ RUN /opt/dart-sass/sass --load-path=node_modules "/opt/app/vancelle/static/src/s
 #
 FROM base as final
 WORKDIR /opt/app
-ENTRYPOINT ["poetry", "run"]
-ENV FLASK_APP="vancelle.app:create_personal_app()" \
-    VANCELLE_CACHE_PATH="/var/cache/vancelle" \
-    SCRIPT_NAME="/vancelle"
-CMD gunicorn "vancelle.app:create_personal_app()" --access-logfile=- --bind="0.0.0.0:8000"
-EXPOSE 8000
-VOLUME '/var/cache/vancelle'
 COPY --from=build /opt/app/.venv /opt/app/.venv
 COPY --from=sass /opt/app/vancelle/static/dist/ /opt/app/vancelle/static/dist/
 COPY poetry.lock pyproject.toml ./
 COPY vancelle/ vancelle/
+
+ENTRYPOINT ["poetry", "run"]
+CMD gunicorn "vancelle.app:create_personal_app()" --access-logfile=- --bind="0.0.0.0:8000"
+ENV FLASK_APP="vancelle.app:create_personal_app()" \
+    VANCELLE_CACHE_PATH="/var/cache/vancelle" \
+    SCRIPT_NAME="/vancelle"
+EXPOSE 8000
+VOLUME '/var/cache/vancelle'

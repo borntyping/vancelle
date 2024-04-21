@@ -304,7 +304,7 @@ class SteamApplication(Remote):
         if dlc := self.data.get("dlc"):
             for appid in dlc:
                 url = url_for("remote.detail", remote_type=self.remote_type(), remote_id=appid)
-                yield InternalUrlProperty("DLC", url, appid)
+                yield InternalUrlProperty("DLC", url, str(appid))
 
         yield IterableProperty("Developers", [d for d in self.data.get("developers", []) if d])
         yield IterableProperty("Publishers", [p for p in self.data.get("publishers", []) if p])

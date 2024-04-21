@@ -148,7 +148,7 @@
   {{ control_remote_priority(remote=remote) }}
 {%- endmacro -%}
 
-{% macro controls_work(work) %}
+{% macro controls_resolved_work(work) %}
   {% if work.deleted %}
     {{ control_work_permanently_delete(work, False) }}
     {{ control_work_restore(work, False) }}
@@ -156,6 +156,10 @@
     {{ control_work_update(work, False) }}
     {{ control_work_delete(work, False) }}
   {% endif %}
-  {{ control_work_detail(work) }}
+{% endmacro %}
+
+{% macro controls_work(work) %}
+  {{ control_work_update(work, False) }}
+  {# {{ control_work_detail(work) }} #}
   {{ _control_static_text(text="∞", title="Priority for manually provided details") }}
 {% endmacro %}

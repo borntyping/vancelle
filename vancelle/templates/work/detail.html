@@ -51,11 +51,11 @@
   <section class="block">
     {% call header(details.title, subtitle) %}
       {{ _control_change_shelf(work, details) }}
-
     {% endcall %}
+
     <div class="columns x-has-fullheight-containers">
       <div class="column">
-        {{ resolved_work_panel(details=details, properties=work.into_properties()) }}
+        {{ resolved_work_panel(work=work, details=details, properties=work.into_properties()) }}
       </div>
       <div class="column">{{ library_card_panel(work=work) }}</div>
     </div>

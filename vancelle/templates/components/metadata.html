@@ -161,7 +161,7 @@
   </div>
 {% endmacro %}
 
-{% from "components/controls.html" import controls_work, controls_remote %}
+{% from "components/controls.html" import controls_resolved_work, controls_work, controls_remote %}
 
 {% macro remote_panel(remote, candidate_work=None) %}
   {{ metadata_panel(details=remote.into_details(), properties=remote.into_properties(), data=remote.data, controls=controls_remote(remote, candidate_work=candidate_work, show_attached_work=False), subtitle="{} {}".format(remote.info.noun_full, remote.id), colour=remote.info.colour) }}
@@ -171,6 +171,6 @@
   {{ metadata_panel(details=work.into_details(), properties=work.into_properties(), data=None, controls=controls_work(work), subtitle="Work {}".format(work.id), colour="primary") }}
 {% endmacro %}
 
-{% macro resolved_work_panel(details, properties) %}
-  {{ metadata_panel(details=details, properties=properties, data=None, controls=None, subtitle=None, colour="primary") }}
+{% macro resolved_work_panel(work, details, properties) %}
+  {{ metadata_panel(details=details, properties=properties, data=None, controls=controls_resolved_work(work), subtitle=None, colour="primary") }}
 {% endmacro %}

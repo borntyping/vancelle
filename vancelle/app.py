@@ -92,7 +92,6 @@ def create_personal_app() -> wsgiref.types.WSGIApplication:
         },
         "SENTRY_ENABLED": True,
         "SPOTLIGHT_ENABLED": True,
-        "APPLICATION_ROOT": "/vancelle",
     }
 
     if database_url := os.environ.get("DATABASE_URL"):

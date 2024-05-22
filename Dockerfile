@@ -52,7 +52,6 @@ COPY vancelle/ vancelle/
 ENTRYPOINT ["poetry", "run"]
 CMD gunicorn "vancelle.app:create_personal_app()" --access-logfile=- --bind="0.0.0.0:8000"
 ENV FLASK_APP="vancelle.app:create_personal_app()" \
-    VANCELLE_CACHE_PATH="/var/cache/vancelle" \
-    SCRIPT_NAME="/vancelle"
+    VANCELLE_CACHE_PATH="/var/cache/vancelle"
 EXPOSE 8000
 VOLUME '/var/cache/vancelle'

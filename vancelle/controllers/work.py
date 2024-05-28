@@ -226,7 +226,7 @@ class WorkController:
         stmt = select(cls.type, count).select_from(cls).order_by(count.desc()).group_by(cls.type)
 
         results = {t: c for t, c in db.session.execute(stmt)}
-        return {s: results[s.__mapper__.polymorphic_identity] for s in subclasses}
+        return {s: r for s in subclasses if (r := results.get(s.__mapper__.polymorphic_identity, 0))}
 
     def work_types(self) -> typing.Sequence[str]:
         return [cls.info.noun_plural for cls in Work.iter_subclasses()]

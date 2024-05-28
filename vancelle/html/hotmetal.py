@@ -1,4 +1,5 @@
 import dataclasses
+import time
 import typing
 
 import hotmetal
@@ -21,7 +22,11 @@ class HotmetalClass(HotmetalCallable):
         raise NotImplementedError
 
     def render(self) -> str:
-        return hotmetal.render(self)
+        start = time.perf_counter_ns()
+        html = hotmetal.render(self)
+        end = time.perf_counter_ns()
+        logger.debug("Rendered class to HTML", obj=self, duration=(end - start), seconds=(end - start) / 1000000000)
+        return html
 
 
 @dataclasses.dataclass(slots=True)

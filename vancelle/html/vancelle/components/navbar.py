@@ -58,6 +58,6 @@ def _user_dropdown() -> Hotmetal:
 
 def page_navbar() -> Hotmetal:
     return navbar(
-        navbar_brand(name="Vancelle", href=flask.url_for("work.home")),
+        navbar_brand(name="Vancelle", href=flask.url_for("home.home")),
         navbar_menu(start=[_works_dropdown(), _new_works_dropdown()], end=[_user_dropdown()]),
     )

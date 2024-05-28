@@ -25,7 +25,7 @@ logger = structlog.get_logger(logger_name=__name__)
 
 controller = WorkController()
 
-bp = flask.Blueprint("work", __name__, url_prefix="")
+bp = flask.Blueprint("work", __name__, url_prefix="/works")
 
 SHELF_FORM_CHOICES = {
     group: [(shelf.value, shelf.title) for shelf in items]
@@ -155,13 +155,7 @@ def before_request():
     pass
 
 
-@bp.route("/")
-def home():
-    page = HomePage(categories=controller.work_types(), gauges=controller.gauges())
-    return page.render()
-
-
-@bp.route("/works/-/create", methods={"get", "post"})
+@bp.route("/-/create", methods={"get", "post"})
 def create():
     form = WorkForm()
 
@@ -175,7 +169,7 @@ def create():
     return flask.render_template("work/create.html", form=form)
 
 
-@bp.route("/works/")
+@bp.route("/")
 def index():
     form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
     query = WorkQuery(
@@ -218,14 +212,14 @@ def index():
     return response
 
 
-@bp.route("/works/<uuid:work_id>")
+@bp.route("/<uuid:work_id>")
 def detail(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
     form = WorkForm(obj=work)
     return flask.render_template("work/detail.html", work=work, form=form)
 
 
-@bp.route("/works/<uuid:work_id>/cover")
+@bp.route("/<uuid:work_id>/cover")
 def cover(work_id: uuid.UUID):
     images = svcs.flask.get(ImageCache)
     work = controller.get_or_404(id=work_id)
@@ -234,7 +228,7 @@ def cover(work_id: uuid.UUID):
     return images.as_response(work.cover)
 
 
-@bp.route("/works/<uuid:work_id>/background")
+@bp.route("/<uuid:work_id>/background")
 def background(work_id: uuid.UUID):
     images = svcs.flask.get(ImageCache)
     work = controller.get_or_404(id=work_id)
@@ -243,7 +237,7 @@ def background(work_id: uuid.UUID):
     return images.as_response(work.background)
 
 
-@bp.route("/works/<uuid:work_id>/-/shelve", methods={"get", "post"})
+@bp.route("/<uuid:work_id>/-/shelve", methods={"get", "post"})
 def shelve(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
     form = ShelveWorkForm(obj=work)
@@ -257,7 +251,7 @@ def shelve(work_id: uuid.UUID):
     return htmx.redirect(work.url_for())
 
 
-@bp.route("/works/<uuid:work_id>/-/update", methods={"get", "post"})
+@bp.route("/<uuid:work_id>/-/update", methods={"get", "post"})
 def update(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
     form = WorkForm(obj=work)
@@ -270,19 +264,19 @@ def update(work_id: uuid.UUID):
     return flask.render_template("work/update.html", work=work, form=form)
 
 
-@bp.route("/works/<uuid:work_id>/-/delete", methods={"post"})
+@bp.route("/<uuid:work_id>/-/delete", methods={"post"})
 def delete(work_id: uuid.UUID):
     controller.delete(controller.get_or_404(id=work_id))
     return htmx.refresh()
 
 
-@bp.route("/works/<uuid:work_id>/-/restore", methods={"post"})
+@bp.route("/<uuid:work_id>/-/restore", methods={"post"})
 def restore(work_id: uuid.UUID):
     controller.restore(controller.get_or_404(id=work_id))
     return htmx.refresh()
 
 
-@bp.route("/works/<uuid:work_id>/-/permanently-delete", methods={"post"})
+@bp.route("/<uuid:work_id>/-/permanently-delete", methods={"post"})
 def permanently_delete(work_id: uuid.UUID):
     controller.permanently_delete(controller.get_or_404(id=work_id))
     return htmx.redirect(flask.url_for(".index"))

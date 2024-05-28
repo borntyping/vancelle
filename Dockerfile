@@ -13,6 +13,7 @@ RUN --mount=target=/var/lib/apt/lists,type=cache \
  && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    postgresql-client \
     python3-poetry \
  && apt-get clean
 

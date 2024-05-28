@@ -1,0 +1,52 @@
+---
+name: 'vancelle'
+
+x-vancelle: &x-vancelle
+  image: 'vancelle'
+  network_mode: 'host'
+  environment:
+    VANCELLE_SECRET_KEY: '${VANCELLE_SECRET_KEY}'
+    VANCELLE_SQLALCHEMY_DATABASE_URI: 'postgresql+psycopg://${PGUSER}:${PGPASSWORD}@localhost/${PGDATABASE}'
+    VANCELLE_STEAM_WEB_API_KEY: '${VANCELLE_STEAM_WEB_API_KEY}'
+    VANCELLE_TMDB_API_KEY: '${VANCELLE_TMDB_API_KEY}'
+    VANCELLE_TMDB_READ_ACCESS_TOKEN: '${VANCELLE_TMDB_READ_ACCESS_TOKEN}'
+
+services:
+  vancelle:
+    <<: *x-vancelle
+    container_name: 'vancelle'
+    restart: 'unless-stopped'
+    build:
+      context: '~/Development/github.com/borntyping/vancelle'
+      network: 'host'
+      args:
+        DART_ARCH: 'arm64'
+    depends_on:
+      vancelle-db-upgrade:
+        condition: 'service_completed_successfully'
+      vancelle-user-create:
+        condition: 'service_completed_successfully'
+
+  vancelle-db-upgrade:
+    <<: *x-vancelle
+    container_name: 'vancelle-db-upgrade'
+    restart: 'no'
+    command:
+      - 'flask'
+      - 'db'
+      - 'upgrade'
+
+  vancelle-user-create:
+    <<: *x-vancelle
+    container_name: 'vancelle-user-create'
+    restart: 'no'
+    command:
+      - 'flask'
+      - 'user'
+      - 'create'
+      - '--id=${VANCELLE_CREATE_USER_ID}'
+      - '--username=${VANCELLE_CREATE_USER_USERNAME}'
+      - '--password=${VANCELLE_CREATE_USER_PASSWORD}'
+    depends_on:
+      vancelle-user-create:
+        condition: 'service_completed_successfully'

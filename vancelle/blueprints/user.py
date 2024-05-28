@@ -113,11 +113,26 @@ def load_user(user_id: str):
 @click.option("--username", prompt=True, required=True)
 @click.option("--password", prompt=True, hide_input=True, confirmation_prompt=True, required=True)
 def cli_create_user(id: uuid.UUID, username: str, password: str):
-    """Create a new user. You'll need this before you can login for the first time."""
-    user = User(id=id, username=username, password=werkzeug.security.generate_password_hash(password))
-    db.session.add(user)
-    db.session.commit()
-    logger.warning("Created user", user=user)
+    """
+    Ensure a user exists.
+
+    You'll need this before you can log in for the first time.
+
+    This can be safely called multiple times, so you can use it in init containers.
+    """
+
+    if user := db.session.execute(sqlalchemy.select(User).filter_by(username=username)).scalar_one_or_none():
+        if user.id == id and werkzeug.security.check_password_hash(user.password, password):
+            logger.info("User already exists", user=user)
+            raise click.exceptions.Exit(0)
+        else:
+            logger.error("User already exists and does not match", user=user)
+            raise click.exceptions.Exit(1)
+    else:
+        user = User(id=id, username=username, password=werkzeug.security.generate_password_hash(password))
+        db.session.add(user)
+        db.session.commit()
+        logger.warning("Created user", user=user)
 
 
 @bp.cli.command("clear")

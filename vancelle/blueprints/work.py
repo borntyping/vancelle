@@ -4,7 +4,6 @@ import uuid
 import flask.sansio.blueprints
 import flask_login
 import flask_wtf
-import hotmetal
 import structlog
 import svcs
 import werkzeug.exceptions
@@ -17,7 +16,7 @@ from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
-from vancelle.html.vancelle.pages.home import home_page
+from vancelle.html.vancelle.pages.home import HomePage
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
 from vancelle.shelf import Case, Shelf
@@ -158,12 +157,8 @@ def before_request():
 
 @bp.route("/")
 def home():
-    return hotmetal.render(
-        home_page(
-            categories=controller.work_types(),
-            gauges=controller.gauges(),
-        )
-    )
+    page = HomePage(categories=controller.work_types(), gauges=controller.gauges())
+    return page.render()
 
 
 @bp.route("/works/-/create", methods={"get", "post"})

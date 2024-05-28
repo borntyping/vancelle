@@ -8,7 +8,7 @@ import wtforms.csrf.core
 from vancelle.html.bulma.elements.icon import icon
 from vancelle.html.document import p
 from vancelle.html.helpers import html_classes
-from vancelle.html.hotmetal import Element, Hotmetal
+from vancelle.html.hotmetal import Hotmetal, element
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -53,7 +53,7 @@ def form_field(
 
     input_element = hotmetal.safe(_render(field, **kwargs))
 
-    control_element = Element("div", {"class": "control"}, [input_element])
+    control_element = element("div", {"class": "control"}, [input_element])
     if icon_left:
         control_element.attrs["class"] += " has-icons-left"
         control_element.children.append(icon(icon_left, "is-small", "is-left"))
@@ -61,10 +61,10 @@ def form_field(
         control_element.attrs["class"] += " has-icons-right"
         control_element.children.append(icon(icon_right, "is-small", "is-right"))
 
-    element = Element("div", {"class": "field"}, [control_element])
+    field_element = element("div", {"class": "field"}, [control_element])
     if label:
-        element.children.insert(0, field.label(class_="label"))
+        field_element.children.insert(0, field.label(class_="label"))
     for error in field.errors:
-        element.children.append(p({"class": "help is-danger"}, [str(error)]))
+        field_element.children.append(p({"class": "help is-danger"}, [str(error)]))
 
-    return element
+    return field_element

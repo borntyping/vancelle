@@ -238,7 +238,7 @@ class WorkController:
 
         yield Gauge(works, p.plural("Work", works), flask.url_for("work.index"), "primary")
         yield Gauge(remotes, p.plural("Remote", remotes), flask.url_for("remote.index"), "primary")
-        yield Gauge(users, p.plural("User", users), flask.url_for("user.index"), "primary")
+        yield Gauge(users, p.plural("User", users), flask.url_for("user.settings"), "primary")
 
         for cls, count in self.count_works_by_type().items():
             url = flask.url_for("work.index", work_type=cls.work_type())

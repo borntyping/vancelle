@@ -20,9 +20,12 @@ class HotmetalClass(HotmetalCallable):
     def __call__(self, context: typing.Any) -> Hotmetal:
         raise NotImplementedError
 
+    def render(self) -> str:
+        return hotmetal.render(self)
+
 
 @dataclasses.dataclass(slots=True)
-class Element(HotmetalClass):
+class HotmetalElement(HotmetalClass):
     """
     A callable constructor for a Hotmetal tuple.
 
@@ -63,4 +66,4 @@ class Element(HotmetalClass):
 
 
 def element(tag: HotmetalTag, attrs: HotmetalAttrs, children: HotmetalChildren) -> Hotmetal:
-    return Element(tag, attrs, children).hotmetal
+    return HotmetalElement(tag, attrs, children).hotmetal

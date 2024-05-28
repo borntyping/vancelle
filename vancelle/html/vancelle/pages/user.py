@@ -123,7 +123,7 @@ class SettingsPage(HotmetalClass):
                 ],
             ),
             form(
-                {"method": "post", "action": flask.url_for("cache.reload_steam_cache")},
+                {"method": "post", "action": flask.url_for(".reload_steam_cache")},
                 [button({"class": "button", "type": "submit"}, ["Reload"])],
             ),
         )

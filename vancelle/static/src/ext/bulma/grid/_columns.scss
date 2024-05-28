@@ -1,0 +1,4 @@
+// Make boxes in a column layout equal height.
+.columns .column > .box:only-child {
+  height: 100%;
+}

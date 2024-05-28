@@ -50,9 +50,7 @@ def _user_dropdown() -> Hotmetal:
 
     return navbar_item_dropdown(
         f"Logged in as {flask_login.current_user.username}",
-        _page_navbar_item("Import/export data", "user.profile"),
-        _page_navbar_item("Manage remote data", "remote.index"),
-        _page_navbar_item("Manage cached data", "cache.index"),
+        _page_navbar_item("Manage data", "user.settings"),
         _page_navbar_item("Logout", "user.logout"),
         is_right=True,
     )

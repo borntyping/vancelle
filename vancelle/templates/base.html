@@ -54,9 +54,7 @@
           <div class="navbar-end">
             {% if current_user.is_authenticated %}
               {% call navbar_group(current_user.username, is_right=True) %}
-                {{ navbar_item("Import/export data", "user.profile") }}
-                {{ navbar_item("Manage remote data", "remote.index") }}
-                {{ navbar_item("Manage cached data", "cache.index") }}
+                {{ navbar_item("Settings", "user.settings") }}
                 {{ navbar_item("Logout", "user.logout") }}
               {% endcall %}
             {% else %}

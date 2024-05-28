@@ -6,7 +6,6 @@ import flask
 import svcs.flask
 
 from .blueprints.bulma import bp as bp_bulma
-from .blueprints.cache import bp as bp_admin
 from .blueprints.data import bp as bp_data
 from .blueprints.errors import bp as bp_errors
 from .blueprints.health import bp as bp_health
@@ -58,7 +57,6 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     html.init_app(app)
     htmx.init_app(app)
 
-    app.register_blueprint(bp_admin)
     app.register_blueprint(bp_bulma)
     app.register_blueprint(bp_errors)
     app.register_blueprint(bp_health)

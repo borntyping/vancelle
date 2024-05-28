@@ -1,5 +1,3 @@
-import typing
-import uuid
 from datetime import date, datetime
 from typing import Literal, Optional
 from uuid import UUID
@@ -8,8 +6,9 @@ import pydantic
 import sqlalchemy
 import structlog
 
+from vancelle.controllers.sources.steam import SteamApplicationManager
 from vancelle.extensions import db
-from vancelle.models import Base, Record, Remote, User
+from vancelle.models import Record, Remote, User
 from ..models.work import Work
 from ..shelf import Shelf
 
@@ -17,7 +16,7 @@ logger = structlog.get_logger(logger_name=__name__)
 
 
 class RemoteModel(pydantic.BaseModel):
-    work_id: uuid.UUID
+    work_id: UUID
     type: str
     id: str
 
@@ -37,7 +36,7 @@ class RemoteModel(pydantic.BaseModel):
 
 
 class RecordModel(pydantic.BaseModel):
-    work_id: uuid.UUID
+    work_id: UUID
     id: UUID
 
     time_created: datetime
@@ -75,7 +74,7 @@ class BackupModel(pydantic.BaseModel):
     works: list[WorkModel]
 
 
-class UserController:
+class UserSettingsController:
     def export_json(self, user: User) -> str:
         works = (
             db.session.execute(sqlalchemy.select(Work).filter_by(user_id=user.id).options(sqlalchemy.orm.selectinload("*")))
@@ -111,3 +110,8 @@ class UserController:
             db.session.commit()
 
         logger.warning("Imported", user=user.id, works=len(works))
+
+
+class ApplicationSettingsController:
+    def reload_steam_cache(self) -> None:
+        SteamApplicationManager.reload_appid_cache()

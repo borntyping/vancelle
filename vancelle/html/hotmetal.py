@@ -16,8 +16,13 @@ Hotmetal = HotmetalCallable | str | hotmetal.safe | typing.Tuple[HotmetalTag, Ho
 ExtendedHotmetalAttrs = dict[str, str | bool]
 
 
+class HotmetalClass(HotmetalCallable):
+    def __call__(self, context: typing.Any) -> Hotmetal:
+        raise NotImplementedError
+
+
 @dataclasses.dataclass(slots=True)
-class Element(HotmetalCallable):
+class Element(HotmetalClass):
     """
     A callable constructor for a Hotmetal tuple.
 

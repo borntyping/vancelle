@@ -9,9 +9,9 @@ from vancelle.html.bulma.columns import columns
 from vancelle.html.bulma.elements.box import box
 from vancelle.html.bulma.form.file import bulma_file_input
 from vancelle.html.bulma.form.general import form_field
-from vancelle.html.document import a, button, code, div, form, h2, p
-from vancelle.html.hotmetal import Hotmetal
-from vancelle.html.vancelle.components.header import heading, block_section
+from vancelle.html.document import a, button, code, div, form, h3, p, pre
+from vancelle.html.hotmetal import Hotmetal, HotmetalClass
+from vancelle.html.vancelle.components.header import block_section, card_header, page_header, section_header
 from vancelle.html.vancelle.pages.base import page
 from vancelle.inflect import p as inf
 
@@ -36,7 +36,7 @@ def login_page(login_form: LoginForm) -> Hotmetal:
 
 
 @dataclasses.dataclass()
-class ProfilePage:
+class SettingsPage(HotmetalClass):
     import_form: ImportForm
     work_count: int
     filename: str
@@ -44,9 +44,20 @@ class ProfilePage:
     def __call__(self, context: typing.Any) -> Hotmetal:
         return page(
             block_section(
-                heading("User profile", f"@{flask_login.current_user.username}"),
-                columns(self.import_box(), self.export_box()),
-            )
+                page_header("Settings"),
+            ),
+            block_section(
+                section_header("User data", f"This data can only be seen by the current user."),
+                columns(
+                    self.import_box(),
+                    self.export_box(),
+                    self.clear_box(),
+                ),
+            ),
+            block_section(
+                section_header("Application data", "This data is shared by all users of the application."),
+                self.steam_box(),
+            ),
         )
 
     def import_box(self) -> Hotmetal:
@@ -62,7 +73,7 @@ class ProfilePage:
             description_p = p({"class": "block"}, [f"Import from a ", code({}, self.filename), " file."])
 
         return box(
-            h2({"class": "title is-5"}, ["Import data"]),
+            card_header("Import data"),
             description_p,
             form(
                 {"action": flask.url_for("user.import"), "method": "POST", "enctype": "multipart/form-data"},
@@ -82,10 +93,37 @@ class ProfilePage:
 
     def export_box(self) -> Hotmetal:
         return box(
-            h2({"class": "title is-5"}, ["Export data"]),
+            card_header("Export data"),
             p(
                 {"class": "block"},
-                [f"Export {self.work_count} {inf.plural('work', self.work_count)} to a ", code({}, self.filename), " file."],
+                [f"Export {self.work_count} {inf.plural('work', self.work_count)} to ", code({}, self.filename), "."],
             ),
             a({"href": flask.url_for("user.export"), "class": "button is-primary"}, ["Export"]),
+        )
+
+    def clear_box(self) -> Hotmetal:
+        command = code({}, [f"flask user clear --username {flask_login.current_user.username}"])
+
+        return box(
+            card_header("Clear data"),
+            p({"class": "block"}, ["This is only available."]),
+            pre({"class": "block"}, [command]),
+        )
+
+    def steam_box(self) -> Hotmetal:
+        return box(
+            card_header("Steam AppID list"),
+            p(
+                {"class": "block"},
+                [
+                    "Vancelle caches a copy of the Steam AppID list. This is used to "
+                    "search for Steam applications by name. The list is quite large, "
+                    "so expect to wait 30 seconds or so for the list to be downloaded "
+                    "and inserted into the database."
+                ],
+            ),
+            form(
+                {"method": "post", "action": flask.url_for("cache.reload_steam_cache")},
+                [button({"class": "button", "type": "submit"}, ["Reload"])],
+            ),
         )

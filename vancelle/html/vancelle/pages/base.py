@@ -4,18 +4,17 @@ import flask
 
 from vancelle.html.components.title import title
 from vancelle.html.document import document, link, meta, script
-from vancelle.html.hotmetal import Hotmetal
+from vancelle.html.hotmetal import Hotmetal, element
 from vancelle.html.vancelle.components.footer import page_footer
 from vancelle.html.vancelle.components.navbar import page_navbar
 
 
 def content_section(*content: Hotmetal) -> Hotmetal:
-    return ("main", {"class": "section"}, [("div", {"class": "container block"}, list(content))])
+    return element("main", {"class": "section"}, [("div", {"class": "container block"}, list(content))])
 
 
 def page(
-    content: Hotmetal,
-    *,
+    *content: Hotmetal,
     before: Hotmetal | None = None,
     after: Hotmetal | None = None,
 ) -> Hotmetal:
@@ -42,7 +41,7 @@ def page(
     body = [
         page_navbar(),
         before,
-        content_section(content),
+        content_section(*content),
         after,
         page_footer(),
         script("https://unpkg.com/htmx.org@1.9.11/dist/htmx.js"),

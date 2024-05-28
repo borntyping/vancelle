@@ -1,9 +1,12 @@
-from vancelle.html.document import div, h1, header, p, section
+import typing
+
+from vancelle.html.document import div, header, p, section
 from vancelle.html.helpers import html_classes
 from vancelle.html.hotmetal import Hotmetal, element
 
 
-def _header(
+def _complex_header(
+    tag: typing.Literal["h1", "h2"],
     title: str,
     subtitle: str | None,
     fields: Hotmetal | None,
@@ -13,7 +16,7 @@ def _header(
     text = div(
         {},
         [
-            h1({"class": html_classes("title", title_class)}, [title]),
+            element(tag, {"class": html_classes("title", title_class)}, [title]),
             p({"class": html_classes("subtitle", subtitle_class)}, [subtitle]),
         ],
     )
@@ -25,13 +28,33 @@ def _header(
     return header({"class": "block"}, [div({"class": "columns"}, columns)])
 
 
-def heading(title: str, subtitle: str | None = None, fields: Hotmetal | None = None) -> Hotmetal:
-    return _header(title=title, subtitle=subtitle, fields=fields, title_class="is-3", subtitle_class="is-5")
+def _header(
+    tag: typing.Literal["h1", "h2", "h3"],
+    title: str,
+    subtitle: str | None,
+    title_class: str,
+    subtitle_class: str,
+) -> Hotmetal:
+    return header(
+        {"class": "block"},
+        [
+            element(tag, {"class": html_classes("title", title_class)}, [title]),
+            element("p", {"class": html_classes("subtitle", subtitle_class)}, [subtitle]),
+        ],
+    )
 
 
-def subheading(title: str, subtitle: str | None = None, fields: Hotmetal | None = None) -> Hotmetal:
-    return _header(title=title, subtitle=subtitle, fields=fields, title_class="is-3", subtitle_class="is-5")
+def page_header(title: str, subtitle: str | None = None) -> Hotmetal:
+    return _header(tag="h1", title=title, subtitle=subtitle, title_class="is-2", subtitle_class="is-4")
+
+
+def section_header(title: str, subtitle: str | None = None) -> Hotmetal:
+    return _header(tag="h2", title=title, subtitle=subtitle, title_class="is-3", subtitle_class="is-5")
+
+
+def card_header(title: str, subtitle: str | None = None) -> Hotmetal:
+    return _header(tag="h3", title=title, subtitle=subtitle, title_class="is-4", subtitle_class="is-6")
 
 
 def block_section(*children: Hotmetal) -> Hotmetal:
-    return section({"class": "block"}, children)
+    return element("section", {"class": "block"}, children)

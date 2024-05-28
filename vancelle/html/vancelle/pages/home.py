@@ -59,4 +59,4 @@ def _gauges(gauges: typing.Sequence[Gauge]) -> Hotmetal:
 
 
 def home_page(categories: typing.Sequence[str], gauges: typing.Sequence[Gauge]) -> Hotmetal:
-    return page(before=home_page_hero(categories), content=_gauges(gauges))
+    return page(_gauges(gauges), before=home_page_hero(categories))

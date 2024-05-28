@@ -9,27 +9,29 @@ import sqlalchemy
 import sqlalchemy.exc
 import sqlalchemy.orm
 import structlog
-import werkzeug.security
 import werkzeug.exceptions
+import werkzeug.security
 
-from vancelle.controllers.user import UserController
+from vancelle.controllers.settings import ApplicationSettingsController, UserSettingsController
 from vancelle.ext.flask_login import get_user
 from vancelle.extensions import db, login_manager
 from vancelle.forms.user import ImportForm, LoginForm
-from vancelle.html.vancelle.pages.user import login_page, ProfilePage
+from vancelle.html.vancelle.pages.user import SettingsPage, login_page
 from vancelle.models import User
 
 logger = structlog.get_logger(logger_name=__name__)
 
 BACKUP_FILENAME = "vancelle-backup.json.gz"
 
-controller = UserController()
-bp = flask.Blueprint("user", __name__)
+user_settings = UserSettingsController()
+application_settings = ApplicationSettingsController()
+
+bp = flask.Blueprint("user", __name__, url_prefix="/user")
 bp.cli.short_help = "Manage users."
 
 
 @bp.app_errorhandler(werkzeug.exceptions.Unauthorized)
-@bp.route("/users/login", methods={"get", "post"})
+@bp.route("/login", methods={"get", "post"})
 def login(exception: werkzeug.exceptions.Unauthorized | None = None):
     form = LoginForm()
 
@@ -51,42 +53,36 @@ def login(exception: werkzeug.exceptions.Unauthorized | None = None):
     return flask.redirect(flask.url_for("work.index"))
 
 
-@bp.route("/users/logout")
+@bp.route("/logout")
 @flask_login.login_required
 def logout():
     flask_login.logout_user()
     return flask.redirect(flask.url_for("work.index"))
 
 
-@bp.route("/users/profile")
-@bp.route("/users/import", methods={"post"}, endpoint="import")
-def profile():
+@bp.route("/settings")
+@bp.route("/import", methods={"post"}, endpoint="import")
+def settings():
     form = ImportForm()
 
     if form.validate_on_submit():
         data = gzip.decompress(form.backup.data.read()).decode("utf-8")
-        controller.import_json(data, user=flask_login.current_user)
-        return flask.redirect(flask.url_for("user.profile"))
+        user_settings.import_json(data, user=flask_login.current_user)
+        return flask.redirect(flask.url_for(flask.request.endpoint))
 
     work_count = flask_login.current_user.works.count()
     return hotmetal.render(
-        ProfilePage(
+        SettingsPage(
             import_form=form,
             work_count=work_count,
             filename=BACKUP_FILENAME,
         )
     )
-    return flask.render_template(
-        "user/profile.html",
-        form=form,
-        work_count=work_count,
-        filename=BACKUP_FILENAME,
-    )
 
 
-@bp.route("/users/export")
+@bp.route("/export")
 def export():
-    data = controller.export_json(user=flask_login.current_user)
+    data = user_settings.export_json(user=flask_login.current_user)
     return flask.Response(
         response=gzip.compress(data.encode("utf-8")),
         mimetype="application/x-gzip-compressed",
@@ -94,13 +90,15 @@ def export():
     )
 
 
-@bp.route("/users/")
-@flask_login.login_required
-def index():
-    users = db.paginate(
-        sqlalchemy.select(User).order_by(User.username).options(sqlalchemy.orm.load_only(User.id, User.username))
-    )
-    return flask.render_template("user/index.html", users=users)
+@bp.route("/reload-steam-cache")
+def reload_steam_cache():
+    application_settings.reload_steam_cache()
+    return flask.redirect(flask.url_for(".settings"))
+
+
+@bp.cli.command("reload-steam-cache")
+def cli_reload_steam_cache():
+    application_settings.reload_steam_cache()
 
 
 @login_manager.user_loader

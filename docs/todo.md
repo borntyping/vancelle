@@ -20,6 +20,7 @@ Improvements
 ------------
 
 * Add `[+]` button to `[n items]` tags on board columns.
+* Imported Goodreads book should have a "search this exact ID on goodreads" button.
 
 Bugs
 ----

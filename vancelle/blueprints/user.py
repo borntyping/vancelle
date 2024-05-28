@@ -47,7 +47,7 @@ def login(exception: werkzeug.exceptions.Unauthorized | None = None):
         return hotmetal.render(login_page(login_form=form))
 
     flask_login.login_user(user, remember=True)
-    flask.flash(f"Logged in as {user.username}", "Logged in")
+    flask.flash(f"Logged in as {user.username}.", "Logged in")
     return flask.redirect(flask.url_for("work.index"))
 
 

@@ -35,7 +35,8 @@ $x-board-card-cover: 2fr;
   padding: 1em;
 
   // Show a dense layout when we're filtering shelves.
-  &:not([data-work-shelf="all"][data-work-shelf-group="all"]) {
+  &.x-board-auto:not([data-work-shelf="all"][data-work-shelf-group="all"]),
+  &.x-board-horizontal {
     grid-template-columns: repeat(6, 1fr);
     grid-auto-flow: row;
     grid-auto-rows: minmax(0, 1fr);
@@ -46,7 +47,8 @@ $x-board-card-cover: 2fr;
   }
 
   // Show a "kanban" style board layout when all shelf groups are selected
-  &[data-work-shelf="all"][data-work-shelf-group="all"] {
+  &.x-board-auto[data-work-shelf="all"][data-work-shelf-group="all"],
+  &.x-board-vertical {
     grid-auto-flow: column;
 
     @include mixins.until-widescreen {

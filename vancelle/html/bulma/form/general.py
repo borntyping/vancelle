@@ -1,14 +1,14 @@
 import typing
 
-import hotmetal
+import markupsafe
 import structlog
 import wtforms
 import wtforms.csrf.core
 
 from vancelle.html.bulma.elements.icon import icon
-from vancelle.html.document import p
 from vancelle.html.helpers import html_classes
-from vancelle.html.hotmetal import Hotmetal, element
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalElement
+from vancelle.lib.heavymetal.html import p
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -47,13 +47,13 @@ def form_field(
     icon_left: str | None = None,
     icon_right: str | None = None,
     **kwargs: typing.Any,
-) -> Hotmetal:
+) -> Heavymetal:
     if isinstance(field, wtforms.csrf.core.CSRFTokenField):
-        return hotmetal.safe(field)
+        return markupsafe.Markup(field)
 
-    input_element = hotmetal.safe(_render(field, **kwargs))
+    input_element = markupsafe.Markup(_render(field, **kwargs))
 
-    control_element = element("div", {"class": "control"}, [input_element])
+    control_element = HeavymetalElement("div", {"class": "control"}, [input_element])
     if icon_left:
         control_element.attrs["class"] += " has-icons-left"
         control_element.children.append(icon(icon_left, "is-small", "is-left"))
@@ -61,7 +61,7 @@ def form_field(
         control_element.attrs["class"] += " has-icons-right"
         control_element.children.append(icon(icon_right, "is-small", "is-right"))
 
-    field_element = element("div", {"class": "field"}, [control_element])
+    field_element = HeavymetalElement("div", {"class": "field"}, [control_element])
     if label:
         field_element.children.insert(0, field.label(class_="label"))
     for error in field.errors:

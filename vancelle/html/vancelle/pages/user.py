@@ -9,14 +9,14 @@ from vancelle.html.bulma.columns import columns
 from vancelle.html.bulma.elements.box import box
 from vancelle.html.bulma.form.file import bulma_file_input
 from vancelle.html.bulma.form.general import form_field
-from vancelle.html.document import a, button, code, div, form, h3, p, pre
-from vancelle.html.hotmetal import Hotmetal, HotmetalClass
+from vancelle.lib.heavymetal.html import a, button, code, div, form, h3, p, pre
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.html.vancelle.components.header import block_section, card_header, page_header, section_header
 from vancelle.html.vancelle.pages.base import page
 from vancelle.inflect import p as inf
 
 
-def login_page(login_form: LoginForm) -> Hotmetal:
+def login_page(login_form: LoginForm) -> Heavymetal:
     return page(
         div(
             {"class": "container is-max-desktop"},
@@ -36,12 +36,12 @@ def login_page(login_form: LoginForm) -> Hotmetal:
 
 
 @dataclasses.dataclass()
-class SettingsPage(HotmetalClass):
+class SettingsPage(HeavymetalComponent):
     import_form: ImportForm
     work_count: int
     filename: str
 
-    def __call__(self, context: typing.Any) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         return page(
             block_section(
                 page_header("Settings"),
@@ -60,7 +60,7 @@ class SettingsPage(HotmetalClass):
             ),
         )
 
-    def import_box(self) -> Hotmetal:
+    def import_box(self) -> Heavymetal:
         error_elements = [p({"class": "help is-danger"}, [str(error)]) for error in self.import_form.backup.errors]
         import_button = button({"class": "button", "type": "submit", "disabled": self.work_count > 0}, ["Import"])
 
@@ -91,7 +91,7 @@ class SettingsPage(HotmetalClass):
             ),
         )
 
-    def export_box(self) -> Hotmetal:
+    def export_box(self) -> Heavymetal:
         return box(
             card_header("Export data"),
             p(
@@ -101,7 +101,7 @@ class SettingsPage(HotmetalClass):
             a({"href": flask.url_for("user.export"), "class": "button is-primary"}, ["Export"]),
         )
 
-    def clear_box(self) -> Hotmetal:
+    def clear_box(self) -> Heavymetal:
         command = code({}, [f"flask user clear --username {flask_login.current_user.username}"])
 
         return box(
@@ -110,7 +110,7 @@ class SettingsPage(HotmetalClass):
             pre({"class": "block"}, [command]),
         )
 
-    def steam_box(self) -> Hotmetal:
+    def steam_box(self) -> Heavymetal:
         return box(
             card_header("Steam AppID list"),
             p(

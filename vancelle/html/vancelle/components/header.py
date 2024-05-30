@@ -1,18 +1,18 @@
 import typing
 
-from vancelle.html.document import div, header, p, section
+from vancelle.lib.heavymetal.html import div, element, header, p
 from vancelle.html.helpers import html_classes
-from vancelle.html.hotmetal import Hotmetal, element
+from vancelle.lib.heavymetal import Heavymetal
 
 
 def _complex_header(
     tag: typing.Literal["h1", "h2"],
     title: str,
     subtitle: str | None,
-    fields: Hotmetal | None,
+    fields: Heavymetal | None,
     title_class: str,
     subtitle_class: str,
-) -> Hotmetal:
+) -> Heavymetal:
     text = div(
         {},
         [
@@ -34,7 +34,7 @@ def _header(
     subtitle: str | None,
     title_class: str,
     subtitle_class: str,
-) -> Hotmetal:
+) -> Heavymetal:
     return header(
         {"class": "block"},
         [
@@ -44,17 +44,17 @@ def _header(
     )
 
 
-def page_header(title: str, subtitle: str | None = None) -> Hotmetal:
+def page_header(title: str, subtitle: str | None = None) -> Heavymetal:
     return _header(tag="h1", title=title, subtitle=subtitle, title_class="is-2", subtitle_class="is-4")
 
 
-def section_header(title: str, subtitle: str | None = None) -> Hotmetal:
+def section_header(title: str, subtitle: str | None = None) -> Heavymetal:
     return _header(tag="h2", title=title, subtitle=subtitle, title_class="is-3", subtitle_class="is-5")
 
 
-def card_header(title: str, subtitle: str | None = None) -> Hotmetal:
+def card_header(title: str, subtitle: str | None = None) -> Heavymetal:
     return _header(tag="h3", title=title, subtitle=subtitle, title_class="is-4", subtitle_class="is-6")
 
 
-def block_section(*children: Hotmetal) -> Hotmetal:
+def block_section(*children: Heavymetal) -> Heavymetal:
     return element("section", {"class": "block"}, children)

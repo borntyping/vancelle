@@ -48,5 +48,5 @@ services:
       - '--username=${VANCELLE_CREATE_USER_USERNAME}'
       - '--password=${VANCELLE_CREATE_USER_PASSWORD}'
     depends_on:
-      vancelle-user-create:
+      vancelle-db-upgrade:
         condition: 'service_completed_successfully'

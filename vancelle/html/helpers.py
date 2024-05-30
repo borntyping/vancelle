@@ -1,6 +1,5 @@
 import typing
 
-from vancelle.html.hotmetal import HotmetalAttrs
 from vancelle.inflect import p
 
 HtmlClasses = str | typing.Mapping[str, bool] | typing.Iterable[str] | None
@@ -27,10 +26,8 @@ def html_classes(*names: HtmlClasses) -> str:
     return " ".join(_classnames_flatten(names))
 
 
-def merge_attrs(a: HotmetalAttrs, b: HotmetalAttrs) -> HotmetalAttrs:
-    merged = {"class": html_classes(a.get("class", None), b.get("class", None))}
+def count_plural(word: str, count: int) -> str:
+    if not isinstance(count, int):
+        raise ValueError("Count must be a number")
 
-    if duplicates := set(a.keys() - {"class"}) & set(b.keys() - {"class"}):
-        raise Exception(f"Duplicate attributes: {p.join(list(duplicates))}")
-
-    return a | b | merged
+    return f"{count} {p.plural(word, count)}"

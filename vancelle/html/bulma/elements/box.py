@@ -1,9 +1,6 @@
-import frozendict
-
-from vancelle.html.document import div
-from vancelle.html.helpers import merge_attrs
-from vancelle.html.hotmetal import Hotmetal, HotmetalAttrs, HotmetalChildren
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalChildren
+from vancelle.lib.heavymetal.html import div
 
 
-def box(*children: HotmetalChildren, attrs: HotmetalAttrs = frozendict.frozendict()) -> Hotmetal:
-    return div(attrs=merge_attrs({"class": "box"}, attrs), children=children)
+def box(*children: HeavymetalChildren) -> Heavymetal:
+    return div({"class": "box"}, children=children)

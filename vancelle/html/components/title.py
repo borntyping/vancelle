@@ -1,5 +1,7 @@
-from vancelle.html.hotmetal import Hotmetal, element
+from vancelle.lib.heavymetal import Heavymetal
+from vancelle.lib.heavymetal.html import title
 
 
-def title(*parts: str) -> Hotmetal:
-    return element("title", {}, [" - ".join(["Vancelle", *parts])])
+def vancelle_title(*parts: str) -> Heavymetal:
+    name = " - ".join(["Vancelle", *parts])
+    return title({}, [name])

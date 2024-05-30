@@ -1,6 +1,6 @@
-from vancelle.html.document import div
-from vancelle.html.hotmetal import Hotmetal
+from vancelle.lib.heavymetal.html import div
+from vancelle.lib.heavymetal import Heavymetal
 
 
-def columns(*children: Hotmetal) -> Hotmetal:
+def columns(*children: Heavymetal) -> Heavymetal:
     return div({"class": "columns "}, [div({"class": "column"}, [c]) for c in children])

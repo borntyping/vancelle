@@ -1,15 +1,15 @@
-from vancelle.html.document import div, label, span
-from vancelle.html.hotmetal import Hotmetal, element
+from vancelle.lib.heavymetal.html import div, element, label, span, input_
+from vancelle.lib.heavymetal import Heavymetal
 
 
-def bulma_file_input(name: str) -> Hotmetal:
+def bulma_file_input(name: str) -> Heavymetal:
     return div(
         {"class": "file has-name is-fullwidth"},
         [
             label(
                 {"class": "file-label"},
                 [
-                    element("input", {"class": "file-input", "type": "file", "name": name}, ()),
+                    input_({"class": "file-input", "type": "file", "name": name}, ()),
                     span({"class": "file-cta"}, [span({"class": "file-label"}, ["Choose a file..."])]),
                     span({"class": "file-name"}, ()),
                 ],

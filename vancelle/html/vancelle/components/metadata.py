@@ -1,18 +1,33 @@
+import datetime
+
+import humanize
+
 from vancelle.extensions import html
 from vancelle.html.bulma.elements.icon import icon
-from vancelle.html.document import a, span
-from vancelle.html.hotmetal import Hotmetal
+from vancelle.lib.heavymetal.html import a, span
+from vancelle.lib.heavymetal import Heavymetal
 
 
-def absent() -> Hotmetal:
-    return span({"class": "x-absent"}, html.ABSENT)
+ABSENT = "—"
 
 
-def url(href: str, text: str | None) -> Hotmetal:
+def span_absent() -> Heavymetal:
+    return span({"class": "x-absent"}, [ABSENT])
+
+
+def maybe_string(value: str | None) -> str:
+    return str(value) if value else ABSENT
+
+
+def maybe_span(string: str | None) -> Heavymetal:
+    return span({}, [string]) if string is not None else span_absent()
+
+
+def url(href: str, text: str | None) -> Heavymetal:
     return span({}, [text or html.pretty_url(href)])
 
 
-def internal_url(href: str, text: str | None = None) -> Hotmetal:
+def internal_url(href: str, text: str | None = None) -> Heavymetal:
     return a(
         {
             "href": href,
@@ -22,7 +37,7 @@ def internal_url(href: str, text: str | None = None) -> Hotmetal:
     )
 
 
-def external_url(href: str, text: str | None = None) -> Hotmetal:
+def external_url(href: str, text: str | None = None) -> Heavymetal:
     return a(
         {
             "href": href,
@@ -33,3 +48,10 @@ def external_url(href: str, text: str | None = None) -> Hotmetal:
         },
         [icon("exit-outline"), url(href, text)],
     )
+
+
+def span_date(d: datetime.date | None) -> Heavymetal:
+    if not isinstance(d, datetime.date):
+        raise ValueError(f"Not a date: {d!r}")
+
+    return span({"class": "x-has-tabular-nums", "title": str(d)}, [humanize.naturaldate(d)])

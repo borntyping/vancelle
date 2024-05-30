@@ -5,6 +5,8 @@ import wsgiref.types
 import flask
 import svcs.flask
 
+from .converters import WorkTypeConverter
+from .blueprints.board.blueprint import bp as bp_board
 from .blueprints.bulma import bp as bp_bulma
 from .blueprints.data import bp as bp_data
 from .blueprints.errors import bp as bp_errors
@@ -35,6 +37,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
     app.config.from_mapping(config)
     app.config.from_prefixed_env("VANCELLE")
+    app.url_map.converters["work_type"] = WorkTypeConverter
 
     svcs.flask.init_app(app)
 
@@ -57,6 +60,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     html.init_app(app)
     htmx.init_app(app)
 
+    app.register_blueprint(bp_board)
     app.register_blueprint(bp_bulma)
     app.register_blueprint(bp_errors)
     app.register_blueprint(bp_health)

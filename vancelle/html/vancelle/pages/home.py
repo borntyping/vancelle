@@ -6,25 +6,25 @@ import flask_login
 import sqlalchemy
 
 from vancelle.extensions import db
-from vancelle.html.hotmetal import Hotmetal, HotmetalClass, element
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
+from vancelle.lib.heavymetal.html import a, div, section
+from vancelle.html.helpers import html_classes
 from vancelle.inflect import p
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
 from .base import page
-from ...helpers import html_classes
 
 
 @dataclasses.dataclass()
-class HomePageGauge(HotmetalClass):
+class HomePageGauge(HeavymetalComponent):
     count: int
     title: str
     href: str
     colour: str
 
-    def __call__(self, context: typing.Any) -> Hotmetal:
-        return element(
-            "a",
+    def heavymetal(self) -> Heavymetal:
+        return a(
             {
                 "href": self.href,
                 "class": html_classes(
@@ -42,7 +42,7 @@ class HomePageGauge(HotmetalClass):
         )
 
 
-class HomePageGauges(HotmetalClass):
+class HomePageGauges(HeavymetalComponent):
     def _count_works(self) -> int:
         query = (
             sqlalchemy.select(sqlalchemy.func.count())
@@ -86,25 +86,22 @@ class HomePageGauges(HotmetalClass):
             url = flask.url_for("work.index", remote_type=cls.remote_type())
             yield HomePageGauge(count, cls.info.noun_full_plural, url, cls.info.colour)
 
-    def __call__(self, context: typing.Any) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         gauges = sorted(self, key=lambda g: g.count, reverse=True)
-        return element(
-            "div",
+        return div(
             {"class": "columns is-multiline is-mobile is-centered"},
-            [element("div", {"class": "column is-half-mobile is-one-fifth-desktop"}, [g]) for g in gauges],
+            [div({"class": "column is-half-mobile is-one-fifth-desktop"}, [g]) for g in gauges],
         )
 
 
-class HomePageHero(HotmetalClass):
+class HomePageHero(HeavymetalComponent):
     categories: list[str] = [cls.info.noun_plural for cls in Work.iter_subclasses()]
 
-    def __call__(self, context: typing.Any) -> Hotmetal:
-        return (
-            "section",
+    def heavymetal(self) -> Heavymetal:
+        return section(
             {"class": "hero is-medium is-primary"},
             [
-                (
-                    "div",
+                div(
                     {"class": "hero-body has-text-centered"},
                     [
                         ("h1", {"class": "title is-2"}, "Vancelle"),
@@ -118,6 +115,6 @@ class HomePageHero(HotmetalClass):
 
 
 @dataclasses.dataclass()
-class HomePage(HotmetalClass):
-    def __call__(self, context: typing.Any) -> Hotmetal:
+class HomePage(HeavymetalComponent):
+    def heavymetal(self) -> Heavymetal:
         return page(HomePageGauges(), before=HomePageHero())

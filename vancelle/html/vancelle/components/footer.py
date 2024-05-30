@@ -1,34 +1,34 @@
 import flask
 
-from vancelle.html.document import a, img, whitespace
-from vancelle.html.hotmetal import Hotmetal, HotmetalAttrs
+from vancelle.lib.heavymetal.html import a, img
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs
 from vancelle.html.vancelle.elements.picture import light_dark_img
 
 
-def toggle_theme(attributes: HotmetalAttrs) -> Hotmetal:
+def toggle_theme(attributes: HeavymetalAttrs) -> Heavymetal:
     return ("a", {**attributes, "data-theme-toggle": ""}, [f"Toggle light/dark mode."])
 
 
-def created_by() -> Hotmetal:
+def created_by() -> Heavymetal:
     author = a({"href": "https://borntyping.co.uk"}, "@borntyping")
     return ("span", {}, ["Created by ", author, ". "])
 
 
-def source_code() -> Hotmetal:
+def source_code() -> Heavymetal:
     source = a({"href": "https://github.com/borntyping/vancelle"}, "github.com/borntyping/vancelle")
     return ("span", {}, ["Source code at ", source, "."])
 
 
-def tmdb_notice() -> Hotmetal:
+def tmdb_notice() -> Heavymetal:
     """TMDB terms of use require this notice: https://developer.themoviedb.org/docs/faq"""
     return ("span", {}, ["This product uses the TMDB API but is not endorsed or certified by TMDB."])
 
 
-def dependency_logo(name: str, *, id: str, href: str, src: str) -> Hotmetal:
-    return a({"href": href, "id": id, "title": name}, [img(src=src, alt=name, style="height: 2em !important")])
+def dependency_logo(name: str, *, id: str, href: str, src: str) -> Heavymetal:
+    return a({"href": href, "id": id, "title": name}, [img({"src": src, "alt": name, "style": "height: 2em !important"})])
 
 
-def page_footer() -> Hotmetal:
+def page_footer() -> Heavymetal:
     """
     Open Library requests a "courtesy link". https://openlibrary.org/dev/docs/api/covers
     TMDB terms of use require a notice: https://developer.themoviedb.org/docs/faq
@@ -68,15 +68,15 @@ def page_footer() -> Hotmetal:
                             ),
                             a(
                                 {"id": "openlibrary", "href": "https://openlibrary.org", "title": "Open Library"},
-                                [img(src=flask.url_for("static", filename="img/openlibrary.svg"), alt="Open Library")],
+                                [img({"src": flask.url_for("static", filename="img/openlibrary.svg"), "alt": "Open Library"})],
                             ),
                             a(
                                 {"id": "tmdb", "href": "https://www.themoviedb.org", "title": "The Movie Database"},
-                                [img(src=flask.url_for("static", filename="img/tmdb.svg"), alt="The Movie Database")],
+                                [img({"src": flask.url_for("static", filename="img/tmdb.svg"), "alt": "The Movie Database"})],
                             ),
                             a(
                                 {"id": "steam", "href": "https://store.steampowered.com", "title": "Steam"},
-                                [img(src=flask.url_for("static", filename="img/steam.svg"), alt="Steam")],
+                                [img({"src": flask.url_for("static", filename="img/steam.svg"), "alt": "Steam"})],
                             ),
                         ],
                     ),
@@ -85,7 +85,7 @@ def page_footer() -> Hotmetal:
                         {"class": "has-text-grey"},
                         [
                             tmdb_notice(),
-                            whitespace(),
+                            " ",
                             toggle_theme({"class": "has-text-grey"}),
                         ],
                     ),

@@ -1,10 +1,10 @@
 import typing
 
 from vancelle.html.helpers import html_classes
-from vancelle.html.hotmetal import Hotmetal
+from vancelle.lib.heavymetal import Heavymetal
 
 
-def navbar(brand: Hotmetal, menu: Hotmetal) -> Hotmetal:
+def navbar(brand: Heavymetal, menu: Heavymetal) -> Heavymetal:
     return (
         "nav",
         {"class": "navbar is-primary"},
@@ -21,7 +21,7 @@ def navbar(brand: Hotmetal, menu: Hotmetal) -> Hotmetal:
     )
 
 
-def navbar_brand(name: str, href: str) -> Hotmetal:
+def navbar_brand(name: str, href: str) -> Heavymetal:
     return (
         "div",
         {"class": "navbar-brand"},
@@ -32,7 +32,7 @@ def navbar_brand(name: str, href: str) -> Hotmetal:
     )
 
 
-def navbar_burger() -> Hotmetal:
+def navbar_burger() -> Heavymetal:
     return (
         "a",
         {"class": "navbar-burger", "_": "on click toggle .is-active on .navbar-menu"},
@@ -44,7 +44,7 @@ def navbar_burger() -> Hotmetal:
     )
 
 
-def navbar_menu(start: typing.Iterable[Hotmetal], end: typing.Iterable[Hotmetal]) -> Hotmetal:
+def navbar_menu(start: typing.Iterable[Heavymetal], end: typing.Iterable[Heavymetal]) -> Heavymetal:
     return (
         "div",
         {"class": "navbar-menu"},
@@ -55,11 +55,11 @@ def navbar_menu(start: typing.Iterable[Hotmetal], end: typing.Iterable[Hotmetal]
     )
 
 
-def navbar_item(title: str, href: str, active: bool = False) -> Hotmetal:
+def navbar_item(title: str, href: str, active: bool = False) -> Heavymetal:
     return ("a", {"class": html_classes("navbar-item", {"is-active": active}), "href": href}, [title])
 
 
-def navbar_item_dropdown(name: str, *items: typing.Iterable[Hotmetal], is_right: bool = False) -> Hotmetal:
+def navbar_item_dropdown(name: str, *items: typing.Iterable[Heavymetal], is_right: bool = False) -> Heavymetal:
     return (
         "div",
         {
@@ -73,5 +73,5 @@ def navbar_item_dropdown(name: str, *items: typing.Iterable[Hotmetal], is_right:
     )
 
 
-def navbar_divider() -> Hotmetal:
+def navbar_divider() -> Heavymetal:
     return ("hr", {"class": "navbar-divider"}, [])

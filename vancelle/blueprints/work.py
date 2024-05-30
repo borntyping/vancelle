@@ -16,7 +16,6 @@ from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
-from vancelle.html.vancelle.pages.home import HomePage
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
 from vancelle.shelf import Case, Shelf
@@ -78,10 +77,12 @@ class WorkIndexForm(flask_wtf.FlaskForm):
     layout = wtforms.SelectField(
         label="Layout",
         choices=[
+            ("vertical", "Vertical"),
+            ("horizontal", "Horizontal"),
             ("board", "Board"),
             ("list", "List"),
         ],
-        default="board",
+        default="vertical",
         widget=BulmaSelect(),
         validators=[DataRequired()],
     )

@@ -6,9 +6,9 @@ import flask
 import hotmetal
 import structlog
 
-from vancelle.html.document import span
-from vancelle.html.hotmetal import Hotmetal
-from vancelle.html.vancelle.components.metadata import absent, external_url, internal_url
+from vancelle.lib.heavymetal.html import span
+from vancelle.lib.heavymetal import Heavymetal
+from vancelle.html.vancelle.components.metadata import span_absent, external_url, internal_url
 from vancelle.inflect import p
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -23,11 +23,11 @@ class Property:
 
     def __str__(self) -> str:
         if not self:
-            return hotmetal.render(absent())
+            return hotmetal.render(span_absent())
 
-        return hotmetal.render(self.html())
+        return hotmetal.render(self.heavymetal())
 
-    def html(self) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         raise NotImplementedError
 
     @staticmethod
@@ -45,7 +45,7 @@ class StringProperty(Property):
     def __bool__(self) -> bool:
         return bool(self.value)
 
-    def html(self) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         return span({}, str(self.value))
 
 
@@ -58,7 +58,7 @@ class TimeProperty(Property):
     def __bool__(self) -> bool:
         return self.value is not None
 
-    def html(self) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         return span({}, str(self.value))
 
 
@@ -72,7 +72,7 @@ class InternalUrlProperty(Property):
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
 
-    def html(self) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         return internal_url(href=self.link, text=self.text)
 
 
@@ -86,7 +86,7 @@ class ExternalUrlProperty(Property):
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
 
-    def html(self) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         return external_url(href=self.link, text=self.text)
 
 
@@ -103,7 +103,7 @@ class IterableProperty(Property):
     def __iter__(self):
         return sorted(self.items) if self.sorted else iter(self.items)
 
-    def html(self) -> Hotmetal:
+    def heavymetal(self) -> Heavymetal:
         return span({}, p.join([str(item) for item in self]))
 
 

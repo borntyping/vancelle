@@ -4,7 +4,7 @@
 
 {% macro board_card(work, details, colour) %}
   <div class="x-board-card box p-0 m-0 has-background-{{ colour }}-light" title="{{ details }}">
-    <div class="x-board-details p-3 is-flex is-flex-direction-column is-justify-content-space-between">
+    <div class="x-board-detail p-3 is-flex is-flex-direction-column is-justify-content-space-between">
       <div>
         <p class="title is-7"><a href="{{ work.url_for() }}">{{ details.title|absent }}</a></p>
         <p class="subtitle is-7 mb-3">

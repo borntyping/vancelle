@@ -1,6 +1,7 @@
 import datetime
 
 import humanize
+import markupsafe
 
 from vancelle.extensions import html
 from vancelle.html.bulma.elements.icon import icon
@@ -54,4 +55,6 @@ def span_date(d: datetime.date | None) -> Heavymetal:
     if not isinstance(d, datetime.date):
         raise ValueError(f"Not a date: {d!r}")
 
-    return span({"class": "x-has-tabular-nums", "title": str(d)}, [humanize.naturaldate(d)])
+    formatted = humanize.naturaldate(d)
+    joined = markupsafe.Markup(formatted.replace(" ", "&nbsp;"))
+    return span({"class": "x-has-tabular-nums", "title": str(d)}, [joined])

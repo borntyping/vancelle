@@ -1,7 +1,19 @@
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/mixins";
 
-$theme-colors: map-merge($theme-colors, ("primary": $blue-800));
+@import "vancelle/theme";
+@import "vancelle/components/board";
+
+$font-sizes: map-merge($font-sizes, (
+        7: $font-size-base * 0.75,
+        8: $font-size-base * 0.50,
+        9: $font-size-base * 0.25,
+));
+
+$theme-colors: map-merge($theme-colors, (
+        "primary": $blue-800,
+));
 
 @import "bootstrap/scss/bootstrap";

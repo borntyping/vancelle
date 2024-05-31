@@ -24,15 +24,23 @@ def duration_span(start: datetime.date | None, stop: datetime.date | None) -> He
     if start and stop and start == stop:
         return span_date(start)
 
-    return fragment([span_date(start) if start else "", markupsafe.Markup("&mdash;"), span_date(stop) if stop else ""])
+    return fragment([span_date(start) if start else "", markupsafe.Markup(" &mdash; "), span_date(stop) if stop else ""])
 
 
-def work_card(work: Work) -> Heavymetal:
+def work_board_item(shelf: Shelf, work: Work) -> Heavymetal:
     details = work.resolve_details()
 
-    title = [a({"href": work.url_for()}, [maybe_span(details.title)])]
-    subtitle = [release_date(details.release_date), ", ", maybe_span(details.author)]
-    duration = [duration_span(work.date_first, work.date_last)]
+    title = a(
+        {
+            "class": html_classes(["stretched-link", "text-decoration-none", "text-primary-emphasis"]),
+            "href": work.url_for(),
+        },
+        [
+            maybe_span(details.title),
+        ],
+    )
+    subtitle = fragment([release_date(details.release_date), ", ", maybe_span(details.author)])
+    duration = duration_span(work.date_first, work.date_last)
 
     if details.cover:
         cover = [img({"src": details.cover, "alt": f"Cover for {details}.", "loading": "lazy"})]
@@ -40,52 +48,61 @@ def work_card(work: Work) -> Heavymetal:
         cover = []
 
     return div(
-        {"class": "x-board-card box p-0 m-0", "title": str(details)},
+        {
+            "class": html_classes(
+                ["x-board-item", "x-board-card"],
+                ["overflow-hidden", "position-relative"],
+                ["border", "rounded", "shadow-sm", "bg-body-tertiary"],
+            ),
+            "data-shelf": str(shelf.value),
+            "title": str(details),
+        },
         [
             div(
                 {
-                    "class": "x-board-details p-3 is-flex is-flex-direction-column is-justify-content-space-between",
+                    "class": html_classes(
+                        ["x-board-detail"],
+                        ["d-flex", "flex-column", "justify-content-between"],
+                        ["p-2"],
+                    ),
                     "title": str(details),
                 },
                 [
                     div(
                         {},
                         [
-                            h3({"class": "title is-7"}, title),
-                            p({"class": "subtitle is-7  mb-3"}, subtitle),
+                            h3({"class": "x-board-line fs-7 fw-bold"}, [title]),
+                            span({"class": "x-board-line fs-7"}, [subtitle]),
                         ],
                     ),
-                    div({}, [p({"class": "is-size-7"}, duration)]),
+                    div(
+                        {},
+                        [
+                            span({"class": "x-board-line fs-7"}, [duration]),
+                        ],
+                    ),
                 ],
             ),
-            figure({"class": "has-background-primary-soft"}, cover),
+            figure({"class": "m-0 p-0 bg-primary-subtle"}, cover),
         ],
     )
-
-
-def work_board_item(shelf: Shelf, work: Work) -> Heavymetal:
-    return div({"class": "x-board-item", "data-shelf": str(shelf.value)}, [work_card(work)])
 
 
 def shelf_board_item(shelf: Shelf, count: int) -> Heavymetal:
     return div(
         {
             "class": html_classes(
-                "x-board-item",
-                "x-board-item-header",
-                "is-flex",
-                "is-flex-direction-column",
-                "is-justify-content-center",
-                "is-align-items-center",
-                "has-text-centered",
+                ["x-board-item", "x-board-item-header"],
+                ["d-flex", "flex-column", "align-items-center", "justify-content-center"],
+                ["overflow-hidden", "fs-6", "has-text-centered"],
             ),
             "data-shelf": str(shelf.value),
             "data-count": str(count),
         },
         [
-            h3({"class": "title is-4"}, [shelf.title]),
-            p({"class": "subtitle is-7"}, [shelf.description]),
-            p({"class": html_classes("block", "tag", "is-size-7")}, [count_plural("item", count)]),
+            h3({"class": "display-7"}, [shelf.title]),
+            p({"class": "fs-7"}, [shelf.description]),
+            span({"class": "badge bg-primary rounded-pill"}, [count_plural("item", count)]),
         ],
     )
 

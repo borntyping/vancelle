@@ -1,0 +1,131 @@
+@import "bootstrap/scss/mixins";
+
+$x-board-card-detail: 3fr;
+$x-board-card-cover: 2fr;
+
+.x-board-card {
+  display: grid !important;
+  grid-template-columns: $x-board-card-detail $x-board-card-cover;
+  overflow: hidden;
+  //height: 100%;
+
+  .x-board-detail {
+    grid-column: 1 !important;
+
+    .x-board-line {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  figure {
+    grid-column: 2 !important;
+
+    img {
+      object-fit: cover;
+      aspect-ratio: 2/3;
+
+      height: 100%;
+      width: 100%;
+    }
+  }
+}
+
+.x-board {
+  display: grid;
+  grid-gap: 1em;
+
+  // Add a margin around screenshots without affecting layout.
+  margin: -1em;
+  padding: 1em;
+
+  &.x-board-horizontal {
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-flow: row;
+    grid-auto-rows: minmax(0, 1fr);
+
+    .x-board-item-header:not([data-count="0"]) {
+      grid-column: 1 !important;
+    }
+  }
+
+  &.x-board-vertical {
+    grid-auto-flow: column;
+    grid-template-rows: none;
+    grid-auto-rows: min-content;
+
+    @include media-breakpoint-down(xl) {
+      grid-template-columns: 1fr 1fr;
+
+      .x-board-item {
+        min-width: 0;
+
+        &[data-shelf="unsorted"],
+        &[data-shelf="unreleased"],
+        &[data-shelf="undecided"],
+        &[data-shelf="upcoming"],
+        &[data-shelf="returning"],
+        &[data-shelf="reference"],
+        &[data-shelf="abandoned"],
+        &[data-shelf="untouched"] {
+          grid-column: 1;
+        }
+
+        &[data-shelf="playing"],
+        &[data-shelf="replaying"],
+        &[data-shelf="ongoing"],
+        &[data-shelf="infinite"],
+        &[data-shelf="paused"],
+        &[data-shelf="shelved"],
+        &[data-shelf="completed"] {
+          grid-column: 2;
+        }
+      }
+    }
+    @include media-breakpoint-up(xl) {
+      grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
+
+      .x-board-item {
+        min-width: 0;
+
+        &[data-shelf="unsorted"],
+        &[data-shelf="unreleased"],
+        &[data-shelf="undecided"] {
+          grid-column: 1;
+        }
+
+        &[data-shelf="upcoming"],
+        &[data-shelf="returning"] {
+          grid-column: 2;
+        }
+
+        &[data-shelf="playing"],
+        &[data-shelf="replaying"],
+        &[data-shelf="ongoing"],
+        &[data-shelf="infinite"] {
+          grid-column: 3;
+
+          &.x-board-card {
+            grid-template-columns: calc($x-board-card-detail + $x-board-card-cover + $x-board-card-detail)  $x-board-card-cover;
+          }
+        }
+
+        &[data-shelf="paused"],
+        &[data-shelf="shelved"],
+        &[data-shelf="reference"] {
+          grid-column: 4;
+        }
+
+        &[data-shelf="completed"],
+        &[data-shelf="abandoned"],
+        &[data-shelf="untouched"] {
+          grid-column: 5;
+        }
+      }
+    }
+  }
+}

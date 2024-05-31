@@ -33,6 +33,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app = flask.Flask("vancelle")
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
+    app.config["DEBUG_TB_ENABLED"] = False
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
     app.config.from_mapping(config)

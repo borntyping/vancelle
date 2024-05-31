@@ -16,7 +16,7 @@ from vancelle.controllers.settings import ApplicationSettingsController, UserSet
 from vancelle.ext.flask_login import get_user
 from vancelle.extensions import db, login_manager
 from vancelle.forms.user import ImportForm, LoginForm
-from vancelle.html.vancelle.pages.user import SettingsPage, login_page
+from vancelle.html.vancelle.pages.user import LoginPage, SettingsPage
 from vancelle.models import User
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -34,19 +34,20 @@ bp.cli.short_help = "Manage users."
 @bp.route("/login", methods={"get", "post"})
 def login(exception: werkzeug.exceptions.Unauthorized | None = None):
     form = LoginForm()
+    page = LoginPage(form)
 
     if not form.validate_on_submit():
-        return hotmetal.render(login_page(login_form=form))
+        return page.render()
 
     try:
         user = db.session.execute(sqlalchemy.select(User).filter_by(username=form.username.data)).scalar_one()
     except sqlalchemy.exc.NoResultFound:
         form.username.errors.append("Unknown username")
-        return hotmetal.render(login_page(login_form=form))
+        return page.render()
 
     if not werkzeug.security.check_password_hash(user.password, form.password.data):
         form.password.errors.append("Incorrect password")
-        return hotmetal.render(login_page(login_form=form))
+        return page.render()
 
     flask_login.login_user(user, remember=True)
     flask.flash(f"Logged in as {user.username}.", "Logged in")

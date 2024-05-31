@@ -13,7 +13,7 @@ from .types import (
     Heavymetal,
     HeavymetalAttrs,
     HeavymetalCallable,
-    HeavymetalChildren,
+    HeavymetalContent,
     HeavymetalTag,
     HeavymetalTuple,
 )

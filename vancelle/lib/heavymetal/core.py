@@ -139,7 +139,10 @@ def render(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTupl
         raise HeavymetalException("Invalid attribute", parents, node) from error
 
     # Void elements like <br /> (https://html.spec.whatwg.org/#void-elements)
-    if tag.lower() in VOID_ELEMENTS or not children:
+    #
+    # Don't treat childless elements as self-closing - that's not valid in HTML5.
+    # https://html.spec.whatwg.org/multipage/syntax.html#start-tags
+    if tag.lower() in VOID_ELEMENTS:
         if children:
             raise HeavymetalHtmlError("Void element cannot have children", parents, node)
         return "<{tag}{attributes} />".format(tag=html.escape(tag), attributes=attributes)

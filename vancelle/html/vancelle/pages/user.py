@@ -16,23 +16,27 @@ from vancelle.html.vancelle.pages.base import page
 from vancelle.inflect import p as inf
 
 
-def login_page(login_form: LoginForm) -> Heavymetal:
-    return page(
-        div(
-            {"class": "container is-max-desktop"},
-            [
-                form(
-                    {"action": flask.url_for("user.login"), "method": "POST", "class": "box"},
-                    [
-                        form_field(login_form.csrf_token),
-                        form_field(login_form.username, placeholder="Username"),
-                        form_field(login_form.password, placeholder="Password"),
-                        button({"class": "button", "type": "submit"}, ["Login"]),
-                    ],
-                ),
-            ],
+@dataclasses.dataclass()
+class LoginPage(HeavymetalComponent):
+    login_form: LoginForm
+
+    def heavymetal(self) -> Heavymetal:
+        return page(
+            div(
+                {"class": "container is-max-desktop"},
+                [
+                    form(
+                        {"action": flask.url_for("user.login"), "method": "POST", "class": "box"},
+                        [
+                            form_field(self.login_form.csrf_token),
+                            form_field(self.login_form.username, placeholder="Username"),
+                            form_field(self.login_form.password, placeholder="Password"),
+                            button({"class": "button", "type": "submit"}, ["Login"]),
+                        ],
+                    ),
+                ],
+            )
         )
-    )
 
 
 @dataclasses.dataclass()

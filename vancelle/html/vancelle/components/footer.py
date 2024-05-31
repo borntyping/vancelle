@@ -1,12 +1,12 @@
 import flask
 
-from vancelle.lib.heavymetal.html import a, img
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs
-from vancelle.html.vancelle.elements.picture import light_dark_img
+from vancelle.html.bootstrap.layout.grid import row
+from vancelle.lib.heavymetal import Heavymetal
+from vancelle.lib.heavymetal.html import a, div, footer, img, picture, source
 
 
-def toggle_theme(attributes: HeavymetalAttrs) -> Heavymetal:
-    return ("a", {**attributes, "data-theme-toggle": ""}, [f"Toggle light/dark mode."])
+def toggle_theme() -> Heavymetal:
+    return ("a", {"href": "", "data-theme-toggle": True}, [f"Toggle light/dark mode."])
 
 
 def created_by() -> Heavymetal:
@@ -28,65 +28,76 @@ def dependency_logo(name: str, *, id: str, href: str, src: str) -> Heavymetal:
     return a({"href": href, "id": id, "title": name}, [img({"src": src, "alt": name, "style": "height: 2em !important"})])
 
 
+def openlibrary() -> Heavymetal:
+    return a(
+        {"id": "openlibrary", "href": "https://openlibrary.org", "title": "Open Library"},
+        [
+            img(
+                {
+                    "height": "24",
+                    "src": flask.url_for("static", filename="img/openlibrary.svg"),
+                    "alt": "Open Library",
+                }
+            )
+        ],
+    )
+
+
+def tmdb() -> Heavymetal:
+    return a(
+        {"id": "tmdb", "href": "https://www.themoviedb.org", "title": "The Movie Database"},
+        [
+            img(
+                {
+                    "height": "24",
+                    "src": flask.url_for("static", filename="img/tmdb.svg"),
+                    "alt": "The Movie Database",
+                }
+            )
+        ],
+    )
+
+
+def steam() -> Heavymetal:
+    return a(
+        {"id": "steam", "href": "https://store.steampowered.com", "title": "Steam"},
+        [
+            img({"height": "24", "src": flask.url_for("static", filename="img/steam.svg"), "alt": "Steam"}),
+        ],
+    )
+
+
 def page_footer() -> Heavymetal:
     """
     Open Library requests a "courtesy link". https://openlibrary.org/dev/docs/api/covers
     TMDB terms of use require a notice: https://developer.themoviedb.org/docs/faq
     """
 
-    return (
-        "footer",
-        {"id": "x-footer", "class": "footer"},
+    return footer(
+        {"id": "x-footer", "class": "bg-body-tertiary py-5 mt-5 text-body-secondary"},
         [
-            (
-                "div",
-                {"class": "content has-text-centered"},
+            div(
+                {"class": "container"},
                 [
-                    (
-                        "p",
-                        {},
+                    row(
                         [
-                            created_by(),
-                            source_code(),
-                        ],
-                    ),
-                    (
-                        "p",
-                        {"id": "x-dependency-logos"},
-                        [
-                            a(
-                                {"id": "bulma", "href": "https://bulma.io", "title": "Made with Bulma"},
+                            div(
+                                {"class": "col row row-cols-1 align-items-center text-start"},
                                 [
-                                    light_dark_img(
-                                        light="https://bulma.io/assets/images/made-with-bulma.png",
-                                        dark="https://bulma.io/assets/images/made-with-bulma--dark.png",
-                                        alt="Bulma",
-                                        width=124,
-                                        height=24,
-                                    )
+                                    div({"class": "col text-right"}, [openlibrary()]),
+                                    div({"class": "col text-right"}, [tmdb()]),
+                                    div({"class": "col text-right"}, [steam()]),
                                 ],
                             ),
-                            a(
-                                {"id": "openlibrary", "href": "https://openlibrary.org", "title": "Open Library"},
-                                [img({"src": flask.url_for("static", filename="img/openlibrary.svg"), "alt": "Open Library"})],
+                            div(
+                                {"class": "col row row-cols-1 align-items-center text-end"},
+                                [
+                                    ("p", {}, [created_by()]),
+                                    ("p", {}, [source_code()]),
+                                    ("p", {}, [toggle_theme()]),
+                                    ("small", {}, [tmdb_notice()]),
+                                ],
                             ),
-                            a(
-                                {"id": "tmdb", "href": "https://www.themoviedb.org", "title": "The Movie Database"},
-                                [img({"src": flask.url_for("static", filename="img/tmdb.svg"), "alt": "The Movie Database"})],
-                            ),
-                            a(
-                                {"id": "steam", "href": "https://store.steampowered.com", "title": "Steam"},
-                                [img({"src": flask.url_for("static", filename="img/steam.svg"), "alt": "Steam"})],
-                            ),
-                        ],
-                    ),
-                    (
-                        "p",
-                        {"class": "has-text-grey"},
-                        [
-                            tmdb_notice(),
-                            " ",
-                            toggle_theme({"class": "has-text-grey"}),
                         ],
                     ),
                 ],

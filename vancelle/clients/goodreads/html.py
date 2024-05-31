@@ -209,13 +209,16 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         return value
 
     @typing.overload
-    def parse_string(self, element: bs4.element.Tag | None) -> str: ...
+    def parse_string(self, element: bs4.element.Tag | None) -> str:
+        ...
 
     @typing.overload
-    def parse_string(self, element: bs4.element.Tag | None, default: str) -> str: ...
+    def parse_string(self, element: bs4.element.Tag | None, default: str) -> str:
+        ...
 
     @typing.overload
-    def parse_string(self, element: bs4.element.Tag | None, default: None) -> str | None: ...
+    def parse_string(self, element: bs4.element.Tag | None, default: None) -> str | None:
+        ...
 
     def parse_string(self, element: bs4.element.Tag | None, default: str | None | Sentinel = sentinel) -> str | None:
         if element is None:
@@ -257,10 +260,12 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         return None
 
     @typing.overload
-    def parse_int(self, value: str) -> int: ...
+    def parse_int(self, value: str) -> int:
+        ...
 
     @typing.overload
-    def parse_int(self, value: str | None) -> int | None: ...
+    def parse_int(self, value: str | None) -> int | None:
+        ...
 
     def parse_int(self, value):
         if value is None:

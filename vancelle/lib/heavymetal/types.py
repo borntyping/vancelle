@@ -2,12 +2,13 @@ import typing
 
 HeavymetalTag = str | None
 HeavymetalAttrs = typing.Mapping[str, str | bool | None]
-HeavymetalChildren = typing.Sequence["Heavymetal"]
+HeavymetalContent = typing.Sequence["Heavymetal"]
 HeavymetalCallable = typing.Callable[[], "Heavymetal"]
-HeavymetalTuple = typing.Tuple[HeavymetalTag, HeavymetalAttrs, HeavymetalChildren]
+HeavymetalTuple = typing.Tuple[HeavymetalTag, HeavymetalAttrs, HeavymetalContent]
 Heavymetal = HeavymetalCallable | str | HeavymetalTuple
 
 
 @typing.runtime_checkable
 class HeavymetalProtocol(typing.Protocol):
-    def heavymetal(self) -> Heavymetal: ...
+    def heavymetal(self) -> Heavymetal:
+        ...

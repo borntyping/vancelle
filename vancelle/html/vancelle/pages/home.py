@@ -7,7 +7,7 @@ import sqlalchemy
 
 from vancelle.extensions import db
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
-from vancelle.lib.heavymetal.html import a, div, section
+from vancelle.lib.heavymetal.html import a, div, h1, section
 from vancelle.html.helpers import html_classes
 from vancelle.inflect import p
 from vancelle.models import User
@@ -24,20 +24,22 @@ class HomePageGauge(HeavymetalComponent):
     colour: str
 
     def heavymetal(self) -> Heavymetal:
-        return a(
-            {
-                "href": self.href,
-                "class": html_classes(
-                    "box",
-                    f"has-background-{self.colour}-soft",
-                    f"has-text-{self.colour}-bold",
-                    "x-gauge",
-                    "has-text-centered",
-                ),
-            },
+        return div(
+            {"class": f"card h-100 text-center bg-{self.colour}-subtle text-{self.colour}-emphasis"},
             [
-                ("div", {"class": "is-size-2-touch is-size-1-desktop"}, [str(self.count)]),
-                ("div", {}, [self.title]),
+                div(
+                    {"class": "card-body"},
+                    [
+                        div({"class": "display-3"}, [str(self.count)]),
+                        a(
+                            {
+                                "class": "card-title stretched-link text-decoration-none",
+                                "href": self.href,
+                            },
+                            [self.title],
+                        ),
+                    ],
+                )
             ],
         )
 
@@ -80,7 +82,7 @@ class HomePageGauges(HeavymetalComponent):
 
         for cls, count in self._count_by_type(Work).items():
             url = flask.url_for("work.index", work_type=cls.work_type())
-            yield HomePageGauge(count, cls.info.noun_plural_title, url, "link")
+            yield HomePageGauge(count, cls.info.noun_plural_title, url, "info")
 
         for cls, count in self._count_by_type(Remote).items():
             url = flask.url_for("work.index", remote_type=cls.remote_type())
@@ -89,8 +91,8 @@ class HomePageGauges(HeavymetalComponent):
     def heavymetal(self) -> Heavymetal:
         gauges = sorted(self, key=lambda g: g.count, reverse=True)
         return div(
-            {"class": "columns is-multiline is-mobile is-centered"},
-            [div({"class": "column is-half-mobile is-one-fifth-desktop"}, [g]) for g in gauges],
+            {"class": "my-5 row row-cols-1 row-cols-lg-4 row-cols-xxl-5 g-4 justify-content-center"},
+            [div({"class": "col"}, [g]) for g in gauges],
         )
 
 
@@ -99,17 +101,10 @@ class HomePageHero(HeavymetalComponent):
 
     def heavymetal(self) -> Heavymetal:
         return section(
-            {"class": "hero is-medium is-primary"},
+            {"class": "container my-5 text-center"},
             [
-                div(
-                    {"class": "hero-body has-text-centered"},
-                    [
-                        ("h1", {"class": "title is-2"}, "Vancelle"),
-                        ("p", {"class": "subtitle is-4"}, f"Track {p.join(self.categories)}"),
-                        ("a", {"class": "button is-large is-link m-2", "href": flask.url_for("work.index")}, ["View works"]),
-                        ("a", {"class": "button is-large is-link m-2", "href": flask.url_for("work.create")}, ["Add work"]),
-                    ],
-                )
+                h1({"class": "display-1 fw-bold"}, "Vancelle"),
+                ("p", {"class": "display-6 mb-4"}, f"Track {p.join(self.categories)}"),
             ],
         )
 

@@ -163,7 +163,7 @@ class ImportedWorkAttributes(typing.TypedDict):
 class ImportedWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "imported"}
     info = RemoteInfo(
-        colour="text",
+        colour="dark",
         source="Imported",
         noun="work",
         priority=-1,
@@ -184,7 +184,7 @@ class GoodreadsPrivateBook(Remote):
 
     __mapper_args__ = {"polymorphic_identity": "goodreads.book"}
     info = RemoteInfo(
-        colour="success",
+        colour="dark",
         source="Goodreads",
         noun="book (imported)",
         noun_full="Goodreads book (imported)",

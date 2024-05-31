@@ -13,14 +13,13 @@ def test_render_void():
 
 
 def test_render_fragment():
-
     assert render((None, {}, [])) == ""
     assert render((None, {}, [("br", {}, [])])) == "<br />"
 
 
 def test_render_doctype():
     document = (None, {}, [markupsafe.Markup("<!DOCTYPE html>"), ("html", {}, [])])
-    assert render(document) == "<!DOCTYPE html><html />"
+    assert render(document) == "<!DOCTYPE html><html></html>"
 
 
 def test_passing_tuple_as_children():

@@ -7,11 +7,9 @@ $x-board-card-cover: 2fr;
   display: grid !important;
   grid-template-columns: $x-board-card-detail $x-board-card-cover;
   overflow: hidden;
-  //height: 100%;
+  aspect-ratio: 3/2;
 
   .x-board-detail {
-    grid-column: 1 !important;
-
     .x-board-line {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -23,8 +21,6 @@ $x-board-card-cover: 2fr;
   }
 
   figure {
-    grid-column: 2 !important;
-
     img {
       object-fit: cover;
       aspect-ratio: 2/3;
@@ -108,9 +104,10 @@ $x-board-card-cover: 2fr;
         &[data-shelf="ongoing"],
         &[data-shelf="infinite"] {
           grid-column: 3;
+          aspect-ratio: 6/2;
 
           &.x-board-card {
-            grid-template-columns: calc($x-board-card-detail + $x-board-card-cover + $x-board-card-detail)  $x-board-card-cover;
+            grid-template-columns: calc($x-board-card-detail + $x-board-card-cover + $x-board-card-detail) $x-board-card-cover;
           }
         }
 

@@ -32,7 +32,7 @@ def work_board_item(shelf: Shelf, work: Work) -> Heavymetal:
 
     title = a(
         {
-            "class": html_classes(["stretched-link", "text-decoration-none", "text-primary-emphasis"]),
+            "class": html_classes(["stretched-link-x", "text-decoration-none", "text-primary-emphasis"]),
             "href": work.url_for(),
         },
         [
@@ -83,7 +83,7 @@ def work_board_item(shelf: Shelf, work: Work) -> Heavymetal:
                     ),
                 ],
             ),
-            figure({"class": "m-0 p-0 bg-primary-subtle"}, cover),
+            figure({"class": "m-0 p-0 bg-info-subtle"}, cover),
         ],
     )
 

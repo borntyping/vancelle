@@ -27,4 +27,4 @@ class PolymorphicBase(Base):
 
     @classmethod
     def get_subclass(cls, name: str) -> typing.Type[typing.Self]:
-        return cls.__mapper__.polymorphic_map[name]
+        return cls.__mapper__.polymorphic_map[name].class_

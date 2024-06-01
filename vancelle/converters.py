@@ -2,7 +2,7 @@ import typing
 
 import werkzeug.routing
 
-from vancelle.models import Work
+from vancelle.models import Remote, Work
 
 
 class WorkTypeConverter(werkzeug.routing.BaseConverter):
@@ -10,4 +10,12 @@ class WorkTypeConverter(werkzeug.routing.BaseConverter):
         return Work.get_subclass(value)
 
     def to_url(self, value: typing.Type[Work]) -> str:
+        return value.polymorphic_identity()
+
+
+class RemoteTypeConverter(werkzeug.routing.BaseConverter):
+    def to_python(self, value: str) -> typing.Type[Remote]:
+        return Remote.get_subclass(value)
+
+    def to_url(self, value: typing.Type[Remote]) -> str:
         return value.polymorphic_identity()

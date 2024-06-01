@@ -8,7 +8,8 @@ import structlog
 
 from vancelle.lib.heavymetal.html import span
 from vancelle.lib.heavymetal import Heavymetal
-from vancelle.html.vancelle.components.metadata import span_absent, external_url, internal_url
+from vancelle.html.vancelle.components.metadata import external_url, internal_url
+from vancelle.html.vancelle.components.optional import span_absent
 from vancelle.inflect import p
 
 logger = structlog.get_logger(logger_name=__name__)

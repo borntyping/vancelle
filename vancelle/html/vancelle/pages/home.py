@@ -101,7 +101,7 @@ class HomePageHero(HeavymetalComponent):
 
     def heavymetal(self) -> Heavymetal:
         return section(
-            {"class": "container my-5 text-center"},
+            {"class": "text-center"},
             [
                 h1({"class": "display-1 fw-bold"}, "Vancelle"),
                 ("p", {"class": "display-6 mb-4"}, f"Track {p.join(self.categories)}"),
@@ -112,4 +112,4 @@ class HomePageHero(HeavymetalComponent):
 @dataclasses.dataclass()
 class HomePage(HeavymetalComponent):
     def heavymetal(self) -> Heavymetal:
-        return page(HomePageGauges(), before=HomePageHero())
+        return page([HomePageHero(), HomePageGauges()])

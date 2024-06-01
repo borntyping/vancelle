@@ -5,7 +5,7 @@ import wsgiref.types
 import flask
 import svcs.flask
 
-from .converters import WorkTypeConverter
+from .converters import RemoteTypeConverter, WorkTypeConverter
 from .blueprints.board.blueprint import bp as bp_board
 from .blueprints.bulma import bp as bp_bulma
 from .blueprints.data import bp as bp_data
@@ -33,12 +33,13 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app = flask.Flask("vancelle")
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
-    app.config["DEBUG_TB_ENABLED"] = False
+    # app.config["DEBUG_TB_ENABLED"] = False
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
     app.config.from_mapping(config)
     app.config.from_prefixed_env("VANCELLE")
     app.url_map.converters["work_type"] = WorkTypeConverter
+    app.url_map.converters["remote_type"] = RemoteTypeConverter
 
     svcs.flask.init_app(app)
 

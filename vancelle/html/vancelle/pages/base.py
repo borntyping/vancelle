@@ -2,13 +2,12 @@ import json
 
 import flask
 
-from vancelle.html.bootstrap.layout.containers import container
 from vancelle.html.vancelle.components.footer import page_footer
 from vancelle.html.vancelle.components.navbar import page_navbar
 from vancelle.html.vancelle.components.title import page_title
 from vancelle.html.vancelle.components.toast import toast_container
-from vancelle.lib.heavymetal import Heavymetal
-from vancelle.lib.heavymetal.html import div, html5, link, main, meta, script, section
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
+from vancelle.lib.heavymetal.html import html5, link, main, meta, script
 
 
 def static(filename: str) -> str:
@@ -16,9 +15,8 @@ def static(filename: str) -> str:
 
 
 def page(
-    *content: Heavymetal,
-    before: Heavymetal | None = None,
-    after: Heavymetal | None = None,
+    content: HeavymetalContent,
+    fluid: bool = False,
 ) -> Heavymetal:
     head = [
         page_title(),
@@ -42,9 +40,7 @@ def page(
 
     body = [
         page_navbar(),
-        before,
-        main({"class": "container my-5"}, content),
-        after,
+        main({"class": "container-fluid my-5" if fluid else "container my-5"}, content),
         toast_container(),
         page_footer(),
         script(

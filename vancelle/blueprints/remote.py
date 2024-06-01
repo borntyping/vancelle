@@ -1,3 +1,4 @@
+import typing
 import uuid
 
 import flask
@@ -8,7 +9,8 @@ from werkzeug.exceptions import NotFound
 from ..clients.images.client import ImageCache
 from ..controllers.remote import RemotesController
 from ..extensions import htmx
-from ..extensions.ext_html import Toggle
+from ..html.vancelle.pages.remotes import remote_index_page
+from ..lib.heavymetal import render
 from ..models.remote import Remote
 
 controller = RemotesController()
@@ -23,12 +25,10 @@ def before_request():
 
 
 @bp.route("/remotes/")
-def index():
-    toggle_remote_type = Toggle({cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()})
-    remote_type = toggle_remote_type.from_request(key="remote_type")
-
-    remotes = controller.index(remote_type=remote_type.value)
-    return flask.render_template("remote/index.html", remotes=remotes, remote_type=remote_type)
+@bp.route("/remotes/<remote_type:remote_type>/")
+def index(remote_type: typing.Type[Remote] | None = None):
+    remotes = controller.index(remote_type=remote_type)
+    return render(remote_index_page(remote_type, remotes))
 
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>")

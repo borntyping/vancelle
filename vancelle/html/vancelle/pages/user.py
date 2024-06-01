@@ -4,13 +4,12 @@ import flask
 import flask_login
 
 from vancelle.forms.user import ImportForm, LoginForm
-from vancelle.html.bulma.form.file import bulma_file_input
 from vancelle.html.bulma.form.general import form_field
 from vancelle.html.vancelle.components.header import page_header, section_header
 from vancelle.html.vancelle.pages.base import page
 from vancelle.inflect import p as inf
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
-from vancelle.lib.heavymetal.html import a, button, code, div, form, input_, label, p, pre, section
+from vancelle.lib.heavymetal.html import a, button, code, div, form, p, section
 
 
 @dataclasses.dataclass()
@@ -19,20 +18,22 @@ class LoginPage(HeavymetalComponent):
 
     def heavymetal(self) -> Heavymetal:
         return page(
-            div(
-                {"class": "container is-max-desktop"},
-                [
-                    form(
-                        {"action": flask.url_for("user.login"), "method": "POST", "class": "box"},
-                        [
-                            form_field(self.login_form.csrf_token),
-                            form_field(self.login_form.username, placeholder="Username"),
-                            form_field(self.login_form.password, placeholder="Password"),
-                            button({"class": "btn", "type": "submit"}, ["Login"]),
-                        ],
-                    ),
-                ],
-            )
+            [
+                div(
+                    {"class": "container is-max-desktop"},
+                    [
+                        form(
+                            {"action": flask.url_for("user.login"), "method": "POST", "class": "box"},
+                            [
+                                form_field(self.login_form.csrf_token),
+                                form_field(self.login_form.username, placeholder="Username"),
+                                form_field(self.login_form.password, placeholder="Password"),
+                                button({"class": "btn", "type": "submit"}, ["Login"]),
+                            ],
+                        ),
+                    ],
+                )
+            ]
         )
 
 

@@ -2,15 +2,11 @@ import typing
 
 import flask.sansio.blueprints
 import flask_login
-import hotmetal
 import structlog
-
 
 from vancelle.blueprints.work import WorkIndexForm
 from vancelle.controllers.work import WorkController, WorkQuery
-from vancelle.html.vancelle.pages.base import page
 from vancelle.html.vancelle.pages.board import BoardPage
-from vancelle.lib.heavymetal import render
 from vancelle.models import Work
 
 logger = structlog.get_logger(logger_name=__name__)

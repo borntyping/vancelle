@@ -9,21 +9,6 @@ from vancelle.lib.heavymetal.html import a, span
 from vancelle.lib.heavymetal import Heavymetal
 
 
-ABSENT = "—"
-
-
-def span_absent() -> Heavymetal:
-    return span({"class": "x-absent"}, [ABSENT])
-
-
-def maybe_string(value: str | None) -> str:
-    return str(value) if value else ABSENT
-
-
-def maybe_span(string: str | None) -> Heavymetal:
-    return span({}, [string]) if string is not None else span_absent()
-
-
 def url(href: str, text: str | None) -> Heavymetal:
     return span({}, [text or html.pretty_url(href)])
 

@@ -9,7 +9,8 @@ from vancelle.lib.heavymetal.html import a, div, figure, h3, p, section, span, i
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.html.helpers import count_plural, html_classes
 from vancelle.lib.heavymetal import HeavymetalComponent
-from vancelle.html.vancelle.components.metadata import maybe_string, span_absent, maybe_span, span_date
+from vancelle.html.vancelle.components.metadata import span_date
+from vancelle.html.vancelle.components.optional import maybe_span, maybe_string, span_absent
 from vancelle.html.vancelle.pages.base import page
 from vancelle.models import Work
 from vancelle.shelf import Shelf
@@ -135,4 +136,4 @@ class BoardPage(HeavymetalComponent):
         else:
             raise ValueError
 
-        return page(section({}, [board]))
+        return page([section({}, [board])])

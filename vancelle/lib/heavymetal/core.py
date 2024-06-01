@@ -110,7 +110,10 @@ def render(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTupl
 
     # This might not always be a tuple, but it should be an ordered sequence.
     # That might be too restrictive — should this allow a generator/iterable?
-    if not isinstance(children, typing.Sequence):
+    if isinstance(children, typing.Iterable) and not isinstance(children, typing.Sequence):
+        children = tuple(children)
+
+    if not isinstance(children, typing.Iterable):
         raise HeavymetalSyntaxError("Expected a list or sequence for the children= parameter", parents, node, children)
 
     # We can safely do this check as no child element should ever be a dict.

@@ -3,6 +3,7 @@ import datetime
 import typing
 import uuid
 
+import flask
 from flask import url_for
 from sqlalchemy import ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
@@ -114,6 +115,9 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
 
     def url_for_background(self) -> str | None:
         return url_for("remote.background", remote_type=self.type, remote_id=self.id) if self.background else None
+
+    def url_for_type(self) -> str:
+        return flask.url_for("remote.index", remote_type=type(self))
 
     @property
     def deleted(self) -> bool:

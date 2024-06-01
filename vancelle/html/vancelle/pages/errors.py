@@ -8,13 +8,15 @@ from vancelle.lib.heavymetal.html import a, div, h1, h3, p, section
 
 def error_page(title: str, description: str) -> Heavymetal:
     return page(
-        div(
-            {"id": "error"},
-            [
-                h1({"class": "display-3 text-danger"}, [title]),
-                p({"class": "lead"}, [description]),
-            ],
-        )
+        [
+            div(
+                {"id": "error"},
+                [
+                    h1({"class": "display-3 text-danger"}, [title]),
+                    p({"class": "lead"}, [description]),
+                ],
+            )
+        ]
     )
 
 
@@ -26,15 +28,17 @@ def error_index_page():
     ]
 
     return page(
-        page_header("Errors", "Trigger error messages for debugging"),
-        section_header("Error pages"),
-        p(
-            {"class": "d-flex justify-content-start gap-2"},
-            [a({"class": "btn btn-danger", "href": url}, [name]) for name, url in errors],
-        ),
-        section_header("HTMX error notifications"),
-        p(
-            {"class": "d-flex justify-content-start gap-2"},
-            [a({"class": "btn btn-warning", "hx-get": url}, [name]) for name, url in errors],
-        ),
+        [
+            page_header("Errors", "Trigger error messages for debugging"),
+            section_header("Error pages"),
+            p(
+                {"class": "d-flex justify-content-start gap-2"},
+                [a({"class": "btn btn-danger", "href": url}, [name]) for name, url in errors],
+            ),
+            section_header("HTMX error notifications"),
+            p(
+                {"class": "d-flex justify-content-start gap-2"},
+                [a({"class": "btn btn-warning", "hx-get": url}, [name]) for name, url in errors],
+            ),
+        ]
     )

@@ -78,11 +78,11 @@ class RemotesController:
         log.debug("Fetched remote from source")
         return remote
 
-    def index(self, *, remote_type: str | None) -> Pagination:
-        query = sqlalchemy.select(Remote)
+    def index(self, *, remote_type: typing.Type[Remote] | None) -> Pagination:
+        query = sqlalchemy.select(Remote).join(Work).join(sqlalchemy.alias(Remote))
 
         if remote_type is not None:
-            query = query.filter(Remote.type == remote_type)
+            query = query.filter(Remote.type == remote_type.__mapper__.polymorphic_identity)
 
         return db.paginate(query)
 

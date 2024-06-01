@@ -15,7 +15,7 @@ $green: darken(#198754, $amount);
 $teal: darken(#20c997, $amount);
 $cyan: darken(#0dcaf0, $amount);
 
-
+$code-color: $blue;
 
 // TODO? generate bg-$color / text-$color for all colours
 // https://getbootstrap.com/docs/5.3/customize/color/#generating-utilities
@@ -34,4 +34,9 @@ $font-sizes: map-merge($font-sizes, (
 
 @import "bootstrap/scss/bootstrap";
 
+@import "ext/bootstrap/scss/type";
+@import "ext/bootstrap/scss/card";
+
+@import "vancelle/colours";
 @import "vancelle/components/board";
+@import "vancelle/typography";

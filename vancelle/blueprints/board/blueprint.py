@@ -10,6 +10,7 @@ from vancelle.blueprints.work import WorkIndexForm
 from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.html.vancelle.pages.base import page
 from vancelle.html.vancelle.pages.board import BoardPage
+from vancelle.lib.heavymetal import render
 from vancelle.models import Work
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -51,4 +52,4 @@ def index():
 
 @bp.route("/<work_type:work_type>/", methods={"GET"})
 def work_type_index(work_type: typing.Type[Work]):
-    return hotmetal.render(page())
+    raise NotImplementedError

@@ -1,5 +1,4 @@
 {%- from 'components/navbar.html' import navbar_group, navbar_divider, navbar_item -%}
-{%- from 'components/toast.html' import toast -%}
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
   <head>
@@ -77,13 +76,13 @@
     {% block after %}
     {% endblock after %}
 
-    <aside id="app-toasts" hx-preserve="true">
-      {% if not htmx %}
-        {% for category, message in get_flashed_messages(with_categories=true) %}
-          {{ toast(category, message|safe) }}
-        {% endfor %}
-      {% endif %}
-    </aside>
+{#    <aside id="app-toasts" hx-preserve="true">#}
+{#      {% if not htmx %}#}
+{#        {% for category, message in get_flashed_messages(with_categories=true) %}#}
+{#          {{ toast(category, message|safe) }}#}
+{#        {% endfor %}#}
+{#      {% endif %}#}
+{#    </aside>#}
 
     <footer id="app-footer" class="footer">
       <div class="content has-text-centered">

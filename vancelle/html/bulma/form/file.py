@@ -9,7 +9,7 @@ def bulma_file_input(name: str) -> Heavymetal:
             label(
                 {"class": "file-label"},
                 [
-                    input_({"class": "file-input", "type": "file", "name": name}, ()),
+                    input_({"class": "file-input", "type": "file", "name": name}),
                     span({"class": "file-cta"}, [span({"class": "file-label"}, ["Choose a file..."])]),
                     span({"class": "file-name"}, ()),
                 ],

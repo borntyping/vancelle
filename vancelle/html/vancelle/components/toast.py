@@ -1,6 +1,10 @@
+import flask
+import markupsafe
+
+from vancelle.extensions import htmx
 from vancelle.html.helpers import HtmlClasses, html_classes
-from vancelle.lib.heavymetal import Heavymetal
-from vancelle.lib.heavymetal.html import button, div, fragment, section, span, strong
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
+from vancelle.lib.heavymetal.html import aside, button, div, fragment, section, span, strong
 
 TOAST_CONTAINER_ID = "v-notifications"
 
@@ -34,11 +38,20 @@ def toast_response(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavy
 
 
 def toast_container() -> Heavymetal:
-    return section(
+    if htmx:
+        toasts = []
+    else:
+        toasts = [
+            toast(category, markupsafe.Markup(message))
+            for category, message in flask.get_flashed_messages(with_categories=True)
+        ]
+
+    return aside(
         {
             "id": TOAST_CONTAINER_ID,
             "class": "toast-container position-absolute bottom-0 start-0 p-3",
             "style": "z-index: 11;",
+            "hx-preserve": "true",
         },
-        [],
+        toasts,
     )

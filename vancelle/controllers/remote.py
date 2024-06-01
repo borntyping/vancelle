@@ -19,6 +19,8 @@ from vancelle.controllers.sources.steam import SteamApplicationManager
 from vancelle.controllers.sources.tmdb import TmdbMovieManager, TmdbTvSeriesManager
 from vancelle.ext.flask_sqlalchemy import EmptyPagination
 from vancelle.extensions import db
+from vancelle.lib.heavymetal import render
+from vancelle.lib.heavymetal.html import a, fragment
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -124,7 +126,7 @@ class RemotesController:
         if remote := self._get_remote_from_db_or_none(remote_type=remote_type, remote_id=remote_id):
             logger.info("Instructed to create a remote that already exists")
             flask.flash(
-                flask.render_template("remote/flash_already_exists.html", remote=remote),
+                render(fragment([a({"href": remote.url_for()}, [remote.title]), "is already attached to a work."])),
                 "Remote already exists",
             )
             assert remote.work

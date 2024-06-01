@@ -5,11 +5,10 @@ import typing
 import markupsafe
 
 from vancelle.blueprints.work import WorkIndexForm
-from vancelle.lib.heavymetal.html import a, div, figure, h3, p, span, img, fragment
+from vancelle.lib.heavymetal.html import a, div, figure, h3, p, section, span, img, fragment
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.html.helpers import count_plural, html_classes
 from vancelle.lib.heavymetal import HeavymetalComponent
-from vancelle.html.vancelle.components.header import block_section
 from vancelle.html.vancelle.components.metadata import maybe_string, span_absent, maybe_span, span_date
 from vancelle.html.vancelle.pages.base import page
 from vancelle.models import Work
@@ -136,4 +135,4 @@ class BoardPage(HeavymetalComponent):
         else:
             raise ValueError
 
-        return page(block_section(board))
+        return page(section({}, [board]))

@@ -13,9 +13,25 @@ def fragment(children: HeavymetalContent) -> HeavymetalTuple:
     """
     Builds a Heavymetal tuple for a fragment.
 
-    (i.e. a tuple that won't create a HTML element, but that can have children.)
+    (i.e. a tuple that won't create an HTML element, but that can have children.)
+
+    >>> from . import render
+    >>> render(fragment([span({}, ['example'])]))
+    '<span>example</span>'
     """
     return (None, {}, children)
+
+
+def nothing() -> HeavymetalTuple:
+    """
+    An empty fragment.
+
+    >>> from . import render
+    >>> example: str | None = None
+    >>> render(span({}, example) if example else nothing())
+    ''
+    """
+    return fragment(())
 
 
 def element(tag: HeavymetalTag, attrs: HeavymetalAttrs, children: HeavymetalContent) -> HeavymetalTuple:
@@ -51,6 +67,7 @@ def make_void_element(tag: str) -> typing.Callable[[HeavymetalAttrs], Heavymetal
 
 
 a = make_element("a")
+aside = make_element("aside")
 button = make_element("button")
 code = make_element("code")
 div = make_element("div")

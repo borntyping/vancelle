@@ -32,7 +32,7 @@ def html5(attrs: HeavymetalAttrs, content: HeavymetalContent, *, lang: str = "en
     return fragment([doctype, html])
 
 
-def make_element(tag: str):
+def make_element(tag: str) -> typing.Callable[[HeavymetalAttrs, HeavymetalContent], HeavymetalTuple]:
     def __element__(attrs: HeavymetalAttrs, children: HeavymetalContent) -> HeavymetalTuple:
         return element(tag, attrs, children)
 
@@ -54,8 +54,8 @@ a = make_element("a")
 button = make_element("button")
 code = make_element("code")
 div = make_element("div")
-footer = make_element("footer")
 figure = make_element("figure")
+footer = make_element("footer")
 form = make_element("form")
 h1 = make_element("h1")
 h2 = make_element("h2")
@@ -69,6 +69,7 @@ picture = make_element("picture")
 pre = make_element("pre")
 section = make_element("section")
 span = make_element("span")
+strong = make_element("strong")
 title = make_element("title")
 ul = make_element("ul")
 

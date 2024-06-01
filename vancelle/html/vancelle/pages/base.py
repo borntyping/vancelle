@@ -6,8 +6,9 @@ from vancelle.html.bootstrap.layout.containers import container
 from vancelle.html.vancelle.components.footer import page_footer
 from vancelle.html.vancelle.components.navbar import page_navbar
 from vancelle.html.vancelle.components.title import page_title
+from vancelle.html.vancelle.components.toast import toast_container
 from vancelle.lib.heavymetal import Heavymetal
-from vancelle.lib.heavymetal.html import div, html5, link, main, meta, script
+from vancelle.lib.heavymetal.html import div, html5, link, main, meta, script, section
 
 
 def static(filename: str) -> str:
@@ -44,6 +45,7 @@ def page(
         before,
         main({"class": "container my-5"}, content),
         after,
+        toast_container(),
         page_footer(),
         script(
             {

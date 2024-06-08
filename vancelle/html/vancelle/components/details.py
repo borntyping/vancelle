@@ -22,3 +22,11 @@ def details_date_and_author(details: Details) -> Heavymetal:
             span({"title": maybe_string(details.author)}, [author]),
         ]
     )
+
+
+def details_tags(details: Details) -> Heavymetal:
+    return fragment([])
+
+
+def details_external_url(details) -> Heavymetal:
+    return fragment([])

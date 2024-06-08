@@ -1,4 +1,5 @@
 import json
+import typing
 
 import flask
 
@@ -17,9 +18,10 @@ def static(filename: str) -> str:
 def page(
     content: HeavymetalContent,
     fluid: bool = False,
+    title: typing.Sequence[str] = (),
 ) -> Heavymetal:
     head = [
-        page_title(),
+        page_title(*title),
         meta({"name": "viewport", "content": "width=device-width, initial-scale=1"}),
         meta({"name": "apple-mobile-web-app-title", "content": "Vancelle"}),
         meta({"name": "application-name", "content": "Vancelle"}),

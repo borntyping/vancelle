@@ -168,7 +168,7 @@ class ImportedWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "imported"}
     info = RemoteInfo(
         colour="dark",
-        source="Imported",
+        source="imported data",
         noun="work",
         priority=-1,
         can_search=False,

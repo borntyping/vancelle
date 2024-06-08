@@ -9,7 +9,7 @@ from werkzeug.exceptions import NotFound
 from ..clients.images.client import ImageCache
 from ..controllers.remote import RemotesController
 from ..extensions import htmx
-from ..html.vancelle.pages.remotes import remote_index_page
+from ..html.vancelle.pages.remotes import remote_detail_page, remote_index_page
 from ..lib.heavymetal import render
 from ..models.remote import Remote
 
@@ -34,6 +34,9 @@ def index(remote_type: typing.Type[Remote] | None = None):
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>")
 def detail(remote_type: str, remote_id: str):
     work_id = flask.request.args.get("work_id", type=uuid.UUID)
+    remote, work = controller.detail(remote_type=remote_type, remote_id=remote_id, work_id=work_id)
+
+    return render(remote_detail_page(remote, work))
 
     return controller.render_detail(remote_type=remote_type, remote_id=remote_id, work_id=work_id)
 

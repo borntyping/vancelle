@@ -196,6 +196,11 @@ class RemotesController:
             items=items,
         )
 
+    def detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> tuple[Remote, Work]:
+        remote = self.get_remote(remote_type=remote_type, remote_id=remote_id)
+        work = self._get_work_from_db(work_id) if work_id else None
+        return remote, work
+
     def render_detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> str:
         remote = self.get_remote(remote_type=remote_type, remote_id=remote_id)
         work = self._get_work_from_db(work_id) if work_id else None

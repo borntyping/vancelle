@@ -18,6 +18,7 @@ from vancelle.extensions import db
 from vancelle.lib.heavymetal import render
 from vancelle.lib.heavymetal.html import a, fragment
 from vancelle.lib.pagination import Pagination
+from vancelle.lib.pagination.flask import FlaskPaginationArgs
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -76,12 +77,13 @@ class RemotesController:
         return remote
 
     def index(self, *, remote_type: typing.Type[Remote] | None) -> Pagination:
-        query = sqlalchemy.select(Remote).join(Work).join(sqlalchemy.alias(Remote))
+        args = FlaskPaginationArgs()
+        query = sqlalchemy.select(Remote).join(Work)
 
         if remote_type is not None:
             query = query.filter(Remote.type == remote_type.__mapper__.polymorphic_identity)
 
-        return Pagination.from_query(db.session, query)
+        return args.query(db.session, query)
 
     def refresh(self, remote_type: str, remote_id: str) -> Remote:
         old_remote = self._get_remote_from_db_or_404(remote_type=remote_type, remote_id=remote_id)

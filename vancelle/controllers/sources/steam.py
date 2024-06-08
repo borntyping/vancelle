@@ -55,7 +55,7 @@ class SteamApplicationManager(Manager):
         )
 
     def search(self, query: str) -> Pagination:
-        args = FlaskPaginationArgs()
+        pagination_args = FlaskPaginationArgs()
 
         log = logger.bind(query=query)
         log.info("Searching Steam apps")
@@ -75,7 +75,7 @@ class SteamApplicationManager(Manager):
             )
         )
 
-        pagination = Pagination.from_query(db.session, stmt)
+        pagination = pagination_args.query(db.session, stmt)
         return pagination.map(lambda a: SteamApplication(id=a.appid, title=a.name))
 
     def ensure_appid_cache(self) -> None:

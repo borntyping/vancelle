@@ -13,6 +13,7 @@ from werkzeug.exceptions import BadRequest
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db
 from vancelle.lib.pagination import Pagination
+from vancelle.lib.pagination.flask import FlaskPaginationArgs
 from vancelle.models import User
 from vancelle.models.record import Record
 from vancelle.models.remote import ImportedWork, Remote
@@ -120,7 +121,8 @@ class WorkQuery:
         Flask-SQLAlchemy doesn't calculate the right total, since the query returns
         non-unique works due to the joins to the record and remote tables.
         """
-        return Pagination.from_query(
+        pagination_args = FlaskPaginationArgs()
+        return pagination_args.query(
             db.session,
             self._select_statement,
             self._count_statement,

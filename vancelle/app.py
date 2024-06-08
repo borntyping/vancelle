@@ -67,7 +67,6 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     alembic.init_app(app)
     cors.init_app(app)
     db.init_app(app)
-    debug_toolbar.init_app(app)
     html.init_app(app)
     htmx.init_app(app)
     login_manager.init_app(app)

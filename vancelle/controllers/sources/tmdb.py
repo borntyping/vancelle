@@ -3,10 +3,11 @@ import svcs
 
 from vancelle.clients.tmdb.client import TmdbAPI
 from vancelle.controllers.sources.base import Manager
-from vancelle.ext.flask_sqlalchemy import ItemsPagination, Pagination
+from ...lib.pagination import Pagination
 from vancelle.inflect import p
 from vancelle.models.remote import TmdbMovie, TmdbTvSeries
 from vancelle.models.work import Film, Show
+from ...lib.pagination.flask import FlaskPaginationArgs
 
 
 class TmdbMovieManager(Manager[TmdbMovie]):
@@ -27,14 +28,15 @@ class TmdbMovieManager(Manager[TmdbMovie]):
             data=data,
         )
 
-    def search(self, query: str) -> ItemsPagination[TmdbMovie]:
-        page = flask.request.args.get("page", 1, type=int)
+    def search(self, query: str) -> Pagination[TmdbMovie]:
+        args = FlaskPaginationArgs(per_page=20, max_per_page=20)
+
         client = svcs.flask.get(TmdbAPI)
-        search = client.search_movies(query, page=page)
+        search = client.search_movies(query, page=args.page)
 
         items = [
             TmdbMovie(
-                id=data["id"],
+                id=str(data["id"]),
                 title=data["title"],
                 description=data["overview"],
                 cover=client.poster_url(data["poster_path"]),
@@ -43,7 +45,7 @@ class TmdbMovieManager(Manager[TmdbMovie]):
             for data in search["results"]
         ]
 
-        return ItemsPagination(page=page, per_page=20, items=items, total=search["total_results"])
+        return Pagination(items=items, count=search["total_results"], page=args.page, per_page=args.per_page)
 
 
 class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
@@ -65,13 +67,14 @@ class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
         )
 
     def search(self, query: str) -> Pagination[TmdbTvSeries]:
-        page = flask.request.args.get("page", 1, type=int)
+        args = FlaskPaginationArgs(per_page=20, max_per_page=20)
+
         client = svcs.flask.get(TmdbAPI)
-        search = client.search_tv(query, page=page)
+        search = client.search_tv(query, page=args.page)
 
         items = [
             TmdbTvSeries(
-                id=data["id"],
+                id=str(data["id"]),
                 title=data["name"],
                 description=data["overview"],
                 cover=client.poster_url(data["poster_path"]),
@@ -80,4 +83,4 @@ class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
             for data in search["results"]
         ]
 
-        return ItemsPagination(page=page, per_page=20, items=items, total=search["total_results"])
+        return Pagination(items=items, count=search["total_results"], page=args.page, per_page=args.per_page)

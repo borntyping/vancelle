@@ -1,7 +1,6 @@
 import logging
 import typing
 
-from vancelle.ext.flask_sqlalchemy import Pagination
 from vancelle.html.vancelle.components.details import details_date_and_author, details_title
 from vancelle.html.vancelle.components.header import page_header
 from vancelle.html.vancelle.components.pagination import nav_pagination
@@ -9,6 +8,7 @@ from vancelle.html.vancelle.components.table import generate_table_from_paginati
 from vancelle.html.vancelle.pages.base import page
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import a, code, div, table, tbody, td, th, thead, tr
+from vancelle.lib.pagination import Pagination
 from vancelle.models import Remote
 from vancelle.models.details import Details
 

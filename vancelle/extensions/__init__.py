@@ -1,14 +1,14 @@
-import pathlib
-
+import flask_alembic
 import flask_cors
 import flask_debugtoolbar
 import flask_login
-import flask_migrate
-import flask_sqlalchemy
+import flask_sqlalchemy_lite
 
 from .ext_html import HtmlExtension
 from .ext_htmx import HtmxExtension
-from ..models import Base
+
+alembic = flask_alembic.Alembic(run_mkdir=False)
+db = flask_sqlalchemy_lite.SQLAlchemy(session_options={"expire_on_commit": False})
 
 cors = flask_cors.CORS(
     allow_headers=[
@@ -18,14 +18,8 @@ cors = flask_cors.CORS(
         *HtmxExtension.CORS_EXPOSE_HEADERS,
     ],
 )
-db = flask_sqlalchemy.SQLAlchemy(model_class=Base, session_options={"expire_on_commit": False})
 debug_toolbar = flask_debugtoolbar.DebugToolbarExtension()
 login_manager = flask_login.LoginManager()
-migrate = flask_migrate.Migrate(
-    directory=pathlib.Path(__file__).parent.with_name("migrations"),
-    alembic_module_prefix="alembic.op.",
-    sqlalchemy_module_prefix="sqlalchemy.",
-)
 
 html = HtmlExtension()
 htmx = HtmxExtension()

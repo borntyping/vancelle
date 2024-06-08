@@ -5,7 +5,6 @@ import typing
 import uuid
 
 import flask_login
-import flask_sqlalchemy.pagination
 import structlog
 from sqlalchemy import ColumnElement, Select, True_, desc, func, nulls_last, or_, select
 from sqlalchemy.sql.functions import coalesce
@@ -13,6 +12,7 @@ from werkzeug.exceptions import BadRequest
 
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db
+from vancelle.lib.pagination import Pagination
 from vancelle.models import User
 from vancelle.models.record import Record
 from vancelle.models.remote import ImportedWork, Remote
@@ -115,14 +115,16 @@ class WorkQuery:
 
         return tuple(Shelf)
 
-    def paginate(self) -> flask_sqlalchemy.pagination.Pagination:
+    def paginate(self) -> Pagination:
         """
         Flask-SQLAlchemy doesn't calculate the right total, since the query returns
         non-unique works due to the joins to the record and remote tables.
         """
-        pagination = db.paginate(self._select_statement, count=False)
-        pagination.total = self.count()
-        return pagination
+        return Pagination.from_query(
+            db.session,
+            self._select_statement,
+            self._count_statement,
+        )
 
     @staticmethod
     def _filter_query(query: str) -> ColumnElement[bool]:

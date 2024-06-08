@@ -1,11 +1,10 @@
-import os
+import pathlib
 import typing
 import wsgiref.types
 
 import flask
 import svcs.flask
 
-from .converters import RemoteTypeConverter, WorkTypeConverter
 from .blueprints.board.blueprint import bp as bp_board
 from .blueprints.bulma import bp as bp_bulma
 from .blueprints.data import bp as bp_data
@@ -24,20 +23,32 @@ from .clients.royalroad.client import RoyalRoadScraper
 from .clients.steam.client_store_api import SteamStoreAPI
 from .clients.steam.client_web_api import SteamWebAPI
 from .clients.tmdb.client import TmdbAPI
+from .converters import RemoteTypeConverter, WorkTypeConverter
 from .ext.structlog import configure_logging
-from .extensions import cors, db, debug_toolbar, html, htmx, login_manager, migrate
+from .extensions import alembic, cors, db, debug_toolbar, html, htmx, login_manager
+from .models import Base
 from .shelf import Shelf
+
+root = pathlib.Path(__file__).parent
 
 
 def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app = flask.Flask("vancelle")
+    app.config["ALEMBIC"] = {
+        "script_location": (root / "migrations").as_posix(),
+        "version_locations": [(root / "migrations" / "versions").as_posix()],
+    }
+    app.config["ALEMBIC_CONTEXT"] = {}
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
-    # app.config["DEBUG_TB_ENABLED"] = False
     app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
     app.config.from_mapping(config)
     app.config.from_prefixed_env("VANCELLE")
+
+    if default := app.config.get("SQLALCHEMY_ENGINES_DEFAULT"):
+        app.config["SQLALCHEMY_ENGINES"] = {"default": default}
+
     app.url_map.converters["work_type"] = WorkTypeConverter
     app.url_map.converters["remote_type"] = RemoteTypeConverter
 
@@ -53,14 +64,18 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     svcs.flask.register_factory(app, SteamWebAPI, SteamWebAPI.factory)
     svcs.flask.register_factory(app, TmdbAPI, TmdbAPI.factory)
 
+    alembic.init_app(app)
     cors.init_app(app)
     db.init_app(app)
     debug_toolbar.init_app(app)
-    login_manager.init_app(app)
-    migrate.init_app(app, db)
-
     html.init_app(app)
     htmx.init_app(app)
+    login_manager.init_app(app)
+
+    # https://flask-sqlalchemy-lite.readthedocs.io/en/latest/alembic/
+    # Flask-Alembic expects these attributes to exist, and Flask-SQLAlchemy-Lite doesn't provide them.
+    app.extensions["sqlalchemy"].db = db
+    app.extensions["sqlalchemy"].db.metadata = Base.metadata
 
     app.register_blueprint(bp_board)
     app.register_blueprint(bp_bulma)
@@ -97,8 +112,5 @@ def create_personal_app() -> wsgiref.types.WSGIApplication:
         "SENTRY_ENABLED": True,
         "SPOTLIGHT_ENABLED": True,
     }
-
-    if database_url := os.environ.get("DATABASE_URL"):
-        config["SQLALCHEMY_DATABASE_URI"] = database_url
 
     return create_app_once(config)

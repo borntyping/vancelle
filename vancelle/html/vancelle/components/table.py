@@ -1,10 +1,10 @@
 import typing
 
-from vancelle.ext.flask_sqlalchemy import Pagination
 from vancelle.html.helpers import HtmlClasses, html_classes
 from vancelle.html.vancelle.components.pagination import nav_pagination
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import fragment, table, tbody, td, th, thead, tr
+from vancelle.lib.pagination import Pagination
 
 T = typing.TypeVar("T")
 
@@ -34,7 +34,7 @@ def generate_table_from_pagination(
 ) -> Heavymetal:
     return fragment(
         [
-            generate_table(header=header, row=row, items=pagination, classes=classes),
+            generate_table(header=header, row=row, items=pagination.items, classes=classes),
             nav_pagination(pagination=pagination),
         ]
     )

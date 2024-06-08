@@ -2,8 +2,7 @@ import abc
 import dataclasses
 import typing
 
-import flask_sqlalchemy.pagination
-
+from vancelle.lib.pagination import Pagination
 from vancelle.models import Work
 from vancelle.models.remote import Remote
 
@@ -25,8 +24,8 @@ class Manager(typing.Generic[R], abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def search(self, query: str) -> flask_sqlalchemy.pagination.Pagination:
-        """Return a flask_sqlalchemy.Pagination object containing Remotes."""
+    def search(self, query: str) -> Pagination:
+        """Return a Pagination object containing Remotes."""
         raise NotImplementedError
 
     def context(self, remote: R) -> typing.Mapping[str, typing.Any]:

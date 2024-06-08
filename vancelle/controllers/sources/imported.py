@@ -1,7 +1,7 @@
 from werkzeug.exceptions import BadRequest
 
 from .base import Manager
-from ...ext.flask_sqlalchemy import Pagination
+from ...lib.pagination import Pagination
 from ...models import Work
 from ...models.remote import ImportedWork
 

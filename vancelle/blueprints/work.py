@@ -203,7 +203,7 @@ def index():
                 form=form,
                 layout=form.layout.data,
                 works=works,
-                total=works.total,
+                total=works.count,
             )
         case _:
             raise werkzeug.exceptions.BadRequest(f"Unknown layout {form.layout.data!r}")

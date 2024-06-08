@@ -1,6 +1,7 @@
+import dataclasses
+
 import structlog
 import svcs
-from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import desc, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Mapped, mapped_column
@@ -8,9 +9,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Manager
 from ...clients.steam.client_store_api import SteamStoreAPI
 from ...clients.steam.client_web_api import SteamWebAPI
-from ...ext.flask_sqlalchemy import EmptyPagination, SelectAndTransformPagination
+from ...lib.pagination import Pagination
 from ...extensions import db
 from ...inflect import p
+from ...lib.pagination.flask import FlaskPaginationArgs
 from ...models import Base
 from ...models.remote import SteamApplication
 from ...models.work import Game
@@ -53,11 +55,13 @@ class SteamApplicationManager(Manager):
         )
 
     def search(self, query: str) -> Pagination:
+        args = FlaskPaginationArgs()
+
         log = logger.bind(query=query)
         log.info("Searching Steam apps")
 
         if not query:
-            return EmptyPagination()
+            return Pagination.empty()
 
         self.ensure_appid_cache()
 
@@ -71,11 +75,8 @@ class SteamApplicationManager(Manager):
             )
         )
 
-        return SelectAndTransformPagination(
-            select=stmt,
-            session=db.session(),
-            transform=lambda a: SteamApplication(id=a.appid, title=a.name),  # type: ignore
-        )
+        pagination = Pagination.from_query(db.session, stmt)
+        return pagination.map(lambda a: SteamApplication(id=a.appid, title=a.name))
 
     def ensure_appid_cache(self) -> None:
         appid_count = db.session.execute(select(func.count()).select_from(SteamAppID).limit(1)).scalar_one()

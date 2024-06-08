@@ -2,7 +2,7 @@ import svcs
 
 from .base import Manager
 from ...clients.royalroad.client import RoyalRoadScraper
-from ...ext.flask_sqlalchemy import Pagination, ItemsPagination
+from ...lib.pagination import Pagination
 from ...models.remote import RoyalroadFiction
 from ...models.work import Book
 
@@ -18,4 +18,4 @@ class RoyalroadFictionManager(Manager):
     def search(self, query: str) -> Pagination[RoyalroadFiction]:
         client = svcs.flask.get(RoyalRoadScraper)
         items = client.search_fictions(title=query)
-        return ItemsPagination(page=1, per_page=len(items), items=items, total=len(items), error_out=False)
+        return Pagination.from_iterable(items)

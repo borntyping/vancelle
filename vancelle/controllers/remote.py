@@ -4,11 +4,8 @@ import typing
 import uuid
 
 import flask
-import jinja2
 import sqlalchemy
 import structlog
-from flask_sqlalchemy.pagination import Pagination
-from sqlalchemy import select
 
 from vancelle.controllers.sources.base import Manager
 from vancelle.controllers.sources.goodreads import GoodreadsPrivateBookManager, GoodreadsPublicBookManager
@@ -17,10 +14,10 @@ from vancelle.controllers.sources.openlibrary import OpenlibraryEditionManager, 
 from vancelle.controllers.sources.royalroad import RoyalroadFictionManager
 from vancelle.controllers.sources.steam import SteamApplicationManager
 from vancelle.controllers.sources.tmdb import TmdbMovieManager, TmdbTvSeriesManager
-from vancelle.ext.flask_sqlalchemy import EmptyPagination
 from vancelle.extensions import db
 from vancelle.lib.heavymetal import render
 from vancelle.lib.heavymetal.html import a, fragment
+from vancelle.lib.pagination import Pagination
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -65,7 +62,7 @@ class RemotesController:
         return db.session.execute(self._get_remote_query(remote_type=remote_type, remote_id=remote_id)).scalar_one_or_none()
 
     def _get_remote_query(self, remote_type: str, remote_id: str) -> sqlalchemy.Select:
-        return select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
+        return sqlalchemy.select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
 
     def get_remote(self, remote_type: str, remote_id: str) -> Remote:
         log = logger.bind(remote_type=remote_type, remote_id=remote_id)
@@ -84,7 +81,7 @@ class RemotesController:
         if remote_type is not None:
             query = query.filter(Remote.type == remote_type.__mapper__.polymorphic_identity)
 
-        return db.paginate(query)
+        return Pagination.from_query(db.session, query)
 
     def refresh(self, remote_type: str, remote_id: str) -> Remote:
         old_remote = self._get_remote_from_db_or_404(remote_type=remote_type, remote_id=remote_id)

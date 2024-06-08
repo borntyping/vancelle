@@ -4,7 +4,7 @@ import svcs
 
 from .base import Manager
 from ...clients.openlibrary.client import OpenLibraryAPI
-from ...ext.flask_sqlalchemy import Pagination, StaticPagination
+from ...lib.pagination import Pagination
 from ...models.remote import OpenlibraryEdition, OpenlibraryWork
 from ...models.work import Book
 
@@ -19,7 +19,7 @@ class OpenlibraryWorkManager(Manager):
 
     def search(self, query: str) -> Pagination[OpenlibraryWork]:
         openlibrary = svcs.flask.get(OpenLibraryAPI)
-        return StaticPagination(items=openlibrary.search(q=query))
+        return Pagination.from_iterable(openlibrary.search(q=query))
 
     def context(self, remote: OpenlibraryWork) -> typing.Mapping[str, typing.Any]:
         openlibrary = svcs.flask.get(OpenLibraryAPI)

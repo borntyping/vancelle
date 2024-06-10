@@ -86,13 +86,41 @@ class HeavymetalHtmlError(HeavymetalException):
     pass
 
 
-def render(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTuple] = ()) -> str:
+def expand(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTuple] = ()) -> HeavymetalTuple | str:
     if isinstance(original_node, HeavymetalProtocol):
         node = original_node.heavymetal()
     elif callable(original_node):
         node = original_node()
+    elif original_node is None:
+        node = (None, {}, ())
+    elif isinstance(original_node, str):
+        return original_node
     else:
         node = original_node
+
+    # This is where hotmetal tripped me up a lot.
+    if not isinstance(node, tuple) or not len(node) == 3:
+        raise HeavymetalSyntaxError(f"Expected a tuple with three elements, got {node!r}", parents, value=node)
+
+    node: HeavymetalTuple
+    tag, attrs, children = node
+    children = tuple(expand(c, parents=(*parents, node)) for c in children)
+    return (tag, attrs, children)
+
+
+def render(node: Heavymetal) -> str:
+    return render_tuple(expand(node))
+
+
+def render_tuple(node: HeavymetalTuple, *, parents: typing.Sequence[HeavymetalTuple] = ()) -> str:
+    # TODO: Expand callables, then render.
+
+    # if isinstance(original_node, HeavymetalProtocol):
+    #     node = original_node.heavymetal()
+    # elif callable(original_node):
+    #     node = original_node()
+    # else:
+    #     node = original_node
 
     if node is None:
         return ""
@@ -133,7 +161,7 @@ def render(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTupl
     if tag is None:
         if attrs:
             raise HeavymetalSyntaxError("Fragments cannot have attributes", parents, node)
-        nested = "".join(render(child, parents=[*parents, node]) for child in children)
+        nested = "".join(render_tuple(child, parents=[*parents, node]) for child in children)
         return "{}".format(nested)
 
     try:
@@ -151,5 +179,5 @@ def render(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTupl
             raise HeavymetalHtmlError("Void element cannot have children", parents, node)
         return "<{tag}{attributes} />".format(tag=html.escape(tag), attributes=attributes)
 
-    nested = "".join(render(child, parents=[*parents, node]) for child in children)
+    nested = "".join(render_tuple(child, parents=[*parents, node]) for child in children)
     return "<{tag}{attributes}>{nested}</{tag}>".format(tag=html.escape(tag), attributes=attributes, nested=nested)

@@ -6,8 +6,8 @@ from vancelle.ext.flask import compare_endpoints
 @pytest.mark.parametrize(
     ("request_endpoint", "request_args", "other_endpoint", "other_args", "result"),
     [
-        ("work.index", {"work_type": "book"}, "work.index", {"work_type": "book"}, True),
-        ("work.index", {"work_type": "book"}, "work.index", {"work_type": "game"}, False),
+        pytest.param("work.index", {"work_type": "book"}, "work.index", {"work_type": "book"}, True, id="=="),
+        pytest.param("work.index", {"work_type": "book"}, "work.index", {"work_type": "game"}, False, id="!="),
     ],
 )
 def test_compare_endpoints(

@@ -1,12 +1,12 @@
-from vancelle.lib.heavymetal.html import br, fragment, make_element
+from vancelle.lib.heavymetal.html import br, fragment, make_element, nothing
 
 invalid = make_element("invalid")
 
 
 def test_make_element():
-    br = make_element("br")
+    element = make_element("br")
 
-    assert br({}, []) == ("br", {}, [])
+    assert element({}, []) == ("br", {}, [])
 
 
 def test_make_element_metadata():
@@ -18,3 +18,9 @@ def test_fragment():
     document = fragment([br({})])
 
     assert document == (None, {}, [("br", {}, [])])
+
+
+def test_nothing():
+    document = nothing()
+
+    assert document == (None, {}, ())

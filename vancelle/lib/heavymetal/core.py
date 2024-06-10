@@ -145,6 +145,7 @@ def render(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTupl
     #
     # Don't treat childless elements as self-closing - that's not valid in HTML5.
     # https://html.spec.whatwg.org/multipage/syntax.html#start-tags
+    # https://github.com/validator/validator/wiki/Markup-%C2%BB-Void-elements
     if tag.lower() in VOID_ELEMENTS:
         if children:
             raise HeavymetalHtmlError("Void element cannot have children", parents, node)

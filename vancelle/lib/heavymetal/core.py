@@ -108,25 +108,11 @@ def expand(original_node: Heavymetal, *, parents: typing.Sequence[HeavymetalTupl
     return (tag, attrs, children)
 
 
-def render(node: Heavymetal) -> str:
-    return render_tuple(expand(node))
-
-
-def render_tuple(node: HeavymetalTuple, *, parents: typing.Sequence[HeavymetalTuple] = ()) -> str:
-    # TODO: Expand callables, then render.
-
-    # if isinstance(original_node, HeavymetalProtocol):
-    #     node = original_node.heavymetal()
-    # elif callable(original_node):
-    #     node = original_node()
-    # else:
-    #     node = original_node
-
-    if node is None:
-        return ""
-    elif isinstance(node, markupsafe.Markup):
+def render_simple(node: HeavymetalTuple | str, *, parents: typing.Sequence[HeavymetalTuple] = ()) -> str:
+    if isinstance(node, markupsafe.Markup):
         return node
-    elif isinstance(node, str):
+
+    if isinstance(node, str):
         return html.escape(node)
 
     # This is where hotmetal tripped me up a lot.
@@ -161,7 +147,7 @@ def render_tuple(node: HeavymetalTuple, *, parents: typing.Sequence[HeavymetalTu
     if tag is None:
         if attrs:
             raise HeavymetalSyntaxError("Fragments cannot have attributes", parents, node)
-        nested = "".join(render_tuple(child, parents=[*parents, node]) for child in children)
+        nested = "".join(render_simple(child, parents=[*parents, node]) for child in children)
         return "{}".format(nested)
 
     try:
@@ -179,5 +165,9 @@ def render_tuple(node: HeavymetalTuple, *, parents: typing.Sequence[HeavymetalTu
             raise HeavymetalHtmlError("Void element cannot have children", parents, node)
         return "<{tag}{attributes} />".format(tag=html.escape(tag), attributes=attributes)
 
-    nested = "".join(render_tuple(child, parents=[*parents, node]) for child in children)
+    nested = "".join(render_simple(child, parents=[*parents, node]) for child in children)
     return "<{tag}{attributes}>{nested}</{tag}>".format(tag=html.escape(tag), attributes=attributes, nested=nested)
+
+
+def render(node: Heavymetal) -> str:
+    return render_simple(expand(node))

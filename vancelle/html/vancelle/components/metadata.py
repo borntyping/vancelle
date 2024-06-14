@@ -4,9 +4,9 @@ import humanize
 import markupsafe
 
 from vancelle.extensions import html
-from vancelle.html.bulma.elements.icon import icon
-from vancelle.lib.heavymetal.html import a, span
+from vancelle.html.bootstrap_icons import bi_font
 from vancelle.lib.heavymetal import Heavymetal
+from vancelle.lib.heavymetal.html import a, span
 
 
 def url(href: str, text: str | None) -> Heavymetal:
@@ -27,12 +27,15 @@ def external_url(href: str, text: str | None = None) -> Heavymetal:
     return a(
         {
             "href": href,
-            "class": "has-text-link is-flex-wrap-nowrap icon-text",
+            "class": "icon-link",
             "rel": "noopener noreferrer nofollow",
             "target": "_blank",
             "title": href,
         },
-        [icon("exit-outline"), url(href, text)],
+        [
+            bi_font("box-arrow-up-right"),
+            url(href, text),
+        ],
     )
 
 

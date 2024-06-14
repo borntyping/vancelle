@@ -84,21 +84,27 @@ function switchTab(element, newTabSelector) {
   container.querySelector(newTabSelector).removeAttribute("hidden");
 }
 
-function initBulmaFileInputs() {
-  console.debug("Configuring Bulma file inputs");
-  document.querySelectorAll(".file").forEach((element) => {
-    const fileInput = element.querySelector(".file-input");
-    const fileName = element.querySelector(".file-name");
-    console.debug("Configuring file input", fileInput.attributes.getNamedItem("name").value, element);
-    fileInput.onchange = () => {
-      if (fileInput.files.length > 0) {
-        fileName.textContent = fileInput.files[0].name;
-      }
-    };
-  });
+// function initBulmaFileInputs() {
+//   console.debug("Configuring Bulma file inputs");
+//   document.querySelectorAll(".file").forEach((element) => {
+//     const fileInput = element.querySelector(".file-input");
+//     const fileName = element.querySelector(".file-name");
+//     console.debug("Configuring file input", fileInput.attributes.getNamedItem("name").value, element);
+//     fileInput.onchange = () => {
+//       if (fileInput.files.length > 0) {
+//         fileName.textContent = fileInput.files[0].name;
+//       }
+//     };
+//   });
+// }
+
+function initBootstrapPopovers() {
+  console.debug("Configuring Bootstrap popovers");
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]')
+  const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl, {}))
 }
 
 window.onload = () => {
   initTheme();
-  initBulmaFileInputs();
+  initBootstrapPopovers();
 };

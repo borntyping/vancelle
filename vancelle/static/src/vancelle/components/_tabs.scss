@@ -1,0 +1,13 @@
+.tab-content {
+  table tr:last-child {
+    th, td {
+      border-bottom: none;
+    }
+  }
+
+  p, table {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

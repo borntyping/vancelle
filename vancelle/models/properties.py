@@ -6,7 +6,7 @@ import flask
 import hotmetal
 import structlog
 
-from vancelle.lib.heavymetal.html import span
+from vancelle.lib.heavymetal.html import code, span
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.html.vancelle.components.metadata import external_url, internal_url
 from vancelle.html.vancelle.components.optional import span_absent
@@ -15,9 +15,10 @@ from vancelle.inflect import p
 logger = structlog.get_logger(logger_name=__name__)
 
 
+@dataclasses.dataclass()
 class Property:
     name: str
-    description: str | None
+    description: str | None = dataclasses.field(default=None, kw_only=True)
 
     def __bool__(self) -> bool:
         raise NotImplementedError
@@ -39,9 +40,7 @@ class Property:
 
 @dataclasses.dataclass()
 class StringProperty(Property):
-    name: str
     value: str | typing.Any
-    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.value)
@@ -51,10 +50,19 @@ class StringProperty(Property):
 
 
 @dataclasses.dataclass()
+class CodeProperty(Property):
+    value: str | typing.Any
+
+    def __bool__(self) -> bool:
+        return bool(self.value)
+
+    def heavymetal(self) -> Heavymetal:
+        return code({}, str(self.value))
+
+
+@dataclasses.dataclass()
 class TimeProperty(Property):
-    name: str
     value: datetime.datetime | datetime.date | typing.Any
-    description: str | None = None
 
     def __bool__(self) -> bool:
         return self.value is not None
@@ -65,10 +73,8 @@ class TimeProperty(Property):
 
 @dataclasses.dataclass()
 class InternalUrlProperty(Property):
-    name: str
     link: str | None
     text: str | None = None
-    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
@@ -79,10 +85,8 @@ class InternalUrlProperty(Property):
 
 @dataclasses.dataclass()
 class ExternalUrlProperty(Property):
-    name: str
     link: str | None
     text: str | None = None
-    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.link or self.text)
@@ -93,10 +97,8 @@ class ExternalUrlProperty(Property):
 
 @dataclasses.dataclass()
 class IterableProperty(Property):
-    name: str
     items: typing.Iterable[typing.Any] = ()
     sorted: bool = False
-    description: str | None = None
 
     def __bool__(self) -> bool:
         return bool(self.items)

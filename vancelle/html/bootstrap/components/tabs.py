@@ -34,7 +34,11 @@ from vancelle.lib.heavymetal.html import a, button, div, fragment, li, nav, ul
 class Tab:
     slug: str
     name: str
-    content: HeavymetalContent = ()
+    content: HeavymetalContent = dataclasses.field(default=(), repr=False)
+    classes: HtmlClasses = dataclasses.field(default=(), repr=False)
+
+    def __bool__(self) -> bool:
+        return any(self.content)
 
     @property
     def nav_id(self) -> str:
@@ -48,25 +52,28 @@ class Tab:
 @dataclasses.dataclass
 class Tabs(HeavymetalComponent):
     id: str
-    tabs: typing.Sequence[Tab]
-    pane_classes: HtmlClasses = ()
+    tabs: typing.Sequence[Tab] = dataclasses.field(repr=False)
     align_tabs: typing.Literal["left", "center", "right"] = "left"
+    active_tab: int = 0
 
-    def nav_id(self, tab: Tab) -> str:
+    def _nav_id(self, tab: Tab) -> str:
         return f"tab-{self.id}-{tab.slug}"
 
-    def pane_id(self, tab: Tab) -> str:
+    def _pane_id(self, tab: Tab) -> str:
         return f"tab-pane-{self.id}-{tab.slug}"
 
     def heavymetal(self) -> Heavymetal:
-        nav_tabs = nav(
+        return fragment([self.navigation(), self.content()])
+
+    def navigation(self) -> Heavymetal:
+        return nav(
             {
                 "class": html_classes(
-                    "nav nav-tabs",
+                    "nav nav-tabs px-3",
                     {
-                        "justify-content-left": self.align_tabs == "left",
+                        "justify-content-start": self.align_tabs == "left",
                         "justify-content-center": self.align_tabs == "center",
-                        "justify-content-right": self.align_tabs == "right",
+                        "justify-content-end": self.align_tabs == "right",
                     },
                 ),
                 "id": self.id,
@@ -75,34 +82,37 @@ class Tabs(HeavymetalComponent):
             [
                 a(
                     {
-                        "class": html_classes("nav-link", {"active": index == 0}),
-                        "id": self.nav_id(tab),
+                        "class": html_classes("nav-link", {"active": index == self.active_tab}),
+                        "id": self._nav_id(tab),
                         "data-bs-toggle": "tab",
-                        "data-bs-target": "#" + self.pane_id(tab),
+                        "data-bs-target": "#" + self._pane_id(tab),
                         "type": "button",
                         "role": "tab",
-                        "aria-controls": self.pane_id(tab),
-                        "aria-selected": "true" if index == 0 else "false",
+                        "aria-controls": self._pane_id(tab),
+                        "aria-selected": "true" if index == self.active_tab else "false",
                     },
                     [tab.name],
                 )
                 for index, tab in enumerate(self.tabs)
+                if tab
             ],
         )
-        tab_content = div(
-            {"class": "tab-content"},
+
+    def content(self) -> Heavymetal:
+        return div(
+            {"class": "tab-content v-tab-content"},
             [
                 div(
                     {
-                        "class": html_classes("tab-pane", {"show active": index == 0}, self.pane_classes),
-                        "id": self.pane_id(tab),
+                        "class": html_classes("tab-pane", {"show active": index == self.active_tab}, tab.classes),
+                        "id": self._pane_id(tab),
                         "role": "tabpanel",
-                        "aria-labelledby": self.nav_id(tab),
+                        "aria-labelledby": self._nav_id(tab),
                         "tabindex": "0",
                     },
                     tab.content,
                 )
                 for index, tab in enumerate(self.tabs)
+                if tab
             ],
         )
-        return fragment([nav_tabs, tab_content])

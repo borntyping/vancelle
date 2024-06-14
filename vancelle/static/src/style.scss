@@ -34,10 +34,12 @@ $font-sizes: map-merge($font-sizes, (
 
 @import "bootstrap/scss/bootstrap";
 
-@import "ext/bootstrap/scss/type";
+@import "ext/bootstrap-icons/bi";
 @import "ext/bootstrap/scss/card";
+@import "ext/bootstrap/scss/type";
 
 @import "vancelle/colours";
 @import "vancelle/components/board";
-@import "vancelle/components/details";
+@import "vancelle/components/panel";
+@import "vancelle/components/tabs";
 @import "vancelle/typography";

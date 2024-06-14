@@ -1,9 +1,10 @@
 .PHONY: default clean
 
 default: \
-vancelle/static/dist/bootstrap-icons/bootstrap-icons.css \
-vancelle/static/dist/bootstrap-icons/fonts/bootstrap-icons.woff \
-vancelle/static/dist/bootstrap-icons/fonts/bootstrap-icons.woff2 \
+vancelle/static/dist/bootstrap-icons/bootstrap-icons.svg \
+vancelle/static/dist/bootstrap-icons/font/bootstrap-icons.min.css \
+vancelle/static/dist/bootstrap-icons/font/fonts/bootstrap-icons.woff \
+vancelle/static/dist/bootstrap-icons/font/fonts/bootstrap-icons.woff2 \
 vancelle/static/dist/bootstrap/ \
 vancelle/static/dist/bootstrap/bootstrap.bundle.min.js \
 vancelle/static/dist/bootstrap/bootstrap.bundle.min.js.map \
@@ -26,16 +27,17 @@ vancelle/static/dist/bootstrap/%:
 
 vancelle/static/dist/bootstrap-icons/%:
 	@mkdir -p "$(@D)"
+	cp "node_modules/bootstrap-icons/$(@F)" "$(@)"
+vancelle/static/dist/bootstrap-icons/font/%:
+	@mkdir -p "$(@D)"
 	cp "node_modules/bootstrap-icons/font/$(@F)" "$(@)"
-
-vancelle/static/dist/bootstrap-icons/fonts/%:
+vancelle/static/dist/bootstrap-icons/font/fonts/%:
 	@mkdir -p "$(@D)"
 	cp "node_modules/bootstrap-icons/font/fonts/$(@F)" "$(@)"
 
 vancelle/static/dist/htmx.org/%:
 	@mkdir -p "$(@D)"
 	cp "node_modules/htmx.org/dist/$(@F)" "$(@)"
-
 vancelle/static/dist/htmx.org/ext/%:
 	@mkdir -p "$(@D)"
 	cp "node_modules/htmx.org/dist/ext/$(@F)" "$(@)"

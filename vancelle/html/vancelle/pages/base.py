@@ -2,6 +2,7 @@ import json
 import typing
 
 import flask
+import markupsafe
 
 from vancelle.extensions import htmx, sentry
 from vancelle.html.vancelle.components.footer import page_footer
@@ -32,7 +33,7 @@ def page(
         meta({"name": "theme-color", "content": "#485fc7"}),
         meta({"name": "htmx-config", "content": json.dumps({"globalViewTransitions": True, "requestClass": "is-loading"})}),
         link({"rel": "stylesheet", "href": static("dist/style.css")}),
-        link({"rel": "stylesheet", "href": static("dist/bootstrap-icons/bootstrap-icons.min.css")}),
+        link({"rel": "stylesheet", "href": static("dist/bootstrap-icons/font/bootstrap-icons.min.css")}),
         link({"rel": "apple-touch-icon", "href": static("favicon/apple-touch-icon.png"), "sizes": "180x180"}),
         link({"rel": "icon", "href": static("favicon/favicon-32x32.png"), "type": "image/png", "sizes": "32x32"}),
         link({"rel": "icon", "href": static("favicon/favicon-194x194.png"), "type": "image/png", "sizes": "194x194"}),
@@ -61,6 +62,14 @@ def page(
         {"class": "bg-body-tertiary"},
         [
             ("head", {}, head),
-            ("body", {"class": "bg-body", "hx-ext": "loading-states", "hx-headers": json.dumps(htmx.headers())}, body),
+            (
+                "body",
+                {
+                    "class": "bg-body",
+                    "hx-ext": "loading-states",
+                    "hx-headers": markupsafe.Markup(json.dumps(htmx.headers())),
+                },
+                body,
+            ),
         ],
     )

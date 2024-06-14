@@ -1,0 +1,4 @@
+// Fix icons rendering below the baseline in links.
+a:not(.btn) .bi::before, {
+  vertical-align: unset;
+}

@@ -11,7 +11,7 @@ from sqlalchemy.sql.functions import coalesce
 
 from .base import PolymorphicBase
 from .details import Details, IntoDetails
-from .properties import IntoProperties, Property, StringProperty, TimeProperty
+from .properties import CodeProperty, IntoProperties, Property, StringProperty, TimeProperty
 from .record import Record
 from .remote import Remote
 from .types import ShelfEnum
@@ -150,7 +150,7 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield StringProperty("ID", self.id)
+        yield CodeProperty("ID", self.id)
         yield StringProperty("Type", self.info.noun_title)
         yield TimeProperty("Created", self.time_created)
         yield TimeProperty("Updated", self.time_updated)

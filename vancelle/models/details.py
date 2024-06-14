@@ -16,12 +16,12 @@ class Details(IntoProperties):
     title: str | None
     author: str | None
     series: str | None
-    description: str | None
+    description: str | None = dataclasses.field(repr=False)
     release_date: datetime.date | None
-    cover: str | None
-    background: str | None
-    tags: typing.Set[str] | None = dataclasses.field(default_factory=set)
-    external_url: str | None
+    cover: str | None = dataclasses.field(repr=False)
+    background: str | None = dataclasses.field(repr=False)
+    tags: typing.Set[str] | None = dataclasses.field(default_factory=set, repr=False)
+    external_url: str | None = dataclasses.field(repr=False)
 
     def __bool__(self) -> bool:
         return any(dataclasses.astuple(self))

@@ -4,7 +4,6 @@ import uuid
 import click
 import flask
 import flask_login
-import hotmetal
 import sqlalchemy
 import sqlalchemy.exc
 import sqlalchemy.orm
@@ -70,16 +69,11 @@ def settings():
     if form.validate_on_submit():
         data = gzip.decompress(form.backup.data.read()).decode("utf-8")
         user_settings.import_json(data, user=flask_login.current_user)
-        return flask.redirect(flask.url_for(flask.request.endpoint))
+        return flask.redirect(flask.url_for(".settings"))
 
     work_count = flask_login.current_user.works.count()
-    return render(
-        SettingsPage(
-            import_form=form,
-            work_count=work_count,
-            filename=BACKUP_FILENAME,
-        )
-    )
+    page = SettingsPage(import_form=form, work_count=work_count, filename=BACKUP_FILENAME)
+    return page.render()
 
 
 @bp.route("/export")

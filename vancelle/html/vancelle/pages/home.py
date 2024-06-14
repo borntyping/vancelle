@@ -112,4 +112,4 @@ class HomePageHero(HeavymetalComponent):
 @dataclasses.dataclass()
 class HomePage(HeavymetalComponent):
     def heavymetal(self) -> Heavymetal:
-        return page([HomePageHero(), HomePageGauges()])
+        return page([HomePageHero(), HomePageGauges()], title=())

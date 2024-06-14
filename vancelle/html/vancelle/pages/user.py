@@ -33,7 +33,8 @@ class LoginPage(HeavymetalComponent):
                         ),
                     ],
                 )
-            ]
+            ],
+            title=["Login"],
         )
 
 
@@ -45,33 +46,36 @@ class SettingsPage(HeavymetalComponent):
 
     def heavymetal(self) -> Heavymetal:
         return page(
-            section(
-                {},
-                [
-                    page_header("Settings", "Manage user data and application data"),
-                ],
-            ),
-            section(
-                {},
-                [
-                    section_header("User data", f"This data can only be seen by the current user."),
-                    div(
-                        {"class": "d-flex flex-column gap-3"},
-                        [
-                            self.import_box(),
-                            self.export_box(),
-                            self.clear_box(),
-                        ],
-                    ),
-                ],
-            ),
-            section(
-                {},
-                [
-                    section_header("Application data", "This data is shared by all users of the application."),
-                    self.steam_box(),
-                ],
-            ),
+            [
+                section(
+                    {},
+                    [
+                        page_header("Settings", "Manage user data and application data"),
+                    ],
+                ),
+                section(
+                    {},
+                    [
+                        section_header("User data", f"This data can only be seen by the current user."),
+                        div(
+                            {"class": "d-flex flex-column gap-3"},
+                            [
+                                self.import_box(),
+                                self.export_box(),
+                                self.clear_box(),
+                            ],
+                        ),
+                    ],
+                ),
+                section(
+                    {},
+                    [
+                        section_header("Application data", "This data is shared by all users of the application."),
+                        self.steam_box(),
+                    ],
+                ),
+            ],
+            title=["Settings"],
         )
 
     def import_box(self) -> Heavymetal:

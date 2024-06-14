@@ -136,4 +136,4 @@ class BoardPage(HeavymetalComponent):
         else:
             raise ValueError
 
-        return page([section({}, [board])])
+        return page([section({}, [board])], title=["Board"])

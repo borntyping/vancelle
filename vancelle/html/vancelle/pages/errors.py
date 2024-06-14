@@ -16,11 +16,12 @@ def error_page(title: str, description: str) -> Heavymetal:
                     p({"class": "lead"}, [description]),
                 ],
             )
-        ]
+        ],
+        title=["Error"],
     )
 
 
-def error_index_page():
+def debug_page():
     errors = [
         ("Exception", flask.url_for("errors.raise_generic_error")),
         ("vancelle.exceptions.ApplicationError", flask.url_for("errors.raise_application_error")),
@@ -40,5 +41,6 @@ def error_index_page():
                 {"class": "d-flex justify-content-start gap-2"},
                 [a({"class": "btn btn-warning", "hx-get": url}, [name]) for name, url in errors],
             ),
-        ]
+        ],
+        title=["Debug"],
     )

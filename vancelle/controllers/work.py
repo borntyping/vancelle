@@ -171,7 +171,7 @@ class WorkQuery:
 @dataclasses.dataclass()
 class WorkController:
     def get_or_404(self, *, user: User = flask_login.current_user, id: uuid.UUID) -> Work:
-        return db.one_or_404(select(Work).filter_by(user_id=user.id, id=id))
+        return db.session.execute(select(Work).filter_by(user_id=user.id, id=id)).scalar_one()
 
     def delete(self, work: Work) -> Work:
         work.time_deleted = datetime.datetime.now()

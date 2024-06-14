@@ -56,10 +56,35 @@ def _attributes(attrs: HeavymetalAttrs) -> str:
     )
 
 
+@dataclasses.dataclass(frozen=True, kw_only=True)
+class Trace:
+    original_node: Heavymetal
+    node: HeavymetalTuple | str
+
+    def __str__(self) -> str:
+        string = ""
+
+        if self.original_node:
+            string += f"{self.original_node!r} -> "
+
+        if isinstance(self.node, str):
+            string += f"{self.node!r}"
+            return string
+
+        tag, attrs, children = self.node
+
+        if tag is None:
+            string += "<!-- fragment -->"
+            return string
+
+        string += f"<{tag}{_attributes(attrs)} />"
+        return string
+
+
 @dataclasses.dataclass(frozen=True)
 class HeavymetalException(Exception):
     message: str
-    parents: typing.Sequence[HeavymetalTuple] = ()
+    parents: typing.Sequence[Trace] = ()
     node: HeavymetalTuple | None = None
     value: typing.Any = None
 

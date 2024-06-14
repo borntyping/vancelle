@@ -6,7 +6,7 @@ import werkzeug.exceptions
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import htmx
 from vancelle.html.vancelle.components.toast import toast_response
-from vancelle.html.vancelle.pages.errors import error_index_page, error_page
+from vancelle.html.vancelle.pages.errors import debug_page, error_page
 from vancelle.lib.heavymetal import render
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -23,7 +23,7 @@ def once(state: flask.sansio.blueprints.BlueprintSetupState):
 
 @bp.route("/")
 def index() -> str:
-    return render(error_index_page())
+    return render(debug_page())
 
 
 @bp.route("/application")

@@ -126,7 +126,14 @@ def details_panel(
                         {"class": f"v-cover has-background-{colour}"},
                         [
                             (
-                                img({"src": details.cover, "alt": f"Cover for {details.title}.", "loading": "lazy"})
+                                img(
+                                    {
+                                        "class": "fs-7",
+                                        "src": details.cover,
+                                        "alt": f"Cover for {details.title}.",
+                                        "loading": "lazy",
+                                    }
+                                )
                                 if details.cover
                                 else nothing()
                             )

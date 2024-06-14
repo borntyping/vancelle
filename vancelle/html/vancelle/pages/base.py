@@ -17,6 +17,7 @@ def static(filename: str) -> str:
 
 def page(
     content: HeavymetalContent,
+    *,
     fluid: bool = False,
     title: typing.Sequence[str] = (),
 ) -> Heavymetal:

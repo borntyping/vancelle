@@ -3,8 +3,9 @@ Functions and classes for building things heavymetal can render.
 """
 
 import dataclasses
-import time
 
+import sentry_sdk
+import sentry_sdk.consts
 import structlog
 
 from .core import render
@@ -20,15 +21,13 @@ class HeavymetalComponent(HeavymetalProtocol):
         raise NotImplementedError
 
     def render(self) -> str:
-        start = time.perf_counter_ns()
-        tree = render(self)
-        end = time.perf_counter_ns()
-        logger.debug("Rendered component to HTML", type=type(self), duration=(end - start), seconds=(end - start) / 1000000000)
-        return tree
+        with sentry_sdk.start_span(op=sentry_sdk.consts.OP.FUNCTION, description="HeavymetalComponent.render()") as span:
+            span.set_tag("component", self.__class__.__qualname__)
+            return render(self)
 
 
 @dataclasses.dataclass
-class HeavymetalElement(HeavymetalComponent):
+class HeavymetalMutableElement(HeavymetalComponent):
     """Sometimes mutability is nice."""
 
     tag: str

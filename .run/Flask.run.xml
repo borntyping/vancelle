@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Flask" type="Python.FlaskServer">
-    <option name="application" value="create_personal_app()" />
     <option name="flaskDebug" value="true" />
     <module name="vancelle" />
-    <option name="target" value="vancelle.app" />
+    <option name="target" value="vancelle.app:create_app_once({})" />
     <option name="targetType" value="PYTHON" />
+    <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <option name="SDK_HOME" value="$PROJECT_DIR$/.venv/bin/python" />

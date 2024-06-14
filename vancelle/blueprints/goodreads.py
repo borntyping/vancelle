@@ -22,7 +22,12 @@ def setup(state: flask.sansio.blueprints.BlueprintSetupState):
             "currently-reading": Shelf.PLAYING,
             "gave-up-on": Shelf.ABANDONED,
             "read": Shelf.COMPLETED,
-            "to-read": Shelf.UNSORTED,
+            "to-read": Shelf.UPCOMING,
+            # Personal shelf names.
+            "non-fiction": Shelf.PAUSED,
+            "to-read-maybe": Shelf.UNDECIDED,
+            "to-read-non-fiction": Shelf.SHELVED,
+            "to-read-sequels": Shelf.UPCOMING,
         },
     )
 

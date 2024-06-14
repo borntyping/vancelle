@@ -3,6 +3,7 @@ import typing
 import wsgiref.types
 
 import flask
+import sentry_sdk
 import svcs.flask
 
 from .blueprints.board.blueprint import bp as bp_board
@@ -25,7 +26,7 @@ from .clients.steam.client_web_api import SteamWebAPI
 from .clients.tmdb.client import TmdbAPI
 from .converters import RemoteTypeConverter, WorkTypeConverter
 from .ext.structlog import configure_logging
-from .extensions import alembic, cors, db, debug_toolbar, html, htmx, login_manager
+from .extensions import alembic, cors, db, debug_toolbar, html, htmx, login_manager, sentry
 from .models import Base
 from .shelf import Shelf
 
@@ -70,6 +71,7 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     html.init_app(app)
     htmx.init_app(app)
     login_manager.init_app(app)
+    sentry.init_app(app)
 
     # https://flask-sqlalchemy-lite.readthedocs.io/en/latest/alembic/
     # Flask-Alembic expects these attributes to exist, and Flask-SQLAlchemy-Lite doesn't provide them.
@@ -93,23 +95,5 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
 
 def create_app_once(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     configure_logging()
+    sentry_sdk.init(spotlight=True)
     return create_app(config)
-
-
-def create_personal_app() -> wsgiref.types.WSGIApplication:
-    config: dict[str, typing.Any] = {
-        "GOODREADS_SHELF_MAPPING": {
-            "currently-reading": Shelf.PLAYING,
-            "gave-up-on": Shelf.ABANDONED,
-            "non-fiction": Shelf.PAUSED,
-            "read": Shelf.COMPLETED,
-            "to-read": Shelf.UPCOMING,
-            "to-read-maybe": Shelf.UNDECIDED,
-            "to-read-non-fiction": Shelf.SHELVED,
-            "to-read-sequels": Shelf.UPCOMING,
-        },
-        "SENTRY_ENABLED": True,
-        "SPOTLIGHT_ENABLED": True,
-    }
-
-    return create_app_once(config)

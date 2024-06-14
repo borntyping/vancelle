@@ -9,13 +9,11 @@ from sqlalchemy import ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base, PolymorphicBase
-from .details import (
-    Details,
-    IntoDetails,
-)
+from .base import PolymorphicBase
+from .details import Details, IntoDetails
 from .properties import ExternalUrlProperty, InternalUrlProperty, IntoProperties, IterableProperty, Property, StringProperty
 from .types import ShelfEnum
+from ..html.bootstrap.utilities.background import BackgroundColour
 from ..inflect import p
 from ..shelf import Shelf
 
@@ -32,7 +30,7 @@ class RemoteInfo:
     noun_plural: str
     noun_full: str  # Source and noun combined
 
-    colour: str  # Used in CSS
+    colour: BackgroundColour  # Used in CSS
     priority: int = 0
 
     can_search: bool = True

@@ -30,15 +30,21 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Build style.css using npm and dart-sass.
 #
 FROM docker.io/library/node:current-slim as sass
+RUN --mount=target=/var/lib/apt/lists,type=cache \
+    --mount=target=/var/cache/apt,type=cache \
+    apt-get update \
+ && apt-get install -y --no-install-recommends make \
+ && apt-get clean
 ARG DART_VERSION=1.69.5
 ARG DART_ARCH=x64
 ADD https://github.com/sass/dart-sass/releases/download/${DART_VERSION}/dart-sass-${DART_VERSION}-linux-${DART_ARCH}.tar.gz /opt/
 RUN tar -C /opt/ -xzvf /opt/dart-sass-${DART_VERSION}-linux-${DART_ARCH}.tar.gz
+ENV PATH="/opt/dart-sass/:$PATH"
 WORKDIR /opt/app
-COPY package.json package-lock.json ./
+COPY "Makefile" "package.json" "package-lock.json" ./
+COPY "vancelle/static/src/" "vancelle/static/src/"
 RUN npm ci
-COPY vancelle/static/src/ /opt/app/vancelle/static/src
-RUN /opt/dart-sass/sass --load-path=node_modules "/opt/app/vancelle/static/src/style.scss:/opt/app/vancelle/static/dist/style.css"
+RUN make
 
 #
 # Configure the final image and copy files from build stages.
@@ -51,8 +57,8 @@ COPY poetry.lock pyproject.toml ./
 COPY vancelle/ vancelle/
 
 ENTRYPOINT ["poetry", "run"]
-CMD gunicorn "vancelle.app:create_personal_app()" --access-logfile=- --bind="0.0.0.0:8000"
-ENV FLASK_APP="vancelle.app:create_personal_app()" \
+CMD gunicorn "vancelle.app:create_app()" --access-logfile=- --bind="0.0.0.0:8000"
+ENV FLASK_APP="vancelle.app:create_app()" \
     VANCELLE_CACHE_PATH="/var/cache/vancelle"
 EXPOSE 8000
 VOLUME '/var/cache/vancelle'

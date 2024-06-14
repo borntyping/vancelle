@@ -1,6 +1,6 @@
 from .components import (
     HeavymetalComponent,
-    HeavymetalElement,
+    HeavymetalMutableElement,
     HeavymetalProtocol,
 )
 from .core import (

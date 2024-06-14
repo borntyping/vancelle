@@ -7,7 +7,7 @@ import wtforms.csrf.core
 
 from vancelle.html.bulma.elements.icon import icon
 from vancelle.html.helpers import html_classes
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalElement
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalMutableElement
 from vancelle.lib.heavymetal.html import p
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -53,7 +53,7 @@ def form_field(
 
     input_element = markupsafe.Markup(_render(field, **kwargs))
 
-    control_element = HeavymetalElement("div", {"class": "control"}, [input_element])
+    control_element = HeavymetalMutableElement("div", {"class": "control"}, [input_element])
     if icon_left:
         control_element.attrs["class"] += " has-icons-left"
         control_element.children.append(icon(icon_left, "is-small", "is-left"))
@@ -61,7 +61,7 @@ def form_field(
         control_element.attrs["class"] += " has-icons-right"
         control_element.children.append(icon(icon_right, "is-small", "is-right"))
 
-    field_element = HeavymetalElement("div", {"class": "field"}, [control_element])
+    field_element = HeavymetalMutableElement("div", {"class": "field"}, [control_element])
     if label:
         field_element.children.insert(0, field.label(class_="label"))
     for error in field.errors:

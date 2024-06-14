@@ -1,6 +1,7 @@
 import dataclasses
 
 import flask
+import sentry_sdk
 import werkzeug.wrappers.response
 
 
@@ -82,3 +83,9 @@ class HtmxExtension:
             return flask.redirect(url)
 
         return flask.Response(status=204, headers={"HX-Redirect": url})
+
+    def headers(self) -> dict[str, str]:
+        return {
+            "sentry-trace": sentry_sdk.get_traceparent(),
+            "baggage": sentry_sdk.get_baggage(),
+        }

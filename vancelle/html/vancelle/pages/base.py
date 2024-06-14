@@ -3,6 +3,7 @@ import typing
 
 import flask
 
+from vancelle.extensions import htmx, sentry
 from vancelle.html.vancelle.components.footer import page_footer
 from vancelle.html.vancelle.components.navbar import page_navbar
 from vancelle.html.vancelle.components.title import page_title
@@ -31,6 +32,7 @@ def page(
         meta({"name": "theme-color", "content": "#485fc7"}),
         meta({"name": "htmx-config", "content": json.dumps({"globalViewTransitions": True, "requestClass": "is-loading"})}),
         link({"rel": "stylesheet", "href": static("dist/style.css")}),
+        link({"rel": "stylesheet", "href": static("dist/bootstrap-icons/bootstrap-icons.min.css")}),
         link({"rel": "apple-touch-icon", "href": static("favicon/apple-touch-icon.png"), "sizes": "180x180"}),
         link({"rel": "icon", "href": static("favicon/favicon-32x32.png"), "type": "image/png", "sizes": "32x32"}),
         link({"rel": "icon", "href": static("favicon/favicon-194x194.png"), "type": "image/png", "sizes": "194x194"}),
@@ -46,32 +48,19 @@ def page(
         main({"class": "container-fluid my-5" if fluid else "container my-5"}, content),
         toast_container(),
         page_footer(),
-        script(
-            {
-                "src": "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js",
-                "integrity": "sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r",
-                "crossorigin": "anonymous",
-            }
-        ),
-        script(
-            {
-                "src": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js",
-                "integrity": "sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy",
-                "crossorigin": "anonymous",
-            }
-        ),
-        script({"src": "https://unpkg.com/htmx.org@1.9.11/dist/htmx.js"}),
-        script({"src": "https://unpkg.com/htmx.org@1.9.11/dist/ext/debug.js"}),
-        script({"src": "https://unpkg.com/htmx.org@1.9.11/dist/ext/loading-states.js"}),
-        script({"src": "https://unpkg.com/hyperscript.org@0.9.12"}),
-        script({"src": "https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js", "type": "module"}),
-        script({"src": static("script.js")}),
+        script({"src": static("dist/htmx.org/htmx.min.js")}),
+        script({"src": static("dist/htmx.org/ext/debug.js")}),
+        script({"src": static("dist/htmx.org/ext/loading-states.js")}),
+        script({"src": static("dist/hyperscript.org/_hyperscript.min.js")}),
+        script({"src": static("dist/bootstrap/bootstrap.bundle.min.js")}),
+        script({"src": static("src/script.js")}),
+        sentry.spotlight_script(),
     ]
 
     return html5(
         {"class": "bg-body-tertiary"},
         [
             ("head", {}, head),
-            ("body", {"class": "bg-body", "hx-ext": "loading-states"}, body),
+            ("body", {"class": "bg-body", "hx-ext": "loading-states", "hx-headers": json.dumps(htmx.headers())}, body),
         ],
     )

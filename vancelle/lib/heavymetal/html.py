@@ -117,6 +117,6 @@ track = make_void_element("track")
 wbr = make_void_element("wbr")
 
 
-def script(attrs: HeavymetalAttrs, children: HeavymetalContent = ()) -> HeavymetalTuple:
+def script(attrs: HeavymetalAttrs, content: str | None = None) -> HeavymetalTuple:
     """Script gets a special case as it frequently has no children."""
-    return ("script", attrs, children)
+    return ("script", attrs, [markupsafe.Markup(content)] if content else [])

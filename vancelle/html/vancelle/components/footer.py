@@ -1,6 +1,6 @@
 import flask
 
-from vancelle.html.bootstrap.layout.grid import row
+from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import a, div, footer, img, picture, source
 
@@ -80,17 +80,18 @@ def page_footer() -> Heavymetal:
                 {"class": "container"},
                 [
                     row(
+                        {},
                         [
-                            div(
-                                {"class": "col row row-cols-1 align-items-center text-start"},
+                            col(
+                                {"class": "row row-cols-1 align-items-center text-start"},
                                 [
                                     div({"class": "col text-right"}, [openlibrary()]),
                                     div({"class": "col text-right"}, [tmdb()]),
                                     div({"class": "col text-right"}, [steam()]),
                                 ],
                             ),
-                            div(
-                                {"class": "col row row-cols-1 align-items-center text-end"},
+                            col(
+                                {"class": "row row-cols-1 align-items-center text-end"},
                                 [
                                     ("p", {}, [created_by()]),
                                     ("p", {}, [source_code()]),

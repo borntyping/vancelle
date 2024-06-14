@@ -1,6 +1,11 @@
-import functools
+from vancelle.html.helpers import merge_attrs
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs, HeavymetalContent, HeavymetalProtocol
+from vancelle.lib.heavymetal.html import div
 
-from vancelle.lib.heavymetal.html import element
 
-row = functools.partial(element, "div", {"class": "row"})
-col = functools.partial(element, "div", {"class": "col"})
+def row(attrs: HeavymetalAttrs, content: HeavymetalContent) -> Heavymetal:
+    return div(merge_attrs({"class": "row"}, attrs), content)
+
+
+def col(attrs: HeavymetalAttrs, content: HeavymetalContent) -> Heavymetal:
+    return div(merge_attrs({"class": "col"}, attrs), content)

@@ -3,6 +3,11 @@
     "bulma": "^1.0.0"
   },
   "dependencies": {
-    "bootstrap": "^5.3.3"
+    "@spotlightjs/overlay": "^2.0.0",
+    "@spotlightjs/spotlight": "^2.0.0",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "htmx.org": "^1.9.12",
+    "hyperscript.org": "^0.9.12"
   }
 }

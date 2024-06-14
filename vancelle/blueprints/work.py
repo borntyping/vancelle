@@ -16,6 +16,7 @@ from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
+from vancelle.html.vancelle.pages.work import WorkPage
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
 from vancelle.shelf import Case, Shelf
@@ -216,8 +217,10 @@ def index():
 @bp.route("/<uuid:work_id>")
 def detail(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
-    form = WorkForm(obj=work)
-    return flask.render_template("work/detail.html", work=work, form=form)
+    page = WorkPage(work=work)
+    return page.render()
+    # form = WorkForm(obj=work)
+    # return flask.render_template("work/detail.html", work=work, form=form)
 
 
 @bp.route("/<uuid:work_id>/cover")

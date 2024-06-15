@@ -56,6 +56,13 @@ pythonpath = ["src"]
 [tool.ruff]
 line-length = 128
 
+[tool.ruff.lint]
+preview = true
+
+[tool.ruff.format]
+preview = true
+docstring-code-format = false
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.masonry.api"

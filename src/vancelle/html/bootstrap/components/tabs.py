@@ -26,7 +26,7 @@ import dataclasses
 import typing
 
 from vancelle.html.helpers import HtmlClasses, html_classes
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent, HeavymetalDynamicContent
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent, HeavymetalContent
 from vancelle.lib.heavymetal.html import a, div, fragment, nav
 
 
@@ -34,7 +34,7 @@ from vancelle.lib.heavymetal.html import a, div, fragment, nav
 class Tab:
     slug: str
     name: str
-    content: HeavymetalDynamicContent = dataclasses.field(default=(), repr=False)
+    content: HeavymetalContent = dataclasses.field(default=(), repr=False)
     classes: HtmlClasses = dataclasses.field(default=(), repr=False)
 
     def __bool__(self) -> bool:

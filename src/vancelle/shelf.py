@@ -60,6 +60,9 @@ class Case(enum.Enum):
     COMPLETED = ("completed", "Completed", (Shelf.COMPLETED, Shelf.ABANDONED))
     OTHER = ("other", "Other", (Shelf.UNSORTED, Shelf.REFERENCE, Shelf.UNTOUCHED))
 
+    title: str
+    shelves: typing.Tuple[Shelf, ...]
+
     def __new__(cls, value: str, title: str, shelves: typing.Tuple[Shelf, ...]):
         obj = object.__new__(cls)
         obj._value_ = value

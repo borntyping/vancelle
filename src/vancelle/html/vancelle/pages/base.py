@@ -9,7 +9,7 @@ from vancelle.html.vancelle.components.footer import page_footer
 from vancelle.html.vancelle.components.navbar import page_navbar
 from vancelle.html.vancelle.components.title import page_title
 from vancelle.html.vancelle.components.toast import toast_container
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalDynamicContent
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
 from vancelle.lib.heavymetal.html import html5, link, main, meta, script
 
 
@@ -18,7 +18,7 @@ def static(filename: str) -> str:
 
 
 def page(
-    content: HeavymetalDynamicContent,
+    content: HeavymetalContent,
     *,
     fluid: bool = False,
     title: typing.Sequence[str] = (),

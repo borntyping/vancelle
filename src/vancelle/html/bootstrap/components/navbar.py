@@ -5,14 +5,14 @@ https://getbootstrap.com/docs/5.3/components/navbar/
 import typing
 
 from vancelle.html.helpers import html_classes
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalDynamicContent
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
 from vancelle.lib.heavymetal.html import a, button, div, fragment, nav, span, ul
 
 DropdownItem = typing.NewType("DropdownItem", Heavymetal)
 DropdownDivider = typing.NewType("DropdownDivider", Heavymetal)
 
 
-def navbar(brand: Heavymetal, left: HeavymetalDynamicContent, right: HeavymetalDynamicContent) -> Heavymetal:
+def navbar(brand: Heavymetal, left: HeavymetalContent, right: HeavymetalContent) -> Heavymetal:
     return nav(
         {"class": "navbar navbar-expand-lg bg-primary", "data-bs-theme": "dark"},
         [
@@ -34,15 +34,15 @@ def navbar_brand(name: str, href: str) -> Heavymetal:
     return a({"class": "navbar-brand", "href": href}, [name])
 
 
-def navbar_nav_left(content: HeavymetalDynamicContent) -> Heavymetal:
+def navbar_nav_left(content: HeavymetalContent) -> Heavymetal:
     return ul({"class": "navbar-nav me-auto"}, content)
 
 
-def navbar_nav_right(content: HeavymetalDynamicContent) -> Heavymetal:
+def navbar_nav_right(content: HeavymetalContent) -> Heavymetal:
     return ul({"class": "navbar-nav ms-auto"}, content)
 
 
-def navbar_toggler(content: HeavymetalDynamicContent) -> Heavymetal:
+def navbar_toggler(content: HeavymetalContent) -> Heavymetal:
     navbar_collapse_id = "navbar-content"
     return fragment([
         button(

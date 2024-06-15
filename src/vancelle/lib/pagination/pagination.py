@@ -72,4 +72,9 @@ class Pagination(typing.Generic[T]):
         return self.page + 1 if self.page < self.page_count() else None
 
     def map(self, function: typing.Callable[[T], U]) -> Pagination[U]:
-        return dataclasses.replace(self, items=[function(item) for item in self.items])
+        return Pagination(
+            items=[function(item) for item in self.items],
+            count=self.count,
+            page=self.page,
+            per_page=self.per_page,
+        )

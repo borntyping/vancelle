@@ -126,13 +126,11 @@ class DetailsPanel(Panel, HeavymetalComponent):
     def date_and_author(self) -> Heavymetal:
         year = str(self.details.release_date.year) if self.details.release_date else ABSENT
         author = textwrap.shorten(self.details.author, 50) if self.details.author else ABSENT
-        return fragment(
-            [
-                span({"title": maybe_string(self.details.release_date)}, [year]),
-                ", ",
-                span({"title": maybe_string(self.details.author)}, [author]),
-            ]
-        )
+        return fragment([
+            span({"title": maybe_string(self.details.release_date)}, [year]),
+            ", ",
+            span({"title": maybe_string(self.details.author)}, [author]),
+        ])
 
     def tags(self) -> Heavymetal:
         return fragment([])
@@ -156,10 +154,7 @@ class DetailsPanel(Panel, HeavymetalComponent):
         return div(
             {"class": "v-panel v-panel-details border rounded overflow-hidden"},
             [
-                div(
-                    {"class": "v-panel-header p-1 text-end bg-primary", "style": self.header_style()},
-                    self.controls,
-                ),
+                div({"class": "v-panel-header p-1 text-end bg-primary", "style": self.header_style()}, self.controls),
                 div(
                     {"class": "v-panel-cover border-bottom p-3 pe-0"},
                     [
@@ -167,14 +162,12 @@ class DetailsPanel(Panel, HeavymetalComponent):
                             {"class": f"m-0 rounded-3 bg-{self.background_colour}"},
                             [
                                 (
-                                    img(
-                                        {
-                                            "class": "rounded-3 fs-7",
-                                            "src": self.details.cover,
-                                            "alt": f"Cover for {self.details.title}.",
-                                            "loading": "lazy",
-                                        }
-                                    )
+                                    img({
+                                        "class": "rounded-3 fs-7",
+                                        "src": self.details.cover,
+                                        "alt": f"Cover for {self.details.title}.",
+                                        "loading": "lazy",
+                                    })
                                     if self.details.cover
                                     else nothing()
                                 )
@@ -185,7 +178,7 @@ class DetailsPanel(Panel, HeavymetalComponent):
                 div(
                     {"class": "v-panel-body"},
                     [
-                        h3({"class": "card-title mb-1"}, [self.details.title]),
+                        h3({"class": "card-title mb-1"}, [maybe_string(self.details.title)]),
                         self.date_and_author(),
                         self.tags(),
                         self.external_url(),

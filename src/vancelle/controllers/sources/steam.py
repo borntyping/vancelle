@@ -1,4 +1,3 @@
-
 import structlog
 import svcs
 from sqlalchemy import desc, func, select

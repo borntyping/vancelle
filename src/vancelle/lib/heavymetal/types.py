@@ -11,5 +11,4 @@ Heavymetal = HeavymetalCallable | str | HeavymetalTuple
 
 @typing.runtime_checkable
 class HeavymetalProtocol(typing.Protocol):
-    def heavymetal(self) -> Heavymetal:
-        ...
+    def heavymetal(self) -> Heavymetal: ...

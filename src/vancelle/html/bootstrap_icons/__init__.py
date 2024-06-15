@@ -1,9 +1,9 @@
 import flask
 
-from vancelle.lib.heavymetal import HeavymetalTuple
+from vancelle.lib.heavymetal import Heavymetal
 
 
-def bi_font(name: str) -> HeavymetalTuple:
+def bi_font(name: str) -> Heavymetal:
     """
     The font icons seem to render in odd positions below the baseline when used in text.
     Fixed in 'static/src/ext/bootstrap-icons/'.
@@ -15,7 +15,7 @@ def bi_font(name: str) -> HeavymetalTuple:
     return ("i", {"class": f"bi bi-{name}"}, [])
 
 
-def bi_svg(name: str) -> HeavymetalTuple:
+def bi_svg(name: str) -> Heavymetal:
     """
     The SVG icons seem to render below the baseline when used in buttons.
 

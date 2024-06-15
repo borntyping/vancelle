@@ -5,14 +5,14 @@ https://getbootstrap.com/docs/5.3/components/navbar/
 import typing
 
 from vancelle.html.helpers import html_classes
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalDynamicContent
 from vancelle.lib.heavymetal.html import a, button, div, fragment, nav, span, ul
 
 DropdownItem = typing.NewType("DropdownItem", Heavymetal)
 DropdownDivider = typing.NewType("DropdownDivider", Heavymetal)
 
 
-def navbar(brand: Heavymetal, left: HeavymetalContent, right: HeavymetalContent) -> Heavymetal:
+def navbar(brand: Heavymetal, left: HeavymetalDynamicContent, right: HeavymetalDynamicContent) -> Heavymetal:
     return nav(
         {"class": "navbar navbar-expand-lg bg-primary", "data-bs-theme": "dark"},
         [
@@ -20,12 +20,10 @@ def navbar(brand: Heavymetal, left: HeavymetalContent, right: HeavymetalContent)
                 {"class": "container"},
                 [
                     brand,
-                    navbar_toggler(
-                        [
-                            navbar_nav_left(left),
-                            navbar_nav_right(right),
-                        ]
-                    ),
+                    navbar_toggler([
+                        navbar_nav_left(left),
+                        navbar_nav_right(right),
+                    ]),
                 ],
             )
         ],
@@ -36,33 +34,31 @@ def navbar_brand(name: str, href: str) -> Heavymetal:
     return a({"class": "navbar-brand", "href": href}, [name])
 
 
-def navbar_nav_left(content: HeavymetalContent) -> Heavymetal:
+def navbar_nav_left(content: HeavymetalDynamicContent) -> Heavymetal:
     return ul({"class": "navbar-nav me-auto"}, content)
 
 
-def navbar_nav_right(content: HeavymetalContent) -> Heavymetal:
+def navbar_nav_right(content: HeavymetalDynamicContent) -> Heavymetal:
     return ul({"class": "navbar-nav ms-auto"}, content)
 
 
-def navbar_toggler(content: HeavymetalContent) -> Heavymetal:
+def navbar_toggler(content: HeavymetalDynamicContent) -> Heavymetal:
     navbar_collapse_id = "navbar-content"
-    return fragment(
-        [
-            button(
-                {
-                    "class": "navbar-toggler",
-                    "type": "button",
-                    "data-bs-toggle": "collapse",
-                    "data-bs-target": f"#{navbar_collapse_id}",
-                    "aria-controls": f"{navbar_collapse_id}",
-                    "aria-expanded": "false",
-                    "aria-label": "Toggle navigation",
-                },
-                [span({"class": "navbar-toggler-icon"}, ())],
-            ),
-            div({"class": "collapse navbar-collapse", "id": navbar_collapse_id}, content),
-        ]
-    )
+    return fragment([
+        button(
+            {
+                "class": "navbar-toggler",
+                "type": "button",
+                "data-bs-toggle": "collapse",
+                "data-bs-target": f"#{navbar_collapse_id}",
+                "aria-controls": f"{navbar_collapse_id}",
+                "aria-expanded": "false",
+                "aria-label": "Toggle navigation",
+            },
+            [span({"class": "navbar-toggler-icon"}, ())],
+        ),
+        div({"class": "collapse navbar-collapse", "id": navbar_collapse_id}, content),
+    ])
 
 
 def nav_item(name: str, href: str, active_page: bool = False) -> Heavymetal:

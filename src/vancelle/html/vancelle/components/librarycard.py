@@ -8,7 +8,7 @@ import humanize
 from vancelle.html.bootstrap_icons import bi_svg
 from vancelle.html.vancelle.components.details import Panel
 from vancelle.html.vancelle.components.optional import span_absent
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent, HeavymetalTuple
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.lib.heavymetal.html import a, div, fragment, h5, span, table, tbody, td, th, thead, tr
 from vancelle.models import Record, Work
 
@@ -17,7 +17,7 @@ def ceil_to_even(n: int) -> int:
     return n if n % 2 == 0 else n + 1
 
 
-def exact_date(date: datetime.date | None) -> HeavymetalTuple:
+def exact_date(date: datetime.date | None) -> Heavymetal:
     if date is None:
         return span_absent()
 
@@ -109,27 +109,25 @@ class LibraryCard(Panel, HeavymetalComponent):
 
     @staticmethod
     def _record(record: Record | None) -> Heavymetal:
-        return fragment(
-            [
-                td(
-                    {"class": "table-column-divider"},
-                    [exact_date(record.date_started)] if record else [],
+        return fragment([
+            td(
+                {"class": "table-column-divider"},
+                [exact_date(record.date_started)] if record else [],
+            ),
+            td(
+                {},
+                [exact_date(record.date_stopped)] if record else [],
+            ),
+            td(
+                {"class": "text-truncate"},
+                [record.notes] if record else [],
+            ),
+            td(
+                {"class": ""},
+                (
+                    [a({"href": record.url_for()}, [bi_svg("pencil")])]
+                    if record
+                    else [a({"class": "text-light", "href": "#"}, [bi_svg("pencil")])]
                 ),
-                td(
-                    {},
-                    [exact_date(record.date_stopped)] if record else [],
-                ),
-                td(
-                    {"class": "text-truncate"},
-                    [record.notes] if record else [],
-                ),
-                td(
-                    {"class": ""},
-                    (
-                        [a({"href": record.url_for()}, [bi_svg("pencil")])]
-                        if record
-                        else [a({"class": "text-light", "href": "#"}, [bi_svg("pencil")])]
-                    ),
-                ),
-            ]
-        )
+            ),
+        ])

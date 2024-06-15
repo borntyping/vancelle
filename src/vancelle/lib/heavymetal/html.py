@@ -6,7 +6,7 @@ import typing
 
 import markupsafe
 
-from .types import HeavymetalAttrs, HeavymetalContent, HeavymetalTag, HeavymetalTuple
+from .types import HeavymetalAttrs, HeavymetalContent, _HeavymetalStaticTuple, HeavymetalTag, HeavymetalTuple
 
 
 def fragment(children: HeavymetalContent) -> HeavymetalTuple:
@@ -22,7 +22,7 @@ def fragment(children: HeavymetalContent) -> HeavymetalTuple:
     return (None, {}, children)
 
 
-def nothing() -> HeavymetalTuple:
+def nothing() -> _HeavymetalStaticTuple:
     """
     An empty fragment.
 
@@ -31,7 +31,7 @@ def nothing() -> HeavymetalTuple:
     >>> render(span({}, example) if example else nothing())
     ''
     """
-    return fragment(())
+    return (None, {}, ())
 
 
 def element(tag: HeavymetalTag, attrs: HeavymetalAttrs, children: HeavymetalContent) -> HeavymetalTuple:
@@ -44,7 +44,7 @@ def element(tag: HeavymetalTag, attrs: HeavymetalAttrs, children: HeavymetalCont
 def html5(attrs: HeavymetalAttrs, content: HeavymetalContent, *, lang: str = "en") -> HeavymetalTuple:
     """Creates a <html> element with a HTML5 DOCTYPE."""
     doctype = markupsafe.Markup("<!DOCTYPE html>\n")
-    html = ("html", {"lang": lang} | attrs, content)
+    html = ("html", {"lang": lang, **attrs}, content)
     return fragment([doctype, html])
 
 

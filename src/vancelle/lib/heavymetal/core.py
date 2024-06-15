@@ -32,18 +32,38 @@ which has the following copyright notice and license.
 
 import dataclasses
 import html
+import logging
 import typing
 
 import markupsafe
 import sentry_sdk
-import structlog
 
-from .types import Heavymetal, HeavymetalAttrs, HeavymetalProtocol, HeavymetalTuple
+from .types import (
+    HeavymetalAnything,
+    HeavymetalAttrs,
+    HeavymetalProtocol,
+    Heavymetal,
+    _HeavymetalStatic,
+)
+
+logger = logging.getLogger(__name__)
 
 # https://html.spec.whatwg.org/#void-elements
-VOID_ELEMENTS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
-
-logger = structlog.get_logger(logger_name=__name__)
+VOID_ELEMENTS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "source",
+    "track",
+    "wbr",
+}
 
 
 def _attributes(attrs: HeavymetalAttrs) -> str:
@@ -57,24 +77,24 @@ def _attributes(attrs: HeavymetalAttrs) -> str:
     )
 
 
-@dataclasses.dataclass(frozen=True, kw_only=True)
+@dataclasses.dataclass(frozen=True)
 class Trace:
-    original_node: Heavymetal | None
-    node: HeavymetalTuple | str
+    current: Heavymetal = dataclasses.field()
+    original: typing.Optional[HeavymetalAnything] = dataclasses.field(default=None)
 
     def __str__(self) -> str:
-        if isinstance(self.node, str):
-            string = f"{self.node!r}"
+        if isinstance(self.current, str):
+            string = f"{self.current!r}"
         else:
-            tag, attrs, _ = self.node
+            tag, attrs, _ = self.current
 
             if tag is None:
                 string = "<!-- fragment -->"
             else:
                 string = f"<{tag}{_attributes(attrs)} />"
 
-        if self.original_node is not None:
-            string += f" from {self.original_node!r}"
+        if self.original is not None:
+            string += f" from {self.original!r}"
 
         return string
 
@@ -82,20 +102,19 @@ class Trace:
 @dataclasses.dataclass(frozen=True)
 class HeavymetalException(Exception):
     message: str
-    parents: typing.Sequence[Trace] = ()
-    node: HeavymetalTuple | None = None
-    value: typing.Any = None
+    traces: typing.Sequence[Trace]
+    value: typing.Optional[Trace | typing.Any] = None
 
     @sentry_sdk.trace
     def __str__(self) -> str:
         message = self.message
 
-        if self.parents:
-            parents = [str(trace) for trace in self.parents]
+        if self.traces:
+            parents = [str(trace) for trace in self.traces]
             message += "\n\n" + "\n".join(f"{'  ' * indent}{parent}" for indent, parent in enumerate(parents))
 
         if self.value is not None:
-            message += "\n\n" + repr(self.value)
+            message += "\n\n" + str(self.value)
 
         return message
 
@@ -108,33 +127,39 @@ class HeavymetalHtmlError(HeavymetalException):
     pass
 
 
-def expand(original_node: Heavymetal, *, traces: typing.Sequence[Trace] = ()) -> HeavymetalTuple | str:
-    if isinstance(original_node, HeavymetalProtocol):
-        node = original_node.heavymetal()
-        trace = Trace(original_node=original_node, node=node)
-    elif callable(original_node):
-        node = original_node()
-        trace = Trace(original_node=original_node, node=node)
-    elif original_node is None:
-        node = (None, {}, ())
-        trace = Trace(original_node=None, node=node)
-    elif isinstance(original_node, str):
-        return original_node
+def unpack_dynamic(original: HeavymetalAnything, /, *, traces: typing.Sequence[Trace] = ()) -> _HeavymetalStatic:
+    """
+    Unpack a 'dynamic' tree containing callable items into a 'static' tree containing tuples and strings.
+
+    Types enforce a minor limitation on callables: the 'top' element they return must be static.
+    """
+    node: Heavymetal
+    if isinstance(original, HeavymetalProtocol):
+        node = original.heavymetal()
+        trace = Trace(node, original)
+    elif callable(original):
+        node = original()
+        trace = Trace(node, original)
     else:
-        node = original_node
-        trace = Trace(original_node=None, node=node)
+        node = original
+        trace = Trace(node)
+
+    # Make sure to do this check _after_ resolving any callables, since they can return strings.
+    if isinstance(node, str):
+        return node
 
     # This is where hotmetal tripped me up a lot.
     if not isinstance(node, tuple) or not len(node) == 3:
-        raise HeavymetalSyntaxError(f"Expected a tuple with three elements, got {node!r}", traces, value=node)
+        raise HeavymetalSyntaxError(f"Expected a tuple with three elements, got {node!r}", traces=traces, value=trace)
 
-    node: HeavymetalTuple
-    tag, attrs, children = node
-    children = tuple(expand(c, traces=(*traces, trace)) for c in children)
+    tag, attrs, original_children = node
+    children = tuple(unpack_dynamic(c, traces=(*traces, trace)) for c in original_children)
     return (tag, attrs, children)
 
 
-def render_simple(node: HeavymetalTuple | str, *, traces: typing.Sequence[Trace] = ()) -> str:
+def render_static(node: _HeavymetalStatic, *, traces: typing.Sequence[Trace] = ()) -> str:
+    """Render a 'static' tree containing tuples and strings to an HTML string."""
+
     if isinstance(node, markupsafe.Markup):
         return node
 
@@ -143,11 +168,11 @@ def render_simple(node: HeavymetalTuple | str, *, traces: typing.Sequence[Trace]
 
     # This is where hotmetal tripped me up a lot.
     if not isinstance(node, tuple) or not len(node) == 3:
-        raise HeavymetalSyntaxError(f"Expected a tuple with three elements, got {node!r}", traces, value=node)
+        raise HeavymetalSyntaxError("Expected a tuple with three elements", traces=traces, value=node)
 
-    node: HeavymetalTuple
     tag, attrs, children = node
-    traces = (*traces, Trace(original_node=None, node=node))
+    trace = Trace(node)
+    traces = (*traces, trace)
 
     # This might not always be a tuple, but it should be an ordered sequence.
     # That might be too restrictive — should this allow a generator/iterable?
@@ -155,32 +180,32 @@ def render_simple(node: HeavymetalTuple | str, *, traces: typing.Sequence[Trace]
         children = tuple(children)
 
     if not isinstance(children, typing.Iterable):
-        raise HeavymetalSyntaxError("Expected a list or sequence for the children= parameter", traces, node, children)
+        raise HeavymetalSyntaxError("Expected a list or sequence for the children= parameter", traces, node)
 
     # We can safely do this check as no child element should ever be a dict.
     if (
         isinstance(children, tuple)
         and len(children) == 3
         and isinstance(children[0], (str, type(None)))
-        and isinstance(children[1], dict)
-        and isinstance(children[2], list)
+        and isinstance(children[1], typing.Mapping)
+        and isinstance(children[2], typing.Sequence)
     ):
-        raise HeavymetalSyntaxError("Another heavymetal tuple was passed to the children= parameter", traces, node, children)
+        raise HeavymetalSyntaxError("A Heavymetal tuple was passed to the children= parameter", traces, node)
 
     if tag == "":
-        raise HeavymetalSyntaxError("Tag is an empty string", traces, node)
+        raise HeavymetalSyntaxError("Tag is an empty string", traces, trace)
 
     # Fragments are not included in their output, but their children are.
     if tag is None:
         if attrs:
-            raise HeavymetalSyntaxError("Fragments cannot have attributes", traces, node)
-        nested = "".join(render_simple(child, traces=traces) for child in children)
+            raise HeavymetalSyntaxError("Fragments cannot have attributes", traces, trace)
+        nested = "".join(render_static(child, traces=traces) for child in children)
         return "{}".format(nested)
 
     try:
         attributes = _attributes(attrs)
     except ValueError as error:
-        raise HeavymetalException("Invalid attribute", traces, node) from error
+        raise HeavymetalException("Invalid attribute", traces, trace) from error
 
     # Void elements like <br /> (https://html.spec.whatwg.org/#void-elements)
     #
@@ -189,13 +214,19 @@ def render_simple(node: HeavymetalTuple | str, *, traces: typing.Sequence[Trace]
     # https://github.com/validator/validator/wiki/Markup-%C2%BB-Void-elements
     if tag.lower() in VOID_ELEMENTS:
         if children:
-            raise HeavymetalHtmlError("Void element cannot have children", traces, node)
+            raise HeavymetalHtmlError("Void element cannot have children", traces, trace)
         return "<{tag}{attributes} />".format(tag=html.escape(tag), attributes=attributes)
 
-    nested = "".join(render_simple(child, traces=traces) for child in children)
+    nested = "".join(render_static(child, traces=traces) for child in children)
     return "<{tag}{attributes}>{nested}</{tag}>".format(tag=html.escape(tag), attributes=attributes, nested=nested)
 
 
 @sentry_sdk.trace()
-def render(node: Heavymetal) -> str:
-    return render_simple(expand(node))
+def render(node: HeavymetalAnything, /) -> str:
+    with sentry_sdk.start_span(op="task", description=unpack_dynamic.__qualname__):
+        expanded = unpack_dynamic(node)
+
+    with sentry_sdk.start_span(op="task", description=render_static.__qualname__):
+        rendered = render_static(expanded)
+
+    return rendered

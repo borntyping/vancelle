@@ -16,7 +16,7 @@ logger = structlog.get_logger(logger_name=__name__)
 class ImageCache(HttpClient):
     @classmethod
     def factory(cls, svcs_container: svcs.Container) -> typing.Self:
-        app, builder = svcs_container.get(flask.Flask, HttpClientBuilder)
+        builder = svcs_container.get(HttpClientBuilder)
         return cls(client=hishel.CacheClient(storage=builder.filesystem_storage_for(cls)))
 
     def as_response(self, url: str) -> flask.Response:

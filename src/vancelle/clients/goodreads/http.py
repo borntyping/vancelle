@@ -3,7 +3,6 @@ import json
 import re
 import typing
 
-import flask
 import hishel
 import structlog
 import svcs.flask
@@ -53,7 +52,7 @@ GoodreadsBookSchema = typing.TypedDict(
 class GoodreadsPublicScraper(HttpClient):
     @classmethod
     def factory(cls, svcs_container: svcs.Container) -> typing.Self:
-        app, builder = svcs_container.get(flask.Flask, HttpClientBuilder)
+        builder = svcs_container.get(HttpClientBuilder)
         return cls(client=hishel.CacheClient(storage=builder.filesystem_storage_for(cls)))
 
     def fetch(self, id: str) -> GoodreadsPublicBook:

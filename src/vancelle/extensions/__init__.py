@@ -1,6 +1,5 @@
 import flask_alembic
 import flask_cors
-import flask_debugtoolbar
 import flask_login
 import flask_sqlalchemy_lite
 
@@ -21,7 +20,6 @@ cors = flask_cors.CORS(
         *SentryExtension.CORS_EXPOSE_HEADERS,
     ],
 )
-debug_toolbar = flask_debugtoolbar.DebugToolbarExtension()
 login_manager = flask_login.LoginManager()
 
 html = HtmlExtension()

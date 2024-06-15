@@ -13,11 +13,26 @@ partially a way for me to escape the mass of different trackers, lists, and
 storefronts; and instead have one place to track everything I'm interested in
 both before and after reading/watching/playing it.
 
-|                                    |                                    |
-|------------------------------------|------------------------------------|
-| ![](./docs/screenshots/home.png)   | ![](./docs/screenshots/works.png)  |
-| ![](./docs/screenshots/create.png) | ![](./docs/screenshots/search.png) |
-|                                    |                                    |
+## Todo
+
+### Features
+
+* Drag and drop between board columns: https://interactjs.io/
+* Light/dark themes and toggle: https://www.petemillspaugh.com/edison-bulb
+* Calendar view.
+* New sources:
+    * Books:
+        * [Ao3](https://archiveofourown.org/)
+    * Games
+        * [IGBDB](https://api-docs.igdb.com/).
+        * [MobyGames](https://www.mobygames.com/info/api/).
+    * Films/shows
+        * [TVDB](https://thetvdb.com/api-information#attribution).
+
+### Improvements
+
+* Add `[+]` button to `[n items]` tags on board columns.
+* Imported Goodreads book should have a "search this exact ID on goodreads" button.
 
 ## Attributions
 

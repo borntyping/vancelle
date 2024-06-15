@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="All" type="CompoundRunConfigurationType">
     <toRun name="Flask" type="Python.FlaskServer" />
-    <toRun name="pytest" type="tests" />
+    <toRun name="pytest" type="PythonConfigurationType" />
     <toRun name="Sass" type="ShConfigurationType" />
+    <toRun name="Spotlight" type="ShConfigurationType" />
     <method v="2" />
   </configuration>
 </component>

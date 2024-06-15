@@ -4,7 +4,7 @@ import structlog
 
 
 def configure_logging():
-    structlog.configure(
+    structlog.configure_once(
         processors=[
             structlog.stdlib.add_log_level,
             structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S"),

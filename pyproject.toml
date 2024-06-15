@@ -5,6 +5,7 @@ description = ""
 authors = ["Sam Clements <sam@borntyping.co.uk>"]
 license = "Mozilla Public License Version 2.0"
 readme = "README.md"
+packages = [{ include = "vancelle", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -51,8 +52,10 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --ignore=vancelle/migrations"
 filterwarnings = [
-    "ignore:The '__version__' attribute is deprecated:DeprecationWarning",
+    #    "ignore:The '__version__' attribute is deprecated:DeprecationWarning",
 ]
+pythonpath = ["src"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.masonry.api"

@@ -1,9 +1,8 @@
 import pathlib
 import typing
-import wsgiref.types
 
 import flask
-import sentry_sdk
+import frozendict
 import svcs.flask
 
 from .blueprints.board.blueprint import bp as bp_board
@@ -26,14 +25,15 @@ from .clients.steam.client_web_api import SteamWebAPI
 from .clients.tmdb.client import TmdbAPI
 from .converters import RemoteTypeConverter, WorkTypeConverter
 from .ext.structlog import configure_logging
-from .extensions import alembic, cors, db, debug_toolbar, html, htmx, login_manager, sentry
+from .extensions import alembic, cors, db, html, htmx, login_manager, sentry
 from .models import Base
-from .shelf import Shelf
 
 root = pathlib.Path(__file__).parent
 
 
-def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
+def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict(), /) -> flask.Flask:
+    configure_logging()
+
     app = flask.Flask("vancelle")
     app.config["ALEMBIC"] = {
         "script_location": (root / "migrations").as_posix(),
@@ -42,7 +42,6 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app.config["ALEMBIC_CONTEXT"] = {}
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
-    app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
     app.config.from_mapping(config)
     app.config.from_prefixed_env("VANCELLE")
@@ -91,9 +90,3 @@ def create_app(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
     app.register_blueprint(bp_remote)
 
     return app
-
-
-def create_app_once(config: typing.Mapping[str, typing.Any], /) -> flask.Flask:
-    configure_logging()
-    sentry_sdk.init(spotlight=True)
-    return create_app(config)

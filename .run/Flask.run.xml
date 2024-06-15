@@ -2,7 +2,7 @@
   <configuration default="false" name="Flask" type="Python.FlaskServer">
     <option name="flaskDebug" value="true" />
     <module name="vancelle" />
-    <option name="target" value="vancelle.app:create_app_once({})" />
+    <option name="target" value="vancelle.app:create_app()" />
     <option name="targetType" value="PYTHON" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />

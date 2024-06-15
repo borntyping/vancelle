@@ -54,7 +54,7 @@ def page(
         script({"src": static("dist/htmx.org/ext/loading-states.js")}),
         script({"src": static("dist/hyperscript.org/_hyperscript.min.js")}),
         script({"src": static("dist/bootstrap/bootstrap.bundle.min.js")}),
-        script({"src": static("src/script.js")}),
+        script({"src": static("script.js")}),
         sentry.spotlight_script(),
     ]
 

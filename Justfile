@@ -8,8 +8,8 @@ test:
 
 # Run Python linters.
 lint:
-  ruff
-  mypy .
+  ruff check
+  ruff format
 
 # Build SCSS on changes.
 sass:

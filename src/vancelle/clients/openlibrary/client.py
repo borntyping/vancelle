@@ -120,14 +120,14 @@ class OpenLibraryAPI(HttpClient):
             raise Exception(f"Unexpected number of works connected to this edition: {edition['works']}")
 
         id = self.parse_key("books", edition["key"])
-        work_id = self.parse_key("works", edition["works"][0]["key"])
-        goodreads_id = edition.get("identifiers", {}).get("goodreads", None)
-        librarything_id = edition.get("identifiers", {}).get("librarything", None)
+        _work_id = self.parse_key("works", edition["works"][0]["key"])
+        _goodreads_id = edition.get("identifiers", {}).get("goodreads", None)
+        _librarything_id = edition.get("identifiers", {}).get("librarything", None)
         title = edition["title"]
         author = self._author_references(edition.get("authors", []))
-        publish_date = self.parse_date(edition.get("publish_date", None))
-        first_sentence = edition.get("first_sentence", None)
-        number_of_pages = edition.get("number_of_pages", None)
+        _publish_date = self.parse_date(edition.get("publish_date", None))
+        _first_sentence = edition.get("first_sentence", None)
+        _number_of_pages = edition.get("number_of_pages", None)
         isbn_13s = edition.get("isbn_13", [])
         covers = edition.get("covers", [])
 

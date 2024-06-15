@@ -1,4 +1,3 @@
-import datetime
 import typing
 
 from vancelle.lib.heavymetal import Heavymetal

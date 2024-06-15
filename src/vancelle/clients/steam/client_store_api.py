@@ -77,7 +77,7 @@ class SteamStoreAPI(HttpClient):
 
         wrapper = data[appid]
         if not wrapper["success"]:
-            logger.warning(f"Steam appdetails request failed", appid=appid, data=data)
+            logger.warning("Steam appdetails request failed", appid=appid, data=data)
             return None
 
         return wrapper["data"]

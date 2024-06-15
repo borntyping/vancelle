@@ -1,5 +1,5 @@
 from vancelle.html.helpers import merge_attrs
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs, HeavymetalContent, HeavymetalProtocol
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs, HeavymetalContent
 from vancelle.lib.heavymetal.html import div
 
 

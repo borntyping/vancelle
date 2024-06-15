@@ -3,7 +3,7 @@ import typing
 
 from vancelle.html.helpers import HtmlClasses, html_classes
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
-from vancelle.lib.heavymetal.html import a, li, nav, ul
+from vancelle.lib.heavymetal.html import a, li, ul
 
 
 @dataclasses.dataclass

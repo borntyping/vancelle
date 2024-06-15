@@ -141,7 +141,7 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
 
         with self.field(element, "date_added") as tag:
             date_added_str = self.parse_string(tag.find("span"))
-            date_added: datetime.date | None = self.parse_date(date_added_str)
+            _date_added: datetime.date | None = self.parse_date(date_added_str)
 
         with self.field(element, "owned") as tag:
             owned: int = self.parse_int(self.parse_string(tag, default="0"))
@@ -209,16 +209,13 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         return value
 
     @typing.overload
-    def parse_string(self, element: bs4.element.Tag | None) -> str:
-        ...
+    def parse_string(self, element: bs4.element.Tag | None) -> str: ...
 
     @typing.overload
-    def parse_string(self, element: bs4.element.Tag | None, default: str) -> str:
-        ...
+    def parse_string(self, element: bs4.element.Tag | None, default: str) -> str: ...
 
     @typing.overload
-    def parse_string(self, element: bs4.element.Tag | None, default: None) -> str | None:
-        ...
+    def parse_string(self, element: bs4.element.Tag | None, default: None) -> str | None: ...
 
     def parse_string(self, element: bs4.element.Tag | None, default: str | None | Sentinel = sentinel) -> str | None:
         if element is None:
@@ -241,7 +238,7 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
             if not isinstance(default, Sentinel):
                 return default
 
-            raise AttributeError(f"Element contains an empty string")
+            raise AttributeError("Element contains an empty string")
 
         return whitespace.sub(" ", string)
 
@@ -260,12 +257,10 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         return None
 
     @typing.overload
-    def parse_int(self, value: str) -> int:
-        ...
+    def parse_int(self, value: str) -> int: ...
 
     @typing.overload
-    def parse_int(self, value: str | None) -> int | None:
-        ...
+    def parse_int(self, value: str | None) -> int | None: ...
 
     def parse_int(self, value):
         if value is None:

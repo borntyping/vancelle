@@ -3,7 +3,7 @@ import markupsafe
 
 from vancelle.extensions import htmx
 from vancelle.html.helpers import HtmlClasses, html_classes
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
+from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import aside, button, div, fragment, section, span, strong
 
 TOAST_CONTAINER_ID = "v-notifications"

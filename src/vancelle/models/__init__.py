@@ -3,3 +3,11 @@ from vancelle.models.record import Record
 from vancelle.models.remote import Remote
 from vancelle.models.user import User
 from vancelle.models.work import Work
+
+__all__ = (
+    "Base",
+    "Record",
+    "Remote",
+    "User",
+    "Work",
+)

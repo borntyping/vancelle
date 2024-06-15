@@ -185,7 +185,8 @@ class RemotesController:
         if query:
             items = self.managers[remote_type].search(query)
         else:
-            items = EmptyPagination()
+            # items = EmptyPagination()
+            raise NotImplementedError
 
         return flask.render_template(
             [f"remote/{remote_type}/search.html", "remote/search.html"],

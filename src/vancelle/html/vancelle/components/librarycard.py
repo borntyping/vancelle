@@ -3,14 +3,13 @@ import datetime
 import itertools
 import math
 
-import flask
 import humanize
 
 from vancelle.html.bootstrap_icons import bi_svg
-from vancelle.html.vancelle.components.details import Panel, PanelControl
+from vancelle.html.vancelle.components.details import Panel
 from vancelle.html.vancelle.components.optional import span_absent
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent, HeavymetalTuple
-from vancelle.lib.heavymetal.html import a, div, fragment, h4, h5, span, table, tbody, td, th, thead, tr
+from vancelle.lib.heavymetal.html import a, div, fragment, h5, span, table, tbody, td, th, thead, tr
 from vancelle.models import Record, Work
 
 
@@ -48,7 +47,7 @@ class LibraryCard(Panel, HeavymetalComponent):
             [
                 div(
                     {
-                        "class": f"v-panel-header p-1 bg-primary d-flex justify-content-center align-items-center",
+                        "class": "v-panel-header p-1 bg-primary d-flex justify-content-center align-items-center",
                         "style": self.header_style(),
                     },
                     [

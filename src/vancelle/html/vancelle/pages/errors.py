@@ -3,7 +3,7 @@ import flask
 from vancelle.html.vancelle.components.header import page_header, section_header
 from vancelle.html.vancelle.pages.base import page
 from vancelle.lib.heavymetal import Heavymetal
-from vancelle.lib.heavymetal.html import a, div, h1, h3, p, section
+from vancelle.lib.heavymetal.html import a, div, h1, p
 
 
 def error_page(title: str, description: str) -> Heavymetal:

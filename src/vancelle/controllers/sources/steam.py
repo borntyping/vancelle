@@ -1,4 +1,3 @@
-import dataclasses
 
 import structlog
 import svcs

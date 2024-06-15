@@ -1,5 +1,5 @@
-from vancelle.lib.heavymetal.html import div, element, label, span, input_
 from vancelle.lib.heavymetal import Heavymetal
+from vancelle.lib.heavymetal.html import div, input_, label, span
 
 
 def bulma_file_input(name: str) -> Heavymetal:

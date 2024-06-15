@@ -16,7 +16,6 @@ from vancelle.ext.flask_login import get_user
 from vancelle.extensions import db, login_manager
 from vancelle.forms.user import ImportForm, LoginForm
 from vancelle.html.vancelle.pages.user import LoginPage, SettingsPage
-from vancelle.lib.heavymetal import render
 from vancelle.models import User
 
 logger = structlog.get_logger(logger_name=__name__)

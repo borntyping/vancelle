@@ -2,7 +2,7 @@ import typing
 
 from vancelle.html.helpers import HtmlClasses, html_classes
 from vancelle.lib.heavymetal import Heavymetal
-from vancelle.lib.heavymetal.html import element, h3, header, nothing
+from vancelle.lib.heavymetal.html import element, header, nothing
 
 
 def _header(

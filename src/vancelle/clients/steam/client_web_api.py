@@ -44,7 +44,7 @@ class SteamWebAPI(HttpClient):
         """
         logger.info("Fetching Steam appid list")
 
-        url = f"https://api.steampowered.com/ISteamApps/GetAppList/v2/"
+        url = "https://api.steampowered.com/ISteamApps/GetAppList/v2/"
         response = self.get(url)
         response.raise_for_status()
 

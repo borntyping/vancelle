@@ -91,7 +91,7 @@ class PanelControl(HeavymetalComponent):
     icon: str
 
     def heavymetal(self) -> Heavymetal:
-        return a({"class": f"btn btn-sm btn-outline-light", "title": self.name}, [bi_font(self.icon)])
+        return a({"class": "btn btn-sm btn-outline-light", "title": self.name}, [bi_font(self.icon)])
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -106,7 +106,7 @@ class Panel(HeavymetalComponent):
 
     def header(self, controls: typing.Sequence[PanelControl], title: str | None = None) -> Heavymetal:
         return div(
-            {"class": f"v-panel-header p-1 text-end bg-primary", "style": self.header_style()},
+            {"class": "v-panel-header p-1 text-end bg-primary", "style": self.header_style()},
             [title if title else nothing(), *controls],
         )
 
@@ -157,11 +157,11 @@ class DetailsPanel(Panel, HeavymetalComponent):
             {"class": "v-panel v-panel-details border rounded overflow-hidden"},
             [
                 div(
-                    {"class": f"v-panel-header p-1 text-end bg-primary", "style": self.header_style()},
+                    {"class": "v-panel-header p-1 text-end bg-primary", "style": self.header_style()},
                     self.controls,
                 ),
                 div(
-                    {"class": f"v-panel-cover border-bottom p-3 pe-0"},
+                    {"class": "v-panel-cover border-bottom p-3 pe-0"},
                     [
                         figure(
                             {"class": f"m-0 rounded-3 bg-{self.background_colour}"},

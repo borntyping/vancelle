@@ -1,4 +1,3 @@
-import flask
 import svcs
 
 from vancelle.clients.tmdb.client import TmdbAPI

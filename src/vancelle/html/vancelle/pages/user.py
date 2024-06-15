@@ -56,7 +56,7 @@ class SettingsPage(HeavymetalComponent):
                 section(
                     {},
                     [
-                        section_header("User data", f"This data can only be seen by the current user."),
+                        section_header("User data", "This data can only be seen by the current user."),
                         div(
                             {"class": "d-flex flex-column gap-3"},
                             [
@@ -90,7 +90,7 @@ class SettingsPage(HeavymetalComponent):
                 [f"Import is disabled, you already have {self.work_count} {inf.plural('work', self.work_count)}."],
             )
         else:
-            description = p({}, [f"Import from a ", code({}, self.filename), " file."])
+            description = p({}, ["Import from a ", code({}, self.filename), " file."])
 
         return div(
             {"class": "card"},

@@ -2,11 +2,11 @@ import flask
 
 from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.lib.heavymetal import Heavymetal
-from vancelle.lib.heavymetal.html import a, div, footer, img, picture, source
+from vancelle.lib.heavymetal.html import a, div, footer, img
 
 
 def toggle_theme() -> Heavymetal:
-    return ("a", {"href": "", "data-theme-toggle": True}, [f"Toggle light/dark mode."])
+    return ("a", {"href": "", "data-theme-toggle": True}, ["Toggle light/dark mode."])
 
 
 def created_by() -> Heavymetal:

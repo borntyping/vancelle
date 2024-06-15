@@ -8,7 +8,6 @@ import sqlalchemy
 from vancelle.extensions import db
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.lib.heavymetal.html import a, div, h1, section
-from vancelle.html.helpers import html_classes
 from vancelle.inflect import p
 from vancelle.models import User
 from vancelle.models.remote import Remote

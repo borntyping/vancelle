@@ -130,6 +130,9 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
     def url_for_permanently_delete(self) -> str:
         return flask.url_for("remote.permanently_delete", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
 
+    def url_for_refresh(self) -> str:
+        return flask.url_for("remote.refresh", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+
     @property
     def deleted(self) -> bool:
         return self.time_deleted is not None

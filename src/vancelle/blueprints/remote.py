@@ -68,6 +68,7 @@ def create_work(remote_type: str, remote_id: str):
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/refresh", methods={"post"})
 def refresh(remote_type: str, remote_id: str):
     controller.refresh(remote_type=remote_type, remote_id=remote_id)
+
     return htmx.refresh()
 
 

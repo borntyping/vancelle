@@ -378,7 +378,8 @@ class RemoteDetailsPanel(DetailsPanel):
             title="View this remote data.",
         )
         yield PanelControl(
-            href=self.remote.url_for_cover(),
+            post=True,
+            href=self.remote.url_for_refresh(),
             icon="arrow-clockwise",
             name="Refresh",
             title="Update this remote data from it's source.",

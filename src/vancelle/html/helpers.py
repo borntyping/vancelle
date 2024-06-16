@@ -3,7 +3,7 @@ import typing
 
 from vancelle.inflect import p
 
-HtmlClasses = str | typing.Mapping[str, bool] | typing.Iterable[str] | None
+HtmlClasses = typing.Union[str, typing.Mapping[str, bool], typing.Iterable[str], None]
 HtmlAttrs = typing.Mapping[str, str | typing.Any]
 
 

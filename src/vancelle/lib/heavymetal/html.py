@@ -6,7 +6,7 @@ import typing
 
 import markupsafe
 
-from .types import HeavymetalAttrs, HeavymetalContent, _HeavymetalStaticTuple, HeavymetalTag, HeavymetalTuple
+from .types import HeavymetalAttrs, HeavymetalContent, HeavymetalTag, HeavymetalTuple
 
 
 def fragment(children: HeavymetalContent) -> HeavymetalTuple:
@@ -22,7 +22,7 @@ def fragment(children: HeavymetalContent) -> HeavymetalTuple:
     return (None, {}, children)
 
 
-def nothing() -> _HeavymetalStaticTuple:
+def nothing() -> Ellipsis:
     """
     An empty fragment.
 
@@ -31,7 +31,7 @@ def nothing() -> _HeavymetalStaticTuple:
     >>> render(span({}, example) if example else nothing())
     ''
     """
-    return (None, {}, ())
+    return ...
 
 
 def element(tag: HeavymetalTag, attrs: HeavymetalAttrs, children: HeavymetalContent) -> HeavymetalTuple:
@@ -53,7 +53,8 @@ def make_element(tag: str) -> typing.Callable[[HeavymetalAttrs, HeavymetalConten
         return element(tag, attrs, children)
 
     __element__.__name__ = tag
-    __element__.__qualname__ = f"make_element({tag!r})"
+    __element__.__qualname__ = tag
+    __element__.__doc__ = f"make_element({tag!r})"
     return __element__
 
 
@@ -62,7 +63,8 @@ def make_void_element(tag: str) -> typing.Callable[[HeavymetalAttrs], Heavymetal
         return element(tag, attrs, [])
 
     __element__.__name__ = tag
-    __element__.__qualname__ = f"make_void_element({tag!r})"
+    __element__.__qualname__ = tag
+    __element__.__doc__ = f"make_void_element({tag!r})"
     return __element__
 
 

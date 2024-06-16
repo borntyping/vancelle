@@ -4,7 +4,7 @@ import humanize
 import markupsafe
 
 from vancelle.extensions import html
-from vancelle.html.bootstrap_icons import bi_font
+from vancelle.html.bootstrap_icons import bi_svg
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import a, span
 
@@ -33,8 +33,8 @@ def external_url(href: str, text: str | None = None) -> Heavymetal:
             "title": href,
         },
         [
-            bi_font("box-arrow-up-right"),
             url(href, text),
+            bi_svg("box-arrow-up-right"),
         ],
     )
 

@@ -1,11 +1,11 @@
 import typing
 
-from vancelle.html.bootstrap.variables import ThemeColors
+from vancelle.html.bootstrap.variables import ThemeColor
 
 # https://getbootstrap.com/docs/5.0/utilities/background/#background-color
 
 BackgroundColour = (
-    ThemeColors
+    ThemeColor
     | typing.Literal[
         "primary-subtle",
         "secondary-subtle",

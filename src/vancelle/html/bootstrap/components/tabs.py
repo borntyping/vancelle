@@ -62,6 +62,9 @@ class Tabs(HeavymetalComponent):
     def _pane_id(self, tab: Tab) -> str:
         return f"tab-pane-{self.id}-{tab.slug}"
 
+    def _visible_tabs(self) -> list[Tab]:
+        return [tab for tab in self.tabs if tab]
+
     def heavymetal(self) -> Heavymetal:
         return fragment([self.navigation(), self.content()])
 
@@ -93,8 +96,7 @@ class Tabs(HeavymetalComponent):
                     },
                     [tab.name],
                 )
-                for index, tab in enumerate(self.tabs)
-                if tab
+                for index, tab in enumerate(self._visible_tabs())
             ],
         )
 
@@ -112,7 +114,6 @@ class Tabs(HeavymetalComponent):
                     },
                     tab.content,
                 )
-                for index, tab in enumerate(self.tabs)
-                if tab
+                for index, tab in enumerate(self._visible_tabs())
             ],
         )

@@ -10,14 +10,14 @@ from vancelle.lib.heavymetal import Heavymetal
 from vancelle.html.helpers import count_plural, html_classes
 from vancelle.lib.heavymetal import HeavymetalComponent
 from vancelle.html.vancelle.components.metadata import span_date
-from vancelle.html.vancelle.components.optional import maybe_span, maybe_string, span_absent
+from vancelle.html.vancelle.components.optional import maybe_span, maybe_str, span_absent
 from vancelle.html.vancelle.pages.base import page
 from vancelle.models import Work
 from vancelle.shelf import Shelf
 
 
 def release_date(d: datetime.date | None) -> Heavymetal:
-    return span({"title": maybe_string(d)}, [str(d.year) if d else span_absent()])
+    return span({"title": maybe_str(d)}, [str(d.year) if d else span_absent()])
 
 
 def duration_span(start: datetime.date | None, stop: datetime.date | None) -> Heavymetal:

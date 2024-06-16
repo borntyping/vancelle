@@ -1,6 +1,6 @@
 import typing
 
-ThemeColors = typing.Literal[
+ThemeColor = typing.Literal[
     "primary",
     "secondary",
     "success",

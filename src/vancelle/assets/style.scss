@@ -3,18 +3,7 @@
 // Replace Bootstrap's initial colour scheme.
 // https://getbootstrap.com/docs/5.3/customize/color/
 // https://getbootstrap.com/docs/5.3/customize/sass/#maps-and-loops
-$amount: 25%;
-$blue: darken(#0d6efd, $amount);
-$indigo: darken(#6610f2, $amount);
-$purple: darken(#6f42c1, $amount);
-$pink: darken(#d63384, $amount);
-$red: darken(#dc3545, $amount);
-$orange: darken(#fd7e14, $amount);
-$yellow: darken(#ffc107, $amount);
-$green: darken(#198754, $amount);
-$teal: darken(#20c997, $amount);
-$cyan: darken(#0dcaf0, $amount);
-
+$blue: darken(#0d6efd, 25%);
 $code-color: $blue;
 
 // TODO? generate bg-$color / text-$color for all colours

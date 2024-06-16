@@ -11,9 +11,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import PolymorphicBase
 from .details import Details, IntoDetails
-from .properties import ExternalUrlProperty, InternalUrlProperty, IntoProperties, IterableProperty, Property, StringProperty
+from .properties import (
+    CodeProperty,
+    ExternalUrlProperty,
+    InternalUrlProperty,
+    IntoProperties,
+    IterableProperty,
+    Property,
+    StringProperty,
+)
 from .types import ShelfEnum
-from ..html.bootstrap.utilities.background import BackgroundColour
+from ..html.bootstrap.variables import ThemeColor
 from ..inflect import p
 from ..shelf import Shelf
 
@@ -30,7 +38,7 @@ class RemoteInfo:
     noun_plural: str
     noun_full: str  # Source and noun combined
 
-    colour: BackgroundColour  # Used in CSS
+    colour: ThemeColor  # Used in CSS
     priority: int = 0
 
     can_search: bool = True
@@ -42,7 +50,7 @@ class RemoteInfo:
         source: str,
         noun: str,
         *,
-        colour: str,
+        colour: ThemeColor,
         noun_plural: str | None = None,
         noun_full: str | None = None,
         noun_full_plural: str | None = None,
@@ -70,10 +78,6 @@ class RemoteInfo:
 
     def plural_full(self, count: int) -> str:
         return f"{self.source} {self.plural(count)}"
-
-    @property
-    def colour_invert(self) -> str:
-        return f"{self.colour}-invert"
 
 
 class Remote(PolymorphicBase, IntoDetails, IntoProperties):
@@ -117,6 +121,15 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
     def url_for_type(self) -> str:
         return flask.url_for("remote.index", remote_type=type(self))
 
+    def url_for_delete(self) -> str:
+        return flask.url_for("remote.delete", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+
+    def url_for_restore(self) -> str:
+        return flask.url_for("remote.restore", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+
+    def url_for_permanently_delete(self) -> str:
+        return flask.url_for("remote.permanently_delete", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+
     @property
     def deleted(self) -> bool:
         return self.time_deleted is not None
@@ -138,7 +151,7 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield StringProperty("ID", self.id)
+        yield CodeProperty("ID", self.id)
         yield ExternalUrlProperty("Cover", self.cover)
         yield ExternalUrlProperty("Background", self.background)
 
@@ -166,7 +179,7 @@ class ImportedWork(Remote):
     __mapper_args__ = {"polymorphic_identity": "imported"}
     info = RemoteInfo(
         colour="dark",
-        source="imported data",
+        source="Imported",
         noun="work",
         priority=-1,
         can_search=False,
@@ -174,10 +187,9 @@ class ImportedWork(Remote):
         can_refresh=False,
     )
 
-    def into_properties(self) -> typing.Iterable[StringProperty]:
+    def into_properties(self) -> typing.Iterable[Property]:
         yield from super().into_properties()
-        yield StringProperty("Imported from", self.data.get("imported_from"))
-        yield StringProperty("Imported from path", self.data.get("filename"))
+        yield CodeProperty("Filename", self.data.get("filename"))
         yield StringProperty("External URL", self.data.get("url"))
 
 

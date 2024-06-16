@@ -33,6 +33,7 @@ which has the following copyright notice and license.
 import dataclasses
 import html
 import logging
+import types
 import typing
 
 import markupsafe
@@ -66,7 +67,7 @@ VOID_ELEMENTS = {
 }
 
 
-def _attributes(attrs: HeavymetalAttrs) -> str:
+def attributes(attrs: HeavymetalAttrs) -> str:
     if not attrs:
         return ""
 
@@ -83,15 +84,15 @@ class Trace:
     original: typing.Optional[HeavymetalAnything] = dataclasses.field(default=None)
 
     def __str__(self) -> str:
-        if isinstance(self.current, str):
-            string = f"{self.current!r}"
-        else:
+        if isinstance(self.current, tuple):
             tag, attrs, _ = self.current
 
             if tag is None:
                 string = "<!-- fragment -->"
             else:
-                string = f"<{tag}{_attributes(attrs)} />"
+                string = f"<{tag}{attributes(attrs)} />"
+        else:
+            string = f"{self.current!r}"
 
         if self.original is not None:
             string += f" from {self.original!r}"
@@ -107,14 +108,18 @@ class HeavymetalException(Exception):
 
     @sentry_sdk.trace
     def __str__(self) -> str:
-        message = self.message
+        try:
+            message = self.message
 
-        if self.traces:
-            parents = [str(trace) for trace in self.traces]
-            message += "\n\n" + "\n".join(f"{'  ' * indent}{parent}" for indent, parent in enumerate(parents))
+            if self.traces:
+                parents = [str(trace) for trace in self.traces]
+                message += "\n\n" + "\n".join(f"{'  ' * indent}{parent}" for indent, parent in enumerate(parents))
 
-        if self.value is not None:
-            message += "\n\n" + str(self.value)
+            if self.value is not None:
+                message += "\n\n" + str(self.value)
+        except Exception:
+            logger.exception(f"Failed to convert {self.__class__.__qualname__} to string")
+            raise
 
         return message
 
@@ -145,7 +150,7 @@ def unpack_dynamic(original: HeavymetalAnything, /, *, traces: typing.Sequence[T
         trace = Trace(node)
 
     # Make sure to do this check _after_ resolving any callables, since they can return strings.
-    if isinstance(node, str):
+    if isinstance(node, (str, types.EllipsisType)):
         return node
 
     # This is where hotmetal tripped me up a lot.
@@ -153,6 +158,10 @@ def unpack_dynamic(original: HeavymetalAnything, /, *, traces: typing.Sequence[T
         raise HeavymetalSyntaxError(f"Expected a tuple with three elements, got {node!r}", traces=traces, value=trace)
 
     tag, attrs, original_children = node
+
+    if not isinstance(original_children, typing.Iterable):
+        raise HeavymetalSyntaxError("Expected children to be an iterable", traces=traces, value=node)
+
     children = tuple(unpack_dynamic(c, traces=(*traces, trace)) for c in original_children)
     return (tag, attrs, children)
 
@@ -165,6 +174,9 @@ def render_static(node: _HeavymetalStatic, *, traces: typing.Sequence[Trace] = (
 
     if isinstance(node, str):
         return html.escape(node)
+
+    if isinstance(node, types.EllipsisType):
+        return ""
 
     # This is where hotmetal tripped me up a lot.
     if not isinstance(node, tuple) or not len(node) == 3:
@@ -199,11 +211,10 @@ def render_static(node: _HeavymetalStatic, *, traces: typing.Sequence[Trace] = (
     if tag is None:
         if attrs:
             raise HeavymetalSyntaxError("Fragments cannot have attributes", traces, trace)
-        nested = "".join(render_static(child, traces=traces) for child in children)
-        return "{}".format(nested)
+        return "".join(render_static(child, traces=traces) for child in children)
 
     try:
-        attributes = _attributes(attrs)
+        html_attrs = attributes(attrs)
     except ValueError as error:
         raise HeavymetalException("Invalid attribute", traces, trace) from error
 
@@ -215,10 +226,10 @@ def render_static(node: _HeavymetalStatic, *, traces: typing.Sequence[Trace] = (
     if tag.lower() in VOID_ELEMENTS:
         if children:
             raise HeavymetalHtmlError("Void element cannot have children", traces, trace)
-        return "<{tag}{attributes} />".format(tag=html.escape(tag), attributes=attributes)
+        return "<{tag}{attrs}>".format(tag=html.escape(tag), attrs=html_attrs)
 
     nested = "".join(render_static(child, traces=traces) for child in children)
-    return "<{tag}{attributes}>{nested}</{tag}>".format(tag=html.escape(tag), attributes=attributes, nested=nested)
+    return "<{tag}{attrs}>{nested}</{tag}>".format(tag=html.escape(tag), attrs=html_attrs, nested=nested)
 
 
 @sentry_sdk.trace()

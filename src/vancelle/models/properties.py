@@ -15,6 +15,9 @@ from vancelle.inflect import p
 logger = structlog.get_logger(logger_name=__name__)
 
 
+Properties = typing.Sequence["Property"]
+
+
 @dataclasses.dataclass()
 class Property:
     name: str

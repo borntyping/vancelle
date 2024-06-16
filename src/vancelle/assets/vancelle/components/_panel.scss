@@ -1,9 +1,14 @@
+@import "bootstrap/scss/variables";
+
 .v-panel {
   height: 100%;
 
   .v-panel-header {
     background-size: cover;
     min-height: 39px;
+
+    justify-content: flex-start;
+    flex-direction: row-reverse;
   }
 }
 
@@ -23,17 +28,21 @@
     grid-row: 1 / 4;
     grid-column: 1 / 2;
 
-    img {
+    .v-panel-cover-missing, img {
       object-fit: cover;
       aspect-ratio: 2/3;
       height: 100%;
       width: 100%;
     }
+
+    padding: $spacer * .75;
   }
 
   .v-panel-body {
     grid-column: 2 / 3;
-    margin: 1em;
+
+    padding: $spacer * .75;
+    padding-left: 0;
   }
 
   .v-panel-tabs-nav {
@@ -46,8 +55,15 @@
     grid-row: 4 / span 1;
   }
 
-  table tr th {
-    width: 25%;
+  table {
+    tr th {
+      width: 25%;
+    }
+
+    //th, td {
+    //  padding-top: $table-cell-padding-y-sm;
+    //  padding-bottom: $table-cell-padding-y-sm;
+    //}
   }
 }
 

@@ -1,16 +1,11 @@
 import logging
 import typing
 
-from vancelle.html.vancelle.components.details import DetailsPanel
-from vancelle.html.vancelle.components.header import page_header
-from vancelle.html.vancelle.components.optional import maybe_string
-from vancelle.html.vancelle.components.table import generate_table_from_pagination
-from vancelle.html.vancelle.pages.base import page
+from vancelle.html.vancelle.components.panel import RemoteDetailsPanel
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import (
     a,
     code,
-    div,
     span,
     td,
     tr,
@@ -31,14 +26,15 @@ def _remote_type(remote: Remote) -> Heavymetal:
 
 
 def _description(details: Details, href: str) -> Heavymetal:
-    wrapper = DetailsPanel(details)
-    return div(
-        {},
-        [
-            div({}, [wrapper.title(href=href)]),
-            div({"class": "text-body-tertiary"}, [wrapper.date_and_author()]),
-        ],
-    )
+    raise NotImplementedError
+    # wrapper = RemoteDetailsPanel(details)
+    # return div(
+    #     {},
+    #     [
+    #         div({}, [wrapper.title(href=href)]),
+    #         div({"class": "text-body-tertiary"}, [wrapper.date_and_author()]),
+    #     ],
+    # )
 
 
 def remote_index_page_row(remote: Remote) -> Heavymetal:
@@ -83,12 +79,7 @@ def remote_index_page(remote_type: typing.Type[Remote] | None, remotes: Paginati
 def remote_detail_page(remote: Remote, work: Work | None) -> Heavymetal:
     details = remote.into_details()
     properties = list(remote.into_properties())
-    panel = DetailsPanel(
-        details=details,
-        properties=properties,
-        data=remote.data,
-        background_colour=remote.info.colour,
-    )
+    panel = RemoteDetailsPanel(remote)
     subtitle = span({}, [remote.info.source, " ", remote.info.noun, " ", remote.id])
     return page(
         [page_header(maybe_string(details.title), subtitle), panel],

@@ -109,8 +109,13 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
 
     work: Mapped["Work"] = relationship(back_populates="remotes", lazy="selectin")
 
-    def url_for(self, work: typing.Optional["Work"] = None) -> str:
-        return url_for("remote.detail", remote_type=self.type, remote_id=self.id, work_id=work.id if work else None)
+    def url_for(self, candidate_work: typing.Optional["Work"] = None) -> str:
+        return url_for(
+            "remote.detail",
+            remote_type=self.type,
+            remote_id=self.id,
+            candidate_work_id=candidate_work.id if candidate_work else None,
+        )
 
     def url_for_cover(self) -> str | None:
         return url_for("remote.cover", remote_type=self.type, remote_id=self.id) if self.cover else None
@@ -163,15 +168,8 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
         return cls.polymorphic_identity()
 
     @classmethod
-    def filter_subclasses(cls, can_search: bool | None = None) -> typing.Sequence[typing.Type[typing.Self]]:
-        subclasses = cls.iter_subclasses()
-        if can_search is not None:
-            subclasses = (s for s in subclasses if s.info.can_search)
-        return list(subclasses)
-
-    @classmethod
-    def iter_subclasses_for_search(cls) -> typing.Sequence[typing.Type["Remote"]]:
-        return [subclass for subclass in cls.iter_subclasses() if subclass.info.can_search]
+    def iter_subclasses_interactive(cls) -> typing.Sequence[typing.Type[typing.Self]]:
+        return [remote_type for remote_type in cls.iter_subclasses() if remote_type.info.can_search]
 
 
 class ImportedWorkAttributes(typing.TypedDict):

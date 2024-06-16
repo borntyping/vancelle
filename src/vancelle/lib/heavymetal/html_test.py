@@ -15,12 +15,9 @@ def test_make_element_metadata():
 
 
 def test_fragment():
-    document = fragment([br({})])
-
-    assert document == (None, {}, [("br", {}, [])])
+    assert fragment([]) == (None, {}, [])
+    assert fragment([br({})]) == (None, {}, [("br", {}, [])])
 
 
 def test_nothing():
-    document = nothing()
-
-    assert document == (None, {}, ())
+    assert nothing() == ...

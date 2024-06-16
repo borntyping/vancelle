@@ -6,7 +6,7 @@ from vancelle.extensions import html
 from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.header import page_header, section_header
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
-from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote
+from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote_str
 from vancelle.html.vancelle.pages.base import page
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.lib.heavymetal.html import a, div, section
@@ -14,22 +14,18 @@ from vancelle.models import Remote, Work
 
 
 def search_for_work(work: Work) -> Heavymetal:
-    subclasses = Remote.filter_subclasses(can_search=True)
+    subclasses = Remote.iter_subclasses_interactive()
     return div(
         {"class": "list-group"},
         [
             a(
                 {
                     "class": "list-group-item list-group-item-action",
-                    "href": flask.url_for(
-                        "remote.search_source",
-                        remote_type=cls.remote_type(),
-                        work_id=work.id,
-                    ),
+                    "href": flask.url_for("remote.search_source", remote_type=remote_type, work_id=work.id),
                 },
-                ["Search ", cls.info.noun_full_plural],
+                ["Search ", remote_type.info.noun_full_plural],
             )
-            for cls in subclasses
+            for remote_type in subclasses
         ],
     )
 
@@ -67,7 +63,7 @@ class WorkPage(HeavymetalComponent):
                             title="External data",
                             subtitle=external_data_subtitle,
                         ),
-                        row({"class": "row-cols-2"}, [col({}, [RemoteDetailsPanel(r)]) for r in self.work.remotes]),
+                        row({"class": "row-cols-2 g-4"}, [col({}, [RemoteDetailsPanel(r)]) for r in self.work.remotes]),
                     ],
                 ),
                 section(
@@ -75,7 +71,7 @@ class WorkPage(HeavymetalComponent):
                     [
                         section_header(
                             title="Search external sources",
-                            subtitle=f"Search external sources for {quote(details.title)}",
+                            subtitle=f"Search external sources for {quote_str(details.title)}",
                         ),
                         row({}, [col({}, [search_for_work(self.work)])]),
                     ],

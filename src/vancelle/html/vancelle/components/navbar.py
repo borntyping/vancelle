@@ -40,8 +40,8 @@ def _new_works_dropdown() -> Heavymetal:
             _page_dropdown_item("Create new work", "work.create"),
             dropdown_divider(),
             *(
-                _page_dropdown_item(cls.info.noun_full, "remote.search_source", remote_type=cls.remote_type())
-                for cls in Remote.filter_subclasses(can_search=True)
+                _page_dropdown_item(remote_type.info.noun_full, "remote.search_source", remote_type=remote_type)
+                for remote_type in Remote.iter_subclasses_interactive()
             ),
         ],
     )

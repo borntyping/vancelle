@@ -8,9 +8,11 @@ from werkzeug.exceptions import NotFound
 
 from ..clients.images.client import ImageCache
 from ..controllers.remote import RemotesController
-from ..extensions import htmx
-from ..html.vancelle.pages.remotes import remote_detail_page, remote_index_page
+from ..extensions import db, htmx
+from ..html.vancelle.pages.remotes import remote_detail_page, remote_index_page, remote_search_page
 from ..lib.heavymetal import render
+from ..lib.pagination import Pagination
+from ..models import Work
 from ..models.remote import Remote
 
 controller = RemotesController()
@@ -33,12 +35,12 @@ def index(remote_type: typing.Type[Remote] | None = None):
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>")
 def detail(remote_type: str, remote_id: str):
-    work_id = flask.request.args.get("work_id", type=uuid.UUID)
-    remote, work = controller.detail(remote_type=remote_type, remote_id=remote_id, work_id=work_id)
+    remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
 
-    return render(remote_detail_page(remote, work))
+    candidate_work_id = flask.request.args.get("work_id", type=uuid.UUID)
+    candidate_work = controller.get_work(work_id=candidate_work_id)
 
-    return controller.render_detail(remote_type=remote_type, remote_id=remote_id, work_id=work_id)
+    return render(remote_detail_page(remote, candidate_work=candidate_work))
 
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>/cover")
@@ -90,12 +92,30 @@ def permanently_delete(remote_type: str, remote_id: str):
     return htmx.refresh()
 
 
-@bp.route("/remotes/-/search/<string:remote_type>")
-def search_source(remote_type: str):
+@bp.route("/remotes/-/search/<remote_type:remote_type>")
+def search_source(remote_type: typing.Type[Remote]):
     query = flask.request.args.get("query", default="", type=str)
-    work_id = flask.request.args.get("work_id", type=uuid.UUID)
 
-    return controller.render_search(work_id=work_id, remote_type=remote_type, query=query)
+    candidate_work_id = flask.request.args.get("work_id", type=uuid.UUID)
+    candidate_work: Work | None
+    if candidate_work_id:
+        candidate_work = db.session.get(Work, candidate_work_id)
+        candidate_work_details = candidate_work.resolve_details()
+        query = query or candidate_work_details.title
+    else:
+        candidate_work = None
+
+    remote_items = controller.managers[remote_type.remote_type()].search(query) if query else Pagination.empty()
+
+    return render(remote_search_page(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
+    # return flask.render_template(
+    #     [f"remote/{remote_type}/search.html", "remote/search.html"],
+    #     remote_type=remote_type,
+    #     remote_info=self.managers[remote_type].remote_type.info,
+    #     work=candidate_work,
+    #     query=query,
+    #     items=remote_items,
+    # )
 
 
 @bp.route("/works/<uuid:work_id>/-/link-work", methods={"post"})

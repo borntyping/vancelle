@@ -12,7 +12,7 @@ from vancelle.html.bootstrap.components.tabs import Tab, Tabs
 from vancelle.html.bootstrap_icons import bi_font, bi_svg
 from vancelle.html.helpers import HtmlClasses, html_classes
 from vancelle.html.vancelle.components.details import DetailsDescription, DetailsJSON
-from vancelle.html.vancelle.components.optional import ABSENT, maybe_str, span_absent
+from vancelle.html.vancelle.components.optional import maybe_str, quote, span_absent
 from vancelle.html.vancelle.components.properties import PropertiesTable
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.lib.heavymetal.html import (
@@ -26,6 +26,7 @@ from vancelle.lib.heavymetal.html import (
     h3,
     h5,
     img,
+    p,
     span,
     table,
     tbody,
@@ -255,7 +256,7 @@ class DetailsPanel(Panel, HeavymetalComponent):
                 div(
                     {"class": "v-panel-body"},
                     [
-                        div({"class": "mb-2"}, [h3({"class": "card-title mb-1"}, [maybe_str(details.title)]), self.author()]),
+                        div({"class": "mb-3"}, [h3({"class": "card-title mb-1"}, [maybe_str(details.title)]), self.author()]),
                         div({"class": "text-body-secondary"}, [self.description]),
                     ],
                 ),
@@ -274,14 +275,14 @@ class DetailsPanel(Panel, HeavymetalComponent):
 
         return span({"title": self.details().author}, [textwrap.shorten(self.details().author, 50)])
 
-    def date_and_author(self) -> Heavymetal:
-        year = str(self.details().release_date) if self.details().release_date else ABSENT
-        author = textwrap.shorten(self.details().author, 50) if self.details().author else ABSENT
-        return fragment([
-            span({"title": maybe_str(self.details().release_date)}, [year]),
-            ", ",
-            span({"title": maybe_str(self.details().author)}, [author]),
-        ])
+    # def date_and_author(self) -> Heavymetal:
+    #     year = str(self.details().release_date) if self.details().release_date else ABSENT
+    #     author = textwrap.shorten(self.details().author, 50) if self.details().author else ABSENT
+    #     return fragment([
+    #         span({"title": maybe_str(self.details().release_date)}, [year]),
+    #         ", ",
+    #         span({"title": maybe_str(self.details().author)}, [author]),
+    #     ])
 
 
 @dataclasses.dataclass()
@@ -303,9 +304,9 @@ class WorkDetailsPanel(DetailsPanel):
     def controls(self) -> typing.Sequence[PanelControl]:
         yield PanelControl(
             href=self.work.url_for(),
-            name="View work",
             icon="database",
-            title="View this work.",
+            name="Permalink",
+            title="Permalink.",
         )
         yield PanelControl(
             href=flask.url_for("work.update", work_id=self.work.id),
@@ -354,6 +355,11 @@ class WorkDetailsPanel(DetailsPanel):
 @dataclasses.dataclass()
 class RemoteDetailsPanel(DetailsPanel):
     remote: Remote
+    candidate_work: typing.Optional[Work] = None
+
+    def __post_init__(self):
+        if self.remote.work_id and self.candidate_work:
+            raise Exception("Don't do this.")
 
     def id(self) -> str:
         return f"remote-{self.remote.id}"
@@ -374,8 +380,8 @@ class RemoteDetailsPanel(DetailsPanel):
         yield PanelControl(
             href=self.remote.url_for(),
             icon="database",
-            name="View",
-            title="View this remote data.",
+            name="Permalink",
+            title="Permalink.",
         )
         yield PanelControl(
             post=True,
@@ -432,4 +438,19 @@ class RemoteDetailsPanel(DetailsPanel):
             [f"{self.remote.info.noun_full} ", code({}, self.remote.id)],
         )
         released = [f", released {self.remote.release_date}"] if self.remote.release_date else []
-        return fragment([link, *released, "."])
+        description = p({}, [link, *released, "."])
+
+        attached_to = (
+            p(
+                {},
+                [
+                    "Attached to ",
+                    quote([a({"href": self.remote.work.url_for()}, [self.remote.work.resolve_details().title])]),
+                    ".",
+                ],
+            )
+            if self.remote.work
+            else ...
+        )
+
+        return fragment([description, attached_to])

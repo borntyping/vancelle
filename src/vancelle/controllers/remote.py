@@ -15,6 +15,7 @@ from vancelle.controllers.sources.royalroad import RoyalroadFictionManager
 from vancelle.controllers.sources.steam import SteamApplicationManager
 from vancelle.controllers.sources.tmdb import TmdbMovieManager, TmdbTvSeriesManager
 from vancelle.extensions import db
+from vancelle.html.vancelle.pages.remotes import remote_search_page
 from vancelle.lib.heavymetal import render
 from vancelle.lib.heavymetal.html import a, fragment
 from vancelle.lib.pagination import Pagination
@@ -59,6 +60,9 @@ class RemotesController:
 
     def _get_remote_query(self, remote_type: str, remote_id: str) -> sqlalchemy.Select:
         return sqlalchemy.select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
+
+    def get_work(self, work_id: int | None) -> Work | None:
+        return db.session.get(Work, work_id) if work_id else None
 
     def get_remote(self, remote_type: str, remote_id: str) -> Remote:
         log = logger.bind(remote_type=remote_type, remote_id=remote_id)
@@ -169,45 +173,34 @@ class RemotesController:
         db.session.commit()
         return work
 
-    def render_search(self, *, work_id: uuid.UUID | None, remote_type: str, query: str | None) -> str:
-        work: Work | None
-        items: Pagination
+    def render_search(
+        self,
+        *,
+        remote_type: typing.Type[Remote],
+        candidate_work_id: uuid.UUID | None,
+        query: str | None,
+    ) -> str:
+        candidate_work: Work | None
+        remote_items: Pagination
 
-        if work_id:
-            work = db.session.get(Work, work_id)
-            query = query or work.resolve_details().title
+        if candidate_work_id:
+            candidate_work = db.session.get(Work, candidate_work_id)
+            candidate_work_details = candidate_work.resolve_details()
+            query = query or candidate_work_details.title
         else:
-            work = None
+            candidate_work = None
 
         if query:
-            items = self.managers[remote_type].search(query)
+            remote_items = self.managers[remote_type.remote_type()].search(query)
         else:
-            # items = EmptyPagination()
-            raise NotImplementedError
+            remote_items = Pagination.empty()
 
-        return flask.render_template(
-            [f"remote/{remote_type}/search.html", "remote/search.html"],
-            remote_type=remote_type,
-            remote_info=self.managers[remote_type].remote_type.info,
-            work=work,
-            query=query,
-            items=items,
-        )
-
-    def detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> tuple[Remote, Work]:
-        remote = self.get_remote(remote_type=remote_type, remote_id=remote_id)
-        work = db.session.get(Work, work_id) if work_id else None
-        return remote, work
-
-    def render_detail(self, *, remote_type: str, remote_id: str, work_id: uuid.UUID | None) -> str:
-        remote = self.get_remote(remote_type=remote_type, remote_id=remote_id)
-        work = db.session.get(Work, work_id) if work_id else None
-
-        context = self.managers[remote_type].context(remote)
-        return flask.render_template(
-            [f"remote/{remote_type}/detail.html", "remote/detail.html"],
-            remote_type=remote_type,
-            remote=remote,
-            work=work,
-            **context,
-        )
+        return render(remote_search_page(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
+        # return flask.render_template(
+        #     [f"remote/{remote_type}/search.html", "remote/search.html"],
+        #     remote_type=remote_type,
+        #     remote_info=self.managers[remote_type].remote_type.info,
+        #     work=candidate_work,
+        #     query=query,
+        #     items=remote_items,
+        # )

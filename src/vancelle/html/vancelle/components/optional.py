@@ -1,8 +1,8 @@
 import datetime
 import typing
 
-from vancelle.lib.heavymetal import Heavymetal
-from vancelle.lib.heavymetal.html import span
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
+from vancelle.lib.heavymetal.html import fragment, span
 
 ABSENT = "—"
 
@@ -23,5 +23,9 @@ def maybe_span(string: str | None) -> Heavymetal:
     return span({}, [string]) if string is not None else span_absent()
 
 
-def quote(value: str | None) -> str:
+def quote_str(value: str | None) -> str:
     return f"“{value}”" if value is not None else ABSENT
+
+
+def quote(content: HeavymetalContent) -> Heavymetal:
+    return fragment(["“", *content, "”"])

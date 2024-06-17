@@ -67,6 +67,10 @@ def remote_index_page_row(remote: Remote) -> Heavymetal:
 def remote_index_page(remote_type: typing.Type[Remote] | None, remotes: Pagination[Remote]) -> Heavymetal:
     remotes_table = generate_table_from_pagination(
         classes="table table-hover table-sm align-middle",
+        cols=[
+            {"style": "width: 20%;"},
+            {"style": "width: 40%;", "colspan": "2"},
+        ],
         head=[
             th({}, ["Source"]),
             th({}, ["Title"]),

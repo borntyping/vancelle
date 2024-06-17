@@ -2,25 +2,15 @@ import datetime
 
 import humanize
 import markupsafe
+import urllib.parse
 
-from vancelle.extensions import html
 from vancelle.html.bootstrap_icons import bi_svg
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import a, span
 
 
-def url(href: str, text: str | None) -> Heavymetal:
-    return span({}, [text or html.pretty_url(href)])
-
-
-def internal_url(href: str, text: str | None = None) -> Heavymetal:
-    return a(
-        {
-            "href": href,
-            "class": "has-text-link is-flex-wrap-nowrap",
-        },
-        [url(href, text)],
-    )
+def internal_url(href: str, text: str) -> Heavymetal:
+    return a({"href": href, "class": "has-text-link is-flex-wrap-nowrap"}, [text])
 
 
 def external_url(href: str, text: str | None = None) -> Heavymetal:
@@ -33,7 +23,7 @@ def external_url(href: str, text: str | None = None) -> Heavymetal:
             "title": href,
         },
         [
-            url(href, text),
+            span({}, [text or urllib.parse.urlparse(href).hostname]),
             bi_svg("box-arrow-up-right"),
         ],
     )

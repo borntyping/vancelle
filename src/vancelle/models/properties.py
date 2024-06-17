@@ -76,11 +76,11 @@ class TimeProperty(Property):
 
 @dataclasses.dataclass()
 class InternalUrlProperty(Property):
-    link: str | None
-    text: str | None = None
+    link: str
+    text: str
 
     def __bool__(self) -> bool:
-        return bool(self.link or self.text)
+        return bool(self.link and self.text)
 
     def heavymetal(self) -> Heavymetal:
         return internal_url(href=self.link, text=self.text)

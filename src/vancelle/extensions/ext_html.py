@@ -9,7 +9,6 @@ import jinja2
 import markupsafe
 import structlog
 import wtforms.widgets
-import urllib.parse
 
 from ..ext.flask import url_is_active, url_with
 from ..inflect import p
@@ -107,8 +106,7 @@ class HtmlExtension:
 
     @staticmethod
     def pretty_url(url: str):
-        parts = urllib.parse.urlparse(url)
-        return parts.hostname
+        raise NotImplementedError
 
     def _html_classes_flatten(self, items: typing.Iterable[HtmlClass]) -> typing.Sequence[str]:
         classes = []

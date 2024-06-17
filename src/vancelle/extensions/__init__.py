@@ -6,8 +6,9 @@ import flask_sqlalchemy_lite
 from .ext_html import HtmlExtension
 from .ext_htmx import HtmxExtension
 from .ext_sentry import SentryExtension
+from ..models import Base
 
-alembic = flask_alembic.Alembic(run_mkdir=False)
+alembic = flask_alembic.Alembic(metadatas=Base.metadata, run_mkdir=False)
 db = flask_sqlalchemy_lite.SQLAlchemy(session_options={"expire_on_commit": False})
 
 cors = flask_cors.CORS(

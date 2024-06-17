@@ -26,7 +26,6 @@ from .clients.tmdb.client import TmdbAPI
 from .converters import RemoteTypeConverter, WorkTypeConverter
 from .ext.structlog import configure_logging
 from .extensions import alembic, cors, db, html, htmx, login_manager, sentry
-from .models import Base
 
 root = pathlib.Path(__file__).parent
 
@@ -71,11 +70,6 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
     htmx.init_app(app)
     login_manager.init_app(app)
     sentry.init_app(app)
-
-    # https://flask-sqlalchemy-lite.readthedocs.io/en/latest/alembic/
-    # Flask-Alembic expects these attributes to exist, and Flask-SQLAlchemy-Lite doesn't provide them.
-    app.extensions["sqlalchemy"].db = db
-    app.extensions["sqlalchemy"].db.metadata = Base.metadata
 
     app.register_blueprint(bp_board)
     app.register_blueprint(bp_bulma)

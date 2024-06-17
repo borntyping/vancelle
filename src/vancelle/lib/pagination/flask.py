@@ -48,6 +48,4 @@ class FlaskPaginationArgs:
             count_query = sqlalchemy.select(sqlalchemy.func.count()).select_from(count_subquery)
             count = session.execute(count_query).scalar_one()
 
-        logger.warning("...", limit=self.per_page, offset=self.offset, items=len(items), count=count)
-
         return Pagination(items=items, count=count, page=self.page, per_page=self.per_page)

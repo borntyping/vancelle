@@ -8,9 +8,8 @@ src/vancelle/static/dist/bootstrap-icons/font/fonts/bootstrap-icons.woff2 \
 src/vancelle/static/dist/bootstrap/ \
 src/vancelle/static/dist/bootstrap/bootstrap.bundle.min.js \
 src/vancelle/static/dist/bootstrap/bootstrap.bundle.min.js.map \
-src/vancelle/static/dist/htmx.org/ext/debug.js \
-src/vancelle/static/dist/htmx.org/ext/loading-states.js \
 src/vancelle/static/dist/htmx.org/htmx.min.js \
+src/vancelle/static/dist/htmx-ext-loading-states/loading-states.js \
 src/vancelle/static/dist/hyperscript.org/_hyperscript.min.js \
 src/vancelle/static/dist/sentry/sentry-spotlight.js \
 src/vancelle/static/dist/style.css
@@ -38,9 +37,10 @@ src/vancelle/static/dist/bootstrap-icons/font/fonts/%:
 src/vancelle/static/dist/htmx.org/%:
 	@mkdir -p "$(@D)"
 	cp "node_modules/htmx.org/dist/$(@F)" "$(@)"
-src/vancelle/static/dist/htmx.org/ext/%:
+
+src/vancelle/static/dist/htmx-ext-loading-states/%:
 	@mkdir -p "$(@D)"
-	cp "node_modules/htmx.org/dist/ext/$(@F)" "$(@)"
+	cp "node_modules/htmx-ext-loading-states/$(@F)" "$(@)"
 
 src/vancelle/static/dist/hyperscript.org/%:
 	@mkdir -p "$(@D)"

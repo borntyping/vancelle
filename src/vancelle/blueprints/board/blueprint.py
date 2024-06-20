@@ -4,7 +4,7 @@ import flask.sansio.blueprints
 import flask_login
 import structlog
 
-from vancelle.blueprints.work import WorkIndexForm
+from vancelle.forms.work import WorkIndexForm
 from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.html.vancelle.pages.board import BoardPage
 from vancelle.models import Work

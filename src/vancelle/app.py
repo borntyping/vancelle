@@ -6,7 +6,6 @@ import frozendict
 import svcs.flask
 
 from .blueprints.board.blueprint import bp as bp_board
-from .blueprints.bulma import bp as bp_bulma
 from .blueprints.data import bp as bp_data
 from .blueprints.errors import bp as bp_errors
 from .blueprints.health import bp as bp_health
@@ -72,7 +71,6 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
     sentry.init_app(app)
 
     app.register_blueprint(bp_board)
-    app.register_blueprint(bp_bulma)
     app.register_blueprint(bp_errors)
     app.register_blueprint(bp_health)
     app.register_blueprint(bp_home)

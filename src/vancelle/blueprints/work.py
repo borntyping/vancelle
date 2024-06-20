@@ -1,154 +1,25 @@
-import itertools
 import uuid
 
 import flask.sansio.blueprints
 import flask_login
-import flask_wtf
 import structlog
 import svcs
 import werkzeug.exceptions
-import wtforms
-from wtforms.validators import DataRequired, Optional
 
-from vancelle.blueprints.bulma import BulmaSelect
 from vancelle.clients.images.client import ImageCache
 from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
-from vancelle.ext.wtforms import NullFilter
 from vancelle.extensions import db, htmx
-from vancelle.html.vancelle.pages.work import WorkPage
-from vancelle.models.remote import Remote
+from vancelle.forms.work import ShelveWorkForm, WorkForm, WorkIndexForm
+from vancelle.html.vancelle.pages.work import WorkPage, create_work_page
+from vancelle.lib.heavymetal import render
 from vancelle.models.work import Work
-from vancelle.shelf import Case, Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 
 controller = WorkController()
 
 bp = flask.Blueprint("work", __name__, url_prefix="/works")
-
-SHELF_FORM_CHOICES = {
-    group: [(shelf.value, shelf.title) for shelf in items]
-    for group, items in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
-}
-
-
-class ShelveWorkForm(flask_wtf.FlaskForm):
-    shelf = wtforms.SelectField(
-        "Shelf",
-        choices=SHELF_FORM_CHOICES,
-        coerce=Shelf,
-        default=Shelf.UNSORTED,
-        widget=BulmaSelect(),
-        validators=[DataRequired()],
-    )
-
-
-class WorkForm(flask_wtf.FlaskForm):
-    type = wtforms.SelectField(
-        "Type",
-        choices=[(cls.work_type(), cls.info.noun_title) for cls in Work.iter_subclasses()],
-        widget=BulmaSelect(),
-    )
-    shelf = wtforms.SelectField(
-        "Shelf",
-        choices=SHELF_FORM_CHOICES,
-        coerce=Shelf,
-        default=Shelf.UNSORTED,
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-
-    # Details
-    title = wtforms.StringField("Title", validators=[Optional()], filters=[NullFilter()])
-    author = wtforms.StringField("Author", validators=[Optional()], filters=[NullFilter()])
-    series = wtforms.StringField("Series", validators=[Optional()], filters=[NullFilter()])
-    release_date = wtforms.DateField("Release Date", validators=[Optional()])
-    description = wtforms.TextAreaField("Description", validators=[Optional()], filters=[NullFilter()])
-    cover = wtforms.URLField("Cover image", validators=[Optional()], filters=[NullFilter()])
-    background = wtforms.URLField("Background image", validators=[Optional()], filters=[NullFilter()])
-    # tags = wtforms.StringField('tags')
-
-    # Properties
-    external_url = wtforms.URLField("External URL", validators=[Optional()], filters=[NullFilter()])
-    isbn = wtforms.StringField("ISBN", validators=[Optional()], filters=[NullFilter()])
-
-
-class WorkIndexForm(flask_wtf.FlaskForm):
-    layout = wtforms.SelectField(
-        label="Layout",
-        choices=[
-            ("vertical", "Vertical"),
-            ("horizontal", "Horizontal"),
-            ("board", "Board"),
-            ("list", "List"),
-        ],
-        default="vertical",
-        widget=BulmaSelect(),
-        validators=[DataRequired()],
-    )
-    work_type = wtforms.SelectField(
-        label="Work type",
-        choices=[("", "All works")] + [(cls.work_type(), cls.info.noun_plural_title) for cls in Work.iter_subclasses()],
-        default="",
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    work_shelf = wtforms.SelectField(
-        label="Exact shelf",
-        coerce=lambda x: Shelf(x) if x else None,
-        choices=[("", "All shelves")] + [(s.value, s.title) for s in Shelf],
-        default="",
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    work_case = wtforms.SelectField(
-        label="Shelves",
-        coerce=lambda x: Case(x) if x else None,
-        choices=[("", "All shelves")] + [(g.value, g.title) for g in Case],
-        default="",
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    work_deleted = wtforms.SelectField(
-        label="Deleted works",
-        choices=[
-            ("no", "Don't include deleted works"),
-            ("all", "Include deleted works"),
-            ("yes", "Only deleted works"),
-        ],
-        default="no",
-        widget=BulmaSelect(),
-        validators=[DataRequired()],
-    )
-
-    remote_type = wtforms.SelectField(
-        label="Remote type",
-        choices=[("", "All remote types")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
-        default="",
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    remote_data = wtforms.SelectField(
-        label="Has remote",
-        choices=[
-            ("", "Any remote data"),
-            ("yes", "Has remote data"),
-            ("imported", "Only imported data"),
-            ("no", "No remote data"),
-        ],
-        default="",
-        widget=BulmaSelect(),
-        validators=[Optional()],
-    )
-    search = wtforms.SearchField(label="Query", validators=[Optional()])
-
-
-@bp.record_once
-def setup(state: flask.sansio.blueprints.BlueprintSetupState):
-    state.app.jinja_env.globals["Remote"] = Remote
-    state.app.jinja_env.globals["Shelf"] = Shelf
-    state.app.jinja_env.globals["Work"] = Work
 
 
 @bp.before_request
@@ -168,7 +39,7 @@ def create():
         db.session.commit()
         return flask.redirect(work.url_for())
 
-    return flask.render_template("work/create.html", form=form)
+    return render(create_work_page(work_form=form))
 
 
 @bp.route("/")

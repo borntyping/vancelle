@@ -117,14 +117,14 @@ class WorkRecordsPanel(Panel, HeavymetalComponent):
                                 tr(
                                     {"class": "text-center"},
                                     [
-                                        th({"class": "table-column-divider"}, ["Started"]),
-                                        th({}, ["Stopped"]),
-                                        th({}, ["Notes"]),
-                                        th({}, []),
-                                        th({"class": "table-column-divider"}, ["Started"]),
-                                        th({}, ["Stopped"]),
-                                        th({}, ["Notes"]),
-                                        th({}, []),
+                                        th({"class": "text-center table-column-divider"}, ["Started"]),
+                                        th({"class": "text-center"}, ["Stopped"]),
+                                        th({"class": "text-center"}, ["Notes"]),
+                                        th({"class": "text-center"}, []),
+                                        th({"class": "text-center table-column-divider"}, ["Started"]),
+                                        th({"class": "text-center"}, ["Stopped"]),
+                                        th({"class": "text-center"}, ["Notes"]),
+                                        th({"class": "text-center"}, []),
                                     ],
                                 )
                             ],
@@ -164,19 +164,19 @@ class WorkRecordsPanel(Panel, HeavymetalComponent):
     def _record(self, record: Record | None) -> Heavymetal:
         return fragment([
             td(
-                {"class": "table-column-divider"},
+                {"class": "text-center table-column-divider"},
                 [self.exact_date(record.date_started)] if record else [],
             ),
             td(
-                {},
+                {"class": "text-center"},
                 [self.exact_date(record.date_stopped)] if record else [],
             ),
             td(
-                {"class": "text-truncate"},
-                [record.notes] if record else [],
+                {"class": "text-start text-truncate"},
+                [record.notes] if record and record.notes else [],
             ),
             td(
-                {"class": ""},
+                {"class": "c"},
                 (
                     [a({"href": record.url_for()}, [bi_svg("pencil")])]
                     if record

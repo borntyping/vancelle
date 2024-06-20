@@ -2,8 +2,6 @@ import wtforms.csrf.core
 import flask_wtf.file
 import wtforms
 
-from vancelle.html.bootstrap.forms.controls import BootstrapFileInput
-
 
 class LoginForm(flask_wtf.FlaskForm):
     csrf_token: wtforms.csrf.core.CSRFTokenField
@@ -15,8 +13,4 @@ class LoginForm(flask_wtf.FlaskForm):
 class ImportForm(flask_wtf.FlaskForm):
     csrf_token: wtforms.csrf.core.CSRFTokenField
 
-    backup = flask_wtf.file.FileField(
-        "Backup",
-        widget=BootstrapFileInput(),
-        validators=[flask_wtf.file.FileRequired()],
-    )
+    backup = flask_wtf.file.FileField("Backup", validators=[flask_wtf.file.FileRequired()])

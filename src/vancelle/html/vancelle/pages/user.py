@@ -4,7 +4,7 @@ import flask
 import flask_login
 
 from vancelle.forms.user import ImportForm, LoginForm
-from vancelle.html.bulma.form.general import form_field
+from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.vancelle.components.header import page_header, section_header
 from vancelle.html.vancelle.pages.base import page
 from vancelle.inflect import p as inf
@@ -25,9 +25,9 @@ class LoginPage(HeavymetalComponent):
                         form(
                             {"action": flask.url_for("user.login"), "method": "POST", "class": "box"},
                             [
-                                form_field(self.login_form.csrf_token),
-                                form_field(self.login_form.username, placeholder="Username"),
-                                form_field(self.login_form.password, placeholder="Password"),
+                                form_control(self.login_form.csrf_token),
+                                form_control(self.login_form.username, placeholder="Username"),
+                                form_control(self.login_form.password, placeholder="Password"),
                                 button({"class": "btn", "type": "submit"}, ["Login"]),
                             ],
                         ),

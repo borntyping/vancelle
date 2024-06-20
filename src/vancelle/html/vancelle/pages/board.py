@@ -4,7 +4,7 @@ import typing
 
 import markupsafe
 
-from vancelle.blueprints.work import WorkIndexForm
+from vancelle.forms.work import WorkIndexForm
 from vancelle.lib.heavymetal.html import a, div, figure, h3, p, section, span, img, fragment
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.html.helpers import count_plural, html_classes

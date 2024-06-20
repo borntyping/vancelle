@@ -49,3 +49,15 @@ class Details(IntoProperties):
 class IntoDetails:
     def into_details(self) -> Details:
         raise NotImplementedError()
+
+
+EMPTY_DETAILS = Details(
+    title=None,
+    author=None,
+    series=None,
+    description=None,
+    release_date=None,
+    cover=None,
+    background=None,
+    external_url=None,
+)

@@ -38,6 +38,7 @@ class WorkPage(HeavymetalComponent):
     work: Work
 
     def heavymetal(self) -> Heavymetal:
+        title = self.work.resolve_title()
         details = self.work.resolve_details()
 
         work_details_panel = WorkDetailsPanel(self.work)
@@ -52,10 +53,7 @@ class WorkPage(HeavymetalComponent):
                 section(
                     {},
                     [
-                        page_header(
-                            title=maybe_str(details.title),
-                            subtitle=f"{maybe_year(details.release_date)}, {maybe_str(details.author)}",
-                        ),
+                        page_header(title, f"{maybe_year(details.release_date)}, {maybe_str(details.author)}"),
                         row({}, [col({}, [work_details_panel]), col({}, [work_records_panel])]),
                     ],
                 ),
@@ -93,7 +91,7 @@ def create_work_page(work_form: WorkForm, details: Details = EMPTY_DETAILS) -> H
                     page_header(
                         "Create work",
                         "Manually enter details for a new work",
-                        [button({"class": "btn btn-lg btn-primary", "type": "submit"}, ["Save"])],
+                        button({"class": "btn btn-lg btn-primary", "type": "submit"}, ["Save"]),
                     ),
                     work_form.csrf_token(),
                     row(

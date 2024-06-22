@@ -158,6 +158,14 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
         yield TimeProperty("Started", self.date_first, description="First date in this work's records.")
         yield TimeProperty("Stopped", self.date_last, description="Date stopped for this work's most recent record.")
 
+    def resolve_title(self) -> str:
+        items = [
+            self.title,
+            *(remote.title for remote in self.iter_active_remotes()),
+            f"Work {self.id}",
+        ]
+        return next((item for item in items if item))
+
     # @sentry_sdk.trace
     def resolve_details(self) -> Details:
         """Collapse the chain into a single Details instance, including details from the work."""

@@ -1,42 +1,70 @@
-"""
-https://getbootstrap.com/docs/5.3/forms/validation/#server-side
-"""
+""" """
 
 import markupsafe
 import wtforms
-from wtforms.widgets import Input, Select, TextArea
+from wtforms.widgets import CheckboxInput, RadioInput, Select
 
 from vancelle.html.helpers import html_classes
 
 
-def form_control(field: wtforms.Field, *, label: bool = True, **kwargs) -> markupsafe.Markup:
-    if label:
-        label_element = field.label(class_="form-label")
-    else:
-        label_element = ""
-
+def _form_control_validation_class(field: wtforms.Field) -> str:
     if field.errors:
-        valid_classes = "is-invalid"
-        valid_element = markupsafe.Markup(f'<div class="invalid-feedback">{' '.join(field.errors)}</div>')
-    elif field.data and field.data != field.default:
-        valid_classes = "is-valid"
-        valid_element = markupsafe.Markup('<div class="valid-feedback">Looks good!</div>')
-    else:
-        valid_classes = ""
-        valid_element = ""
+        return "is-invalid"
 
-    if isinstance(field.widget, (Input, TextArea)):
-        widget_classes = "form-control"
-    elif isinstance(field.widget, Select):
-        widget_classes = "form-select"
-    else:
-        raise NotImplementedError
+    if field.data and field.data != field.default:
+        return "is-valid"
+
+    return ""
+
+
+def _form_control_validation_element(field: wtforms.Field) -> str:
+    return f'<div class="invalid-feedback">{' '.join(field.errors)}</div>' if field.errors else ""
+
+
+def form_control(field: wtforms.Field, *, label: bool = True, switch: bool = False, **kwargs) -> markupsafe.Markup:
+    """
+    Render a wtforms field as a Bootstrap 5 field.
+
+    https://getbootstrap.com/docs/5.3/forms/validation/#server-side
+
+    """
+    if isinstance(field.widget, (CheckboxInput, RadioInput)):
+        raise ValueError("Use form_control_check() instead")
 
     # Avoid printing the string "None" as a placeholder.
     if "placeholder" in kwargs and kwargs["placeholder"] is None:
         del kwargs["placeholder"]
 
-    field_classes = html_classes(widget_classes, valid_classes, kwargs.pop("class_", None))
-    field_element = field(class_=field_classes, **kwargs)
+    if isinstance(field.widget, Select):
+        widget_classes = "form-select"
+    else:
+        widget_classes = "form-control"
 
-    return label_element + field_element + valid_element
+    valid_classes = _form_control_validation_class(field)
+    field_classes = html_classes(widget_classes, valid_classes, kwargs.pop("class_", None))
+
+    label_element = field.label() if label else ""
+    field_element = field(class_=field_classes, **kwargs)
+    valid_element = _form_control_validation_element(field)
+
+    return markupsafe.Markup(f"{label_element}{field_element}{valid_element}")
+
+
+def form_control_check(field: wtforms.BooleanField, *, switch: bool = False, **kwargs) -> markupsafe.Markup:
+    """
+    https://getbootstrap.com/docs/5.3/forms/checks-radios/
+    """
+
+    if not isinstance(field.widget, (CheckboxInput, RadioInput)):
+        raise ValueError("form_control_check requires a checkbox or radio input")
+
+    valid_classes = _form_control_validation_class(field)
+    field_classes = html_classes("form-check-input", valid_classes, kwargs.pop("class_", None))
+    check_classes = html_classes("form-check", {"form-switch": switch})
+
+    field_element = field(class_=field_classes, **kwargs)
+    label_element = field.label(class_="form-check-label mb-0")
+    valid_element = _form_control_validation_element(field)
+    check_element = f'<div class="{check_classes}">{field_element}{label_element}{valid_element}</div>'
+
+    return markupsafe.Markup(check_element)

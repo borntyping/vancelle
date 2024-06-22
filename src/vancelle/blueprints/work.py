@@ -10,8 +10,8 @@ from vancelle.clients.images.client import ImageCache
 from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db, htmx
-from vancelle.forms.work import ShelveWorkForm, WorkForm, WorkIndexForm
-from vancelle.html.vancelle.pages.work import WorkPage, create_work_page
+from vancelle.forms.work import WorkShelfForm, WorkForm, WorkIndexForm
+from vancelle.html.vancelle.pages.work import work_create_page, work_detail_page, work_update_page
 from vancelle.lib.heavymetal import render
 from vancelle.models.work import Work
 
@@ -39,7 +39,7 @@ def create():
         db.session.commit()
         return flask.redirect(work.url_for())
 
-    return render(create_work_page(work_form=form))
+    return render(work_create_page(work_form=form))
 
 
 @bp.route("/")
@@ -88,10 +88,8 @@ def index():
 @bp.route("/<uuid:work_id>")
 def detail(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
-    page = WorkPage(work=work)
-    return page.render()
-    # form = WorkForm(obj=work)
-    # return flask.render_template("work/detail.html", work=work, form=form)
+    work_shelf_form = WorkShelfForm(obj=work)
+    return render(work_detail_page(work=work, work_shelf_form=work_shelf_form))
 
 
 @bp.route("/<uuid:work_id>/cover")
@@ -112,31 +110,31 @@ def background(work_id: uuid.UUID):
     return images.as_response(work.background)
 
 
-@bp.route("/<uuid:work_id>/-/shelve", methods={"get", "post"})
+@bp.route("/<uuid:work_id>/-/shelve", methods={"post"})
 def shelve(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
-    form = ShelveWorkForm(obj=work)
+    work_shelf_form = WorkShelfForm(obj=work)
 
-    if not form.validate_on_submit():
-        raise ApplicationError(form.errors)
+    if work_shelf_form.validate_on_submit():
+        work_shelf_form.populate_obj(work)
+        db.session.commit()
+        flask.flash(f"Moved {work.resolve_details().title} to the {work.shelf.title} shelf.", "Shelved work")
+        return htmx.refresh()
 
-    form.populate_obj(work)
-    db.session.commit()
-    flask.flash(f"Moved {work.resolve_details().title} to the {work.shelf.title} shelf.", "Shelved work")
-    return htmx.redirect(work.url_for())
+    raise ApplicationError(work_shelf_form.errors)
 
 
 @bp.route("/<uuid:work_id>/-/update", methods={"get", "post"})
 def update(work_id: uuid.UUID):
     work = controller.get_or_404(id=work_id)
-    form = WorkForm(obj=work)
+    work_form = WorkForm(obj=work)
 
-    if form.validate_on_submit():
-        form.populate_obj(work)
+    if work_form.validate_on_submit():
+        work_form.populate_obj(work)
         db.session.commit()
         return htmx.redirect(work.url_for())
 
-    return flask.render_template("work/update.html", work=work, form=form)
+    return render(work_update_page(work, work_form))
 
 
 @bp.route("/<uuid:work_id>/-/delete", methods={"post"})

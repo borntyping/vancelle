@@ -69,6 +69,7 @@ def make_void_element(tag: str) -> typing.Callable[[HeavymetalAttrs], Heavymetal
 
 
 a = make_element("a")
+abbr = make_element("abbr")
 aside = make_element("aside")
 button = make_element("button")
 code = make_element("code")

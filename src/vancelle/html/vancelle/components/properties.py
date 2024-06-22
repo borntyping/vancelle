@@ -2,7 +2,7 @@ import dataclasses
 import typing
 
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
-from vancelle.lib.heavymetal.html import table, tbody, td, th, tr
+from vancelle.lib.heavymetal.html import abbr, table, tbody, td, th, tr
 from vancelle.models.properties import Property
 
 
@@ -23,7 +23,7 @@ class PropertiesTable(HeavymetalComponent):
                         tr(
                             {},
                             [
-                                th({"scope": "row"}, [prop.name]),
+                                th({"scope": "row"}, [abbr({"title": prop.description}, [prop.name])]),
                                 td({}, [prop]),
                             ],
                         )

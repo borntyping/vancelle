@@ -6,7 +6,7 @@ import wtforms.validators
 
 from vancelle.ext.wtforms import NoneFilter
 from vancelle.models.remote import Remote
-from vancelle.models.work import Work, Book
+from vancelle.models.work import Book, Work
 from vancelle.shelf import Case, Shelf
 
 SHELF_FORM_CHOICES = {
@@ -17,7 +17,7 @@ SHELF_FORM_CHOICES = {
 TYPE_FORM_CHOICES = [(cls.work_type(), cls.info.noun_title) for cls in Work.iter_subclasses()]
 
 
-class ShelveWorkForm(flask_wtf.FlaskForm):
+class WorkShelfForm(flask_wtf.FlaskForm):
     csrf_token: wtforms.csrf.core.CSRFTokenField
 
     shelf = wtforms.SelectField(

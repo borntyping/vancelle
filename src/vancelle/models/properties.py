@@ -4,13 +4,15 @@ import typing
 
 import flask
 import hotmetal
+import humanize
 import structlog
 
-from vancelle.lib.heavymetal.html import code, span
+from vancelle.lib.heavymetal.html import abbr, code, span
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.html.vancelle.components.metadata import external_url, internal_url
 from vancelle.html.vancelle.components.optional import span_absent
 from vancelle.inflect import p
+from vancelle.shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -24,7 +26,7 @@ class Property:
     description: str | None = dataclasses.field(default=None, kw_only=True)
 
     def __bool__(self) -> bool:
-        raise NotImplementedError
+        return True
 
     def __str__(self) -> str:
         if not self:
@@ -64,14 +66,14 @@ class CodeProperty(Property):
 
 
 @dataclasses.dataclass()
-class TimeProperty(Property):
-    value: datetime.datetime | datetime.date | typing.Any
+class DatetimeProperty(Property):
+    value: datetime.datetime | datetime.date | None
 
     def __bool__(self) -> bool:
         return self.value is not None
 
     def heavymetal(self) -> Heavymetal:
-        return span({}, str(self.value))
+        return abbr({"title": str(self.value)}, humanize.naturaltime(self.value)) if self.value else span_absent()
 
 
 @dataclasses.dataclass()
@@ -111,6 +113,14 @@ class IterableProperty(Property):
 
     def heavymetal(self) -> Heavymetal:
         return span({}, p.join([str(item) for item in self]))
+
+
+@dataclasses.dataclass()
+class ShelfProperty(Property):
+    shelf: Shelf
+
+    def heavymetal(self) -> Heavymetal:
+        return abbr({"title": self.shelf.description}, self.shelf.title)
 
 
 class IntoProperties:

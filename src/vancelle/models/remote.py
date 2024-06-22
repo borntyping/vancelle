@@ -159,7 +159,10 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield CodeProperty("ID", self.id)
+        yield StringProperty("Type", self.info.noun_full, description="Type used for this remote metadata.")
+        yield StringProperty("Type Priority", self.info.priority, description="Priority for this type of remote metadata.")
+
+        yield CodeProperty("ID", self.id, description="Unique ID for this remote metadata.")
         yield ExternalUrlProperty("Cover", self.cover)
         yield ExternalUrlProperty("Background", self.background)
 

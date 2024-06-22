@@ -26,15 +26,13 @@ def toast(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavymetal:
 
 
 def toast_response(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavymetal:
-    return fragment(
-        [
-            span({}, [title, ": ", body]),
-            section(
-                {"id": TOAST_CONTAINER_ID, "hx-swap-oob": "beforeend"},
-                [toast(title, body, classes=classes)],
-            ),
-        ]
-    )
+    return fragment([
+        span({}, [title, ": ", body]),
+        section(
+            {"id": TOAST_CONTAINER_ID, "hx-swap-oob": "beforeend"},
+            [toast(title, body, classes=classes)],
+        ),
+    ])
 
 
 def toast_container() -> Heavymetal:
@@ -49,7 +47,7 @@ def toast_container() -> Heavymetal:
     return aside(
         {
             "id": TOAST_CONTAINER_ID,
-            "class": "toast-container position-absolute bottom-0 start-0 p-3",
+            "class": "toast-container position-fixed bottom-0 start-0 p-3",
             "style": "z-index: 11;",
             "hx-preserve": "true",
         },

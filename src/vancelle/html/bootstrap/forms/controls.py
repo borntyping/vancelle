@@ -21,7 +21,7 @@ def _form_control_validation_element(field: wtforms.Field) -> str:
     return f'<div class="invalid-feedback">{' '.join(field.errors)}</div>' if field.errors else ""
 
 
-def form_control(field: wtforms.Field, *, label: bool = True, switch: bool = False, **kwargs) -> markupsafe.Markup:
+def form_control(field: wtforms.Field, *, label: bool = True, validation: bool = True, **kwargs) -> markupsafe.Markup:
     """
     Render a wtforms field as a Bootstrap 5 field.
 
@@ -40,12 +40,12 @@ def form_control(field: wtforms.Field, *, label: bool = True, switch: bool = Fal
     else:
         widget_classes = "form-control"
 
-    valid_classes = _form_control_validation_class(field)
+    valid_classes = _form_control_validation_class(field) if validation else ""
     field_classes = html_classes(widget_classes, valid_classes, kwargs.pop("class_", None))
 
     label_element = field.label() if label else ""
     field_element = field(class_=field_classes, **kwargs)
-    valid_element = _form_control_validation_element(field)
+    valid_element = _form_control_validation_element(field) if validation else ""
 
     return markupsafe.Markup(f"{label_element}{field_element}{valid_element}")
 

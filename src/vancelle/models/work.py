@@ -11,7 +11,7 @@ from sqlalchemy.sql.functions import coalesce
 
 from .base import PolymorphicBase
 from .details import Details, IntoDetails
-from .properties import CodeProperty, IntoProperties, Property, StringProperty, TimeProperty
+from .properties import CodeProperty, IntoProperties, Property, ShelfProperty, StringProperty, DatetimeProperty
 from .record import Record
 from .remote import Remote
 from .types import ShelfEnum
@@ -130,6 +130,18 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
     def url_for_background(self) -> str | None:
         return url_for("work.background", work_id=self.id) if self.background else None
 
+    def url_for_update(self) -> str:
+        return url_for("work.update", work_id=self.id)
+
+    def url_for_delete(self) -> str:
+        return url_for("work.delete", work_id=self.id)
+
+    def url_for_restore(self) -> str:
+        return url_for("work.restore", work_id=self.id)
+
+    def url_for_permanently_delete(self) -> str:
+        return url_for("work.permanently_delete", work_id=self.id)
+
     def iter_remotes(self) -> typing.Iterable["Remote"]:
         return reversed(sorted(self.remotes, key=lambda remote: remote.info.priority))
 
@@ -152,11 +164,12 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
     def into_properties(self) -> typing.Iterable[Property]:
         yield CodeProperty("ID", self.id)
         yield StringProperty("Type", self.info.noun_title)
-        yield TimeProperty("Created", self.time_created)
-        yield TimeProperty("Updated", self.time_updated)
-        yield TimeProperty("Deleted", self.time_deleted)
-        yield TimeProperty("Started", self.date_first, description="First date in this work's records.")
-        yield TimeProperty("Stopped", self.date_last, description="Date stopped for this work's most recent record.")
+        yield ShelfProperty("Shelf", self.shelf)
+        yield DatetimeProperty("Created", self.time_created)
+        yield DatetimeProperty("Updated", self.time_updated)
+        yield DatetimeProperty("Deleted", self.time_deleted)
+        yield DatetimeProperty("Started", self.date_first, description="First date in this work's records.")
+        yield DatetimeProperty("Stopped", self.date_last, description="Date stopped for this work's most recent record.")
 
     def resolve_title(self) -> str:
         items = [

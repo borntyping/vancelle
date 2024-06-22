@@ -4,7 +4,14 @@ import typing
 
 import structlog
 
-from vancelle.models.properties import ExternalUrlProperty, IntoProperties, IterableProperty, Property, StringProperty
+from vancelle.models.properties import (
+    DatetimeProperty,
+    ExternalUrlProperty,
+    IntoProperties,
+    IterableProperty,
+    Property,
+    StringProperty,
+)
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -41,7 +48,7 @@ class Details(IntoProperties):
         yield StringProperty("Title", self.title)
         yield StringProperty("Author", self.author)
         yield StringProperty("Series", self.series)
-        yield StringProperty("Release date", self.release_date)
+        yield DatetimeProperty("Release date", self.release_date)
         yield IterableProperty("Tags", list(self.tags) if self.tags else ())
         yield ExternalUrlProperty("External URL", self.external_url)
 

@@ -52,7 +52,6 @@ def detail(record_id: uuid.UUID):
         raise BadRequest()
 
     return render(record_update_page(record=record, record_form=record_form))
-    return flask.render_template("record/detail.html", record=record, form=record_form)
 
 
 @bp.route("/<uuid:record_id>/-/update", methods=["POST"])

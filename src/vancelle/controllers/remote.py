@@ -15,7 +15,7 @@ from vancelle.controllers.sources.royalroad import RoyalroadFictionManager
 from vancelle.controllers.sources.steam import SteamApplicationManager
 from vancelle.controllers.sources.tmdb import TmdbMovieManager, TmdbTvSeriesManager
 from vancelle.extensions import db
-from vancelle.html.vancelle.pages.remotes import remote_search_page
+from vancelle.html.vancelle.pages.remote import remote_search_page
 from vancelle.lib.heavymetal import render
 from vancelle.lib.heavymetal.html import a, fragment
 from vancelle.lib.pagination import Pagination

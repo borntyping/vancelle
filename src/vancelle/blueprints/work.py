@@ -7,11 +7,11 @@ import svcs
 import werkzeug.exceptions
 
 from vancelle.clients.images.client import ImageCache
-from vancelle.controllers.work import WorkController, WorkQuery
+from vancelle.controllers.work import WorkController
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db, htmx
-from vancelle.forms.work import WorkShelfForm, WorkForm, WorkIndexForm
-from vancelle.html.vancelle.pages.work import work_create_page, work_detail_page, work_update_page
+from vancelle.forms.work import WorkForm, WorkShelfForm
+from vancelle.html.vancelle.pages.work import work_create_page, work_detail_page, work_index_page, work_update_page
 from vancelle.lib.heavymetal import render
 from vancelle.models.work import Work
 
@@ -44,45 +44,49 @@ def create():
 
 @bp.route("/")
 def index():
-    form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
-    query = WorkQuery(
-        user=flask_login.current_user,
-        work_type=form.work_type.data,
-        work_shelf=form.work_shelf.data,
-        work_case=form.work_case.data,
-        work_deleted=form.work_deleted.data,
-        remote_type=form.remote_type.data,
-        remote_data=form.remote_data.data,
-        search=form.search.data,
-    )
+    works = controller.index()
 
-    match form.layout.data:
-        case "board":
-            shelves, total = query.shelves()
-            page = flask.render_template(
-                "work/index_board.html",
-                form=form,
-                layout=form.layout.data,
-                work_shelf=form.work_shelf.data,
-                work_case=form.work_case.data,
-                shelves=shelves,
-                total=total,
-            )
-        case "list":
-            works = query.paginate()
-            page = flask.render_template(
-                "work/index_list.html",
-                form=form,
-                layout=form.layout.data,
-                works=works,
-                total=works.count,
-            )
-        case _:
-            raise werkzeug.exceptions.BadRequest(f"Unknown layout {form.layout.data!r}")
+    return render(work_index_page(works))
 
-    response = flask.Response(page)
-    response.delete_cookie("index")
-    return response
+    # form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
+    # query = WorkQuery(
+    #     user=flask_login.current_user,
+    #     work_type=form.work_type.data,
+    #     work_shelf=form.work_shelf.data,
+    #     work_case=form.work_case.data,
+    #     work_deleted=form.work_deleted.data,
+    #     remote_type=form.remote_type.data,
+    #     remote_data=form.remote_data.data,
+    #     search=form.search.data,
+    # )
+    #
+    # match form.layout.data:
+    #     case "board":
+    #         shelves, total = query.shelves()
+    #         page = flask.render_template(
+    #             "work/index_board.html",
+    #             form=form,
+    #             layout=form.layout.data,
+    #             work_shelf=form.work_shelf.data,
+    #             work_case=form.work_case.data,
+    #             shelves=shelves,
+    #             total=total,
+    #         )
+    #     case "list":
+    #         works = query.paginate()
+    #         page = flask.render_template(
+    #             "work/index_list.html",
+    #             form=form,
+    #             layout=form.layout.data,
+    #             works=works,
+    #             total=works.count,
+    #         )
+    #     case _:
+    #         raise werkzeug.exceptions.BadRequest(f"Unknown layout {form.layout.data!r}")
+    #
+    # response = flask.Response(page)
+    # response.delete_cookie("index")
+    # return response
 
 
 @bp.route("/<uuid:work_id>")

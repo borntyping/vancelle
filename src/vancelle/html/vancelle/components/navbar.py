@@ -5,6 +5,7 @@ from vancelle.ext.flask import url_is_active
 from vancelle.html.bootstrap.components.navbar import (
     dropdown_divider,
     dropdown_item,
+    nav_item,
     nav_item_dropdown,
     navbar,
     navbar_brand,
@@ -65,6 +66,7 @@ def page_navbar() -> Heavymetal:
     return navbar(
         navbar_brand(name="Vancelle", href=flask.url_for("home.home")),
         [
+            nav_item("Board", flask.url_for("board.index"), url_is_active("board.index")),
             _works_dropdown(),
             _new_works_dropdown(),
         ],

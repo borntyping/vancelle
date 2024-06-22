@@ -5,13 +5,16 @@ from vancelle.forms.work import WorkForm, WorkShelfForm
 from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.bootstrap.layout.grid import col, row
+from vancelle.html.vancelle.components.details import details_description
 from vancelle.html.vancelle.components.header import page_header, section_header
 from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
+from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.html.vancelle.components.work import return_to_work
 from vancelle.html.vancelle.pages.base import page
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
-from vancelle.lib.heavymetal.html import a, button, div, form, section
+from vancelle.lib.heavymetal.html import a, button, div, form, section, td, th
+from vancelle.lib.pagination import Pagination
 from vancelle.models import Remote, Work
 from vancelle.models.details import Details, EMPTY_DETAILS
 
@@ -238,3 +241,24 @@ def work_create_page(work_form: WorkForm, details: Details = EMPTY_DETAILS) -> H
         btn_groups=[],
         page_title=["Create work"],
     )
+
+
+def work_index_page(works: Pagination[Work]) -> Heavymetal:
+    works_table = generate_table_from_pagination(
+        classes="table table-hover table-sm align-middle",
+        cols=[
+            {"style": "width: 20%;"},
+            {"style": "width: 40%;", "colspan": "2"},
+        ],
+        head=[
+            th({}, ["Type"]),
+            th({}, ["Title"]),
+        ],
+        body=lambda work: [
+            td({}, [work.info.noun_title]),
+            td({}, [details_description(work.resolve_details(), work.url_for())]),
+        ],
+        pagination=works,
+    )
+
+    return page([page_header("Works"), works_table], fluid=False, title=["Remotes"])

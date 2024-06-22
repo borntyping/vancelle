@@ -9,7 +9,7 @@ class WorkTypeConverter(werkzeug.routing.BaseConverter):
     def to_python(self, value: str) -> typing.Type[Work]:
         return Work.get_subclass(value)
 
-    def to_url(self, value: typing.Type[Work]) -> str:
+    def to_url(self, value: str | typing.Type[Work]) -> str:
         return value.polymorphic_identity()
 
 

@@ -39,7 +39,7 @@ class FlaskPaginationArgs:
         count_statement: sqlalchemy.Select[tuple[int]] | None = None,
     ) -> Pagination[T]:
         items_query = query_statement.limit(self.per_page).offset(self.offset)
-        items = list(session.execute(items_query).scalars())
+        items = list(session.execute(items_query).unique().scalars())
 
         if count_statement:
             count = session.execute(count_statement).scalar_one()

@@ -54,6 +54,7 @@ class WorkInfo(IntoProperties):
 
     def into_properties(self) -> typing.Iterable[Property]:
         yield StringProperty("Type", self.noun_title, title="Type of work.")
+        yield StringProperty("Priority", str(self.priority), title="Priority for this type.")
 
 
 class Work(PolymorphicBase, IntoDetails, IntoProperties):
@@ -174,11 +175,7 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
         yield DatetimeProperty("Stopped", self.date_last, title="Date stopped for this work's most recent record.")
 
     def resolve_title(self) -> str:
-        items = [
-            self.title,
-            *(remote.title for remote in self.iter_active_remotes()),
-            f"Work {self.id}",
-        ]
+        items = [self.title, *(remote.title for remote in self.iter_active_remotes()), f"Work {self.id}"]
         return next((item for item in items if item))
 
     # @sentry_sdk.trace

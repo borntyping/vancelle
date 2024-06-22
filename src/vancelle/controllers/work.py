@@ -5,7 +5,9 @@ import typing
 import uuid
 
 import flask_login
+import sqlalchemy
 import structlog
+from sqlalchemy.orm import joinedload
 from sqlalchemy import ColumnElement, Select, True_, desc, func, nulls_last, or_, select
 from sqlalchemy.sql.functions import coalesce
 from werkzeug.exceptions import BadRequest
@@ -191,3 +193,8 @@ class WorkController:
         db.session.delete(work)
         db.session.commit()
         return None
+
+    def index(self) -> Pagination:
+        args = FlaskPaginationArgs()
+        query = sqlalchemy.select(Work).options(joinedload(Work.remotes))
+        return args.query(db.session, query)

@@ -9,7 +9,7 @@ from werkzeug.exceptions import NotFound
 from ..clients.images.client import ImageCache
 from ..controllers.remote import RemotesController
 from ..extensions import db, htmx
-from ..html.vancelle.pages.remotes import remote_detail_page, remote_index_page, remote_search_page
+from ..html.vancelle.pages.remote import remote_detail_page, remote_index_page, remote_search_page
 from ..lib.heavymetal import render
 from ..lib.pagination import Pagination
 from ..models import Work

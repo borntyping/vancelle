@@ -3,8 +3,9 @@ import typing
 
 import flask
 
+from vancelle.html.vancelle.components.details import details_description
 from vancelle.html.vancelle.components.header import page_header
-from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote, quote_str
+from vancelle.html.vancelle.components.optional import maybe_str, quote, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.html.vancelle.pages.base import page
@@ -13,7 +14,6 @@ from vancelle.lib.heavymetal.html import (
     a,
     button,
     code,
-    div,
     form,
     td,
     th,
@@ -21,7 +21,6 @@ from vancelle.lib.heavymetal.html import (
 )
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Remote, Work
-from vancelle.models.details import Details
 
 logger = logging.getLogger(__name__)
 
@@ -34,23 +33,6 @@ def _remote_type(remote: Remote) -> Heavymetal:
     return a({"class": "text-nowrap", "href": remote.url_for_type()}, [remote.info.noun_full])
 
 
-def _description(details: Details, href: str) -> Heavymetal:
-    return div(
-        {},
-        [
-            div({}, [a({"href": href}, maybe_str(details.title))]),
-            div(
-                {"class": "text-body-tertiary"},
-                [
-                    maybe_year(details.release_date),
-                    ", ",
-                    maybe_str(details.author),
-                ],
-            ),
-        ],
-    )
-
-
 def remote_index_page_row(remote: Remote) -> Heavymetal:
     remote_details = remote.into_details()
     resolved_details = remote.work.resolve_details()
@@ -58,8 +40,8 @@ def remote_index_page_row(remote: Remote) -> Heavymetal:
         {},
         [
             td({}, [_remote_type(remote)]),
-            td({}, [_description(remote_details, remote.url_for())]),
-            td({}, [_description(resolved_details, remote.work.url_for())]),
+            td({}, [details_description(remote_details, remote.url_for())]),
+            td({}, [details_description(resolved_details, remote.work.url_for())]),
         ],
     )
 
@@ -78,8 +60,8 @@ def remote_index_page(remote_type: typing.Type[Remote] | None, remotes: Paginati
         ],
         body=lambda remote: [
             td({}, [_remote_type(remote)]),
-            td({}, [_description(remote.into_details(), remote.url_for())]),
-            td({}, [_description(remote.work.resolve_details(), remote.work.url_for())]),
+            td({}, [details_description(remote.into_details(), remote.url_for())]),
+            td({}, [details_description(remote.work.resolve_details(), remote.work.url_for())]),
         ],
         pagination=remotes,
     )
@@ -168,7 +150,7 @@ def remote_search_page(
             th({}, []),
         ],
         body=lambda remote: [
-            td({}, [_description(remote.into_details(), remote.url_for(candidate_work=candidate_work))]),
+            td({}, [details_description(remote.into_details(), remote.url_for(candidate_work=candidate_work))]),
             td(
                 {"class": "text-end"},
                 [link_work_button(remote, candidate_work) if candidate_work else create_work_button(remote)],

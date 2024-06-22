@@ -23,7 +23,7 @@ class PropertiesTable(HeavymetalComponent):
                         tr(
                             {},
                             [
-                                th({"scope": "row"}, [abbr({"title": prop.description}, [prop.name])]),
+                                th({"scope": "row"}, [abbr({"title": prop.title}, [prop.name])]),
                                 td({}, [prop]),
                             ],
                         )

@@ -32,7 +32,7 @@ T = typing.TypeVar("T")
 
 
 @dataclasses.dataclass(kw_only=True)
-class RemoteInfo:
+class RemoteInfo(IntoProperties):
     source: str  # Name of the source these remotes come from
     noun: str  # Noun for this type of remote
     noun_plural: str
@@ -78,6 +78,10 @@ class RemoteInfo:
 
     def plural_full(self, count: int) -> str:
         return f"{self.source} {self.plural(count)}"
+
+    def into_properties(self) -> typing.Iterable[Property]:
+        yield StringProperty("Name", self.noun_full, title="Type of remote metadata.")
+        yield StringProperty("Priority", self.priority, title="Priority for this type of remote metadata.")
 
 
 class Remote(PolymorphicBase, IntoDetails, IntoProperties):
@@ -159,10 +163,7 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield StringProperty("Type", self.info.noun_full, description="Type used for this remote metadata.")
-        yield StringProperty("Type Priority", self.info.priority, description="Priority for this type of remote metadata.")
-
-        yield CodeProperty("ID", self.id, description="Unique ID for this remote metadata.")
+        yield CodeProperty("ID", self.id, title="Unique ID for this remote metadata.")
         yield ExternalUrlProperty("Cover", self.cover)
         yield ExternalUrlProperty("Background", self.background)
 

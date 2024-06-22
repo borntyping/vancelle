@@ -23,7 +23,7 @@ Properties = typing.Sequence["Property"]
 @dataclasses.dataclass()
 class Property:
     name: str
-    description: str | None = dataclasses.field(default=None, kw_only=True)
+    title: str | None = dataclasses.field(default=None, kw_only=True)
 
     def __bool__(self) -> bool:
         return True

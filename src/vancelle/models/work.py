@@ -21,7 +21,7 @@ from ..shelf import Shelf
 
 
 @dataclasses.dataclass()
-class WorkInfo:
+class WorkInfo(IntoProperties):
     slug: str
     noun: str
     noun_title: str
@@ -51,6 +51,9 @@ class WorkInfo:
 
     def plural_title(self, count: int) -> str:
         return self.noun_title if count == 1 else self.noun_plural_title
+
+    def into_properties(self) -> typing.Iterable[Property]:
+        yield StringProperty("Type", self.noun_title, title="Type of work.")
 
 
 class Work(PolymorphicBase, IntoDetails, IntoProperties):
@@ -163,13 +166,12 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
 
     def into_properties(self) -> typing.Iterable[Property]:
         yield CodeProperty("ID", self.id)
-        yield StringProperty("Type", self.info.noun_title)
         yield ShelfProperty("Shelf", self.shelf)
         yield DatetimeProperty("Created", self.time_created)
         yield DatetimeProperty("Updated", self.time_updated)
         yield DatetimeProperty("Deleted", self.time_deleted)
-        yield DatetimeProperty("Started", self.date_first, description="First date in this work's records.")
-        yield DatetimeProperty("Stopped", self.date_last, description="Date stopped for this work's most recent record.")
+        yield DatetimeProperty("Started", self.date_first, title="First date in this work's records.")
+        yield DatetimeProperty("Stopped", self.date_last, title="Date stopped for this work's most recent record.")
 
     def resolve_title(self) -> str:
         items = [

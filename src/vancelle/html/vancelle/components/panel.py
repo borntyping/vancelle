@@ -204,6 +204,8 @@ class DetailsPanel(Panel, HeavymetalComponent):
 
     def properties(self) -> Properties: ...
 
+    def type_properties(self) -> Properties: ...
+
     def data(self) -> str | None: ...
 
     def controls(self) -> typing.Iterable[PanelControl]: ...
@@ -219,6 +221,7 @@ class DetailsPanel(Panel, HeavymetalComponent):
                 Tab("description", "Description", [DetailsDescription(details.description)], classes="p-3"),
                 Tab("details", "Details", [PropertiesTable(details.into_properties())]),
                 Tab("properties", "Properties", [PropertiesTable(self.properties())]),
+                Tab("type", "Type", [PropertiesTable(self.type_properties())]),
                 Tab("data", "Data", [DetailsJSON(self.data())]),
             ],
         )
@@ -301,6 +304,9 @@ class WorkDetailsPanel(DetailsPanel):
     def properties(self) -> Properties:
         return list(self.work.into_properties())
 
+    def type_properties(self) -> Properties:
+        return list(self.work.info.into_properties())
+
     def controls(self) -> typing.Sequence[PanelControl]:
         yield PanelControl(
             href=self.work.url_for(),
@@ -372,6 +378,9 @@ class RemoteDetailsPanel(DetailsPanel):
 
     def properties(self) -> Properties:
         return list(self.remote.into_properties())
+
+    def type_properties(self) -> Properties:
+        return list(self.remote.info.into_properties())
 
     def data(self) -> str | None:
         return self.remote.data

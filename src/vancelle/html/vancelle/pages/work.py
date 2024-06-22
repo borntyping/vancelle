@@ -1,7 +1,7 @@
 import flask
 
 from vancelle.extensions import html
-from vancelle.forms.work import WorkForm, WorkShelfForm
+from vancelle.forms.work import WorkForm, WorkShelfForm, WorksIndexForm
 from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.bootstrap.layout.grid import col, row
@@ -243,7 +243,7 @@ def work_create_page(work_form: WorkForm, details: Details = EMPTY_DETAILS) -> H
     )
 
 
-def work_index_page(works: Pagination[Work]) -> Heavymetal:
+def work_index_page(works: Pagination[Work], works_index_form: WorksIndexForm) -> Heavymetal:
     works_table = generate_table_from_pagination(
         classes="table table-hover table-sm align-middle",
         cols=[
@@ -261,4 +261,11 @@ def work_index_page(works: Pagination[Work]) -> Heavymetal:
         pagination=works,
     )
 
-    return page([page_header("Works"), works_table], fluid=False, title=["Remotes"])
+    return page(
+        [
+            page_header("Works"),
+            works_table,
+        ],
+        fluid=False,
+        title=["Remotes"],
+    )

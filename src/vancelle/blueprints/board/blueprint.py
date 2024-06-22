@@ -4,7 +4,7 @@ import flask.sansio.blueprints
 import flask_login
 import structlog
 
-from vancelle.forms.work import WorkIndexForm
+from vancelle.forms.work import WorksIndexForm
 from vancelle.controllers.work import WorkController, WorkQuery
 from vancelle.html.vancelle.pages.board import BoardPage
 from vancelle.models import Work
@@ -24,7 +24,7 @@ def before_request():
 
 @bp.route("/", methods={"GET"})
 def index():
-    form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
+    form = WorksIndexForm(formdata=flask.request.args, meta={"csrf": False})
 
     query = WorkQuery(
         user=flask_login.current_user,

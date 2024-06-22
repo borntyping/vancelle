@@ -10,7 +10,7 @@ from vancelle.clients.images.client import ImageCache
 from vancelle.controllers.work import WorkController
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db, htmx
-from vancelle.forms.work import WorkForm, WorkShelfForm
+from vancelle.forms.work import WorkForm, WorksIndexForm, WorkShelfForm
 from vancelle.html.vancelle.pages.work import work_create_page, work_detail_page, work_index_page, work_update_page
 from vancelle.lib.heavymetal import render
 from vancelle.models.work import Work
@@ -45,8 +45,9 @@ def create():
 @bp.route("/")
 def index():
     works = controller.index()
+    works_index_form = WorksIndexForm(formdata=flask.request.args, meta={"csrf": False})
 
-    return render(work_index_page(works))
+    return render(work_index_page(works, works_index_form))
 
     # form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
     # query = WorkQuery(

@@ -50,66 +50,61 @@ class WorkForm(flask_wtf.FlaskForm):
     isbn = wtforms.StringField("ISBN", validators=[wtforms.validators.Optional()], filters=[NoneFilter()])
 
 
-class WorkIndexForm(flask_wtf.FlaskForm):
-    csrf_token: wtforms.csrf.core.CSRFTokenField
-
-    layout = wtforms.SelectField(
-        label="Layout",
-        choices=[
-            ("vertical", "Vertical"),
-            ("horizontal", "Horizontal"),
-            ("board", "Board"),
-            ("list", "List"),
-        ],
-        default="vertical",
-        validators=[wtforms.validators.DataRequired()],
-    )
+class WorksIndexForm(flask_wtf.FlaskForm):
     work_type = wtforms.SelectField(
         label="Work type",
-        choices=[("", "All works")] + [(cls.work_type(), cls.info.noun_plural_title) for cls in Work.iter_subclasses()],
+        choices={"": "All works"} | {cls.work_type(): cls.info.noun_plural_title for cls in Work.iter_subclasses()},
         default="",
         validators=[wtforms.validators.Optional()],
     )
     work_shelf = wtforms.SelectField(
         label="Exact shelf",
         coerce=lambda x: Shelf(x) if x else None,
-        choices=[("", "All shelves")] + [(s.value, s.title) for s in Shelf],
+        choices={"": "All shelves"} | {s.value: s.title for s in Shelf},
         default="",
         validators=[wtforms.validators.Optional()],
     )
     work_case = wtforms.SelectField(
         label="Shelves",
         coerce=lambda x: Case(x) if x else None,
-        choices=[("", "All shelves")] + [(g.value, g.title) for g in Case],
+        choices={"": "All shelves"} | {g.value: g.title for g in Case},
         default="",
         validators=[wtforms.validators.Optional()],
     )
     work_deleted = wtforms.SelectField(
         label="Deleted works",
-        choices=[
-            ("no", "Don't include deleted works"),
-            ("all", "Include deleted works"),
-            ("yes", "Only deleted works"),
-        ],
+        choices={
+            "no": "Don't include deleted works",
+            "all": "Include deleted works",
+            "yes": "Only deleted works",
+        },
         default="no",
         validators=[wtforms.validators.DataRequired()],
     )
-
-    remote_type = wtforms.SelectField(
+    work_has_remote_type = wtforms.SelectField(
         label="Remote type",
-        choices=[("", "All remote types")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
+        choices={"": "All remote types"} | {cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()},
         default="",
         validators=[wtforms.validators.Optional()],
     )
-    remote_data = wtforms.SelectField(
-        label="Has remote",
+    work_has_remotes = wtforms.SelectField(
+        label="Has remote metadata",
         choices=[
-            ("", "Any remote data"),
-            ("yes", "Has remote data"),
-            ("imported", "Only imported data"),
-            ("no", "No remote data"),
+            ("", "All works"),
+            ("yes", "Works with remote metadata"),
+            ("imported", "Works with imported metadata"),
+            ("no", "Works without remote metadata"),
         ],
         default="",
         validators=[wtforms.validators.Optional()],
     )
     search = wtforms.SearchField(label="Query", validators=[wtforms.validators.Optional()])
+
+
+class WorksBoardForm(WorksIndexForm):
+    layout = wtforms.SelectField(
+        label="Layout",
+        choices={"vertical": "Vertical", "horizontal": "Horizontal"},
+        default="vertical",
+        validators=[wtforms.validators.DataRequired()],
+    )

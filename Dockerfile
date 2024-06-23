@@ -42,7 +42,7 @@ RUN tar -C /opt/ -xzvf /opt/dart-sass-${DART_VERSION}-linux-${DART_ARCH}.tar.gz
 ENV PATH="/opt/dart-sass/:$PATH"
 WORKDIR /opt/app
 COPY "Makefile" "package.json" "package-lock.json" ./
-COPY "vancelle/static/src/" "vancelle/static/src/"
+COPY "src/vancelle/assets/" "src/vancelle/assets/"
 RUN npm ci
 RUN make
 
@@ -52,9 +52,9 @@ RUN make
 FROM base as final
 WORKDIR /opt/app
 COPY --from=build /opt/app/.venv /opt/app/.venv
-COPY --from=sass /opt/app/vancelle/static/dist/ /opt/app/vancelle/static/dist/
+COPY --from=sass /opt/app/src/vancelle/static/dist/ /opt/app/src/vancelle/static/dist/
 COPY poetry.lock pyproject.toml ./
-COPY vancelle/ vancelle/
+COPY src/ src/
 
 ENTRYPOINT ["poetry", "run"]
 CMD gunicorn "vancelle.app:create_app()" --access-logfile=- --bind="0.0.0.0:8000"

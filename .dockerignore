@@ -6,4 +6,4 @@
 !package.json
 !poetry.lock
 !pyproject.toml
-!vancelle/
+!src/

@@ -5,7 +5,7 @@ import flask_login
 
 from vancelle.forms.user import ImportForm, LoginForm
 from vancelle.html.bootstrap.forms.controls import form_control
-from vancelle.html.vancelle.components.header import page_header, section_header
+from vancelle.html.vancelle.components.header import PageHeader, SectionHeader
 from vancelle.html.vancelle.pages.base import page
 from vancelle.inflect import p as inf
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
@@ -50,13 +50,13 @@ class SettingsPage(HeavymetalComponent):
                 section(
                     {},
                     [
-                        page_header("Settings", "Manage user data and application data"),
+                        PageHeader("Settings", "Manage user data and application data"),
                     ],
                 ),
                 section(
                     {},
                     [
-                        section_header("User data", "This data can only be seen by the current user."),
+                        SectionHeader("User data", "This data can only be seen by the current user."),
                         div(
                             {"class": "d-flex flex-column gap-3"},
                             [
@@ -70,7 +70,7 @@ class SettingsPage(HeavymetalComponent):
                 section(
                     {},
                     [
-                        section_header("Application data", "This data is shared by all users of the application."),
+                        SectionHeader("Application data", "This data is shared by all users of the application."),
                         self.steam_box(),
                     ],
                 ),

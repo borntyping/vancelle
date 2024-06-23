@@ -30,25 +30,25 @@ def _header(
     )
 
 
-def page_header(title: Heavymetal, subtitle: Heavymetal | None = None, *controls: HeavymetalAnything) -> Heavymetal:
+def PageHeader(title: Heavymetal, subtitle: Heavymetal | None = None, *controls: HeavymetalAnything) -> Heavymetal:
     return _header(
         tag="h1",
         title=title,
         subtitle=subtitle,
         controls=controls,
-        header_classes="mb-5",
+        header_classes="v-block",
         title_classes="display-3",
         subtitle_classes="fs-4 ps-1",
     )
 
 
-def section_header(title: Heavymetal, subtitle: Heavymetal | None = None, *controls: HeavymetalAnything) -> Heavymetal:
+def SectionHeader(title: Heavymetal, subtitle: Heavymetal | None = None, *controls: HeavymetalAnything) -> Heavymetal:
     return _header(
         tag="h2",
         title=title,
         subtitle=subtitle,
         controls=controls,
-        header_classes="mt-5 mb-2",
+        header_classes="mb-2",
         title_classes="m-0",
         subtitle_classes="",
     )

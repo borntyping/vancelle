@@ -8,9 +8,9 @@ import structlog
 import werkzeug.exceptions
 import wtforms.csrf.core
 import wtforms.validators
-from sqlalchemy import ColumnElement, Select, True_, desc, nulls_last, or_, select
+from sqlalchemy import ColumnElement, Select, True_, desc, distinct, or_, select
 from sqlalchemy.orm import aliased
-from sqlalchemy.sql.functions import coalesce, func
+from sqlalchemy.sql.functions import func
 
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NoneFilter
@@ -70,42 +70,42 @@ class WorkIndexArgs(PaginationArgs):
     class Meta:
         csrf = False
 
-        def render_field(self, field: wtforms.Field, **kwargs) -> markupsafe.Markup:
+        def render_field(self, field: wtforms.Field, kwargs) -> markupsafe.Markup:
             return form_control(field, **kwargs)
 
     type = wtforms.SelectField(
         label="Work type",
-        choices={"": "All works"} | {cls.work_type(): cls.info.noun_plural_title for cls in Work.iter_subclasses()},
+        choices=[("", "All works")] + [(cls.work_type(), cls.info.noun_plural_title) for cls in Work.iter_subclasses()],
         default="",
         validators=[wtforms.validators.Optional()],
     )
     shelf = wtforms.SelectField(
         label="Exact shelf",
         coerce=lambda x: Shelf(x) if x else None,
-        choices={"": "All shelves"} | {s.value: s.title for s in Shelf},
+        choices=[("", "All shelves")] + [(s.value, s.title) for s in Shelf],
         default="",
         validators=[wtforms.validators.Optional()],
     )
     case = wtforms.SelectField(
         label="Shelves",
         coerce=lambda x: Case(x) if x else None,
-        choices={"": "All shelves"} | {g.value: g.title for g in Case},
+        choices=[("", "All shelves")] + [(g.value, g.title) for g in Case],
         default="",
         validators=[wtforms.validators.Optional()],
     )
     deleted = wtforms.SelectField(
         label="Deleted works",
-        choices={
-            "no": "Exclude deleted works",
-            "any": "Include all works",
-            "yes": "Only deleted works",
-        },
+        choices=[
+            ("no", "Exclude deleted works"),
+            ("any", "Include all works"),
+            ("yes", "Only deleted works"),
+        ],
         default="no",
         validators=[wtforms.validators.DataRequired()],
     )
     has_remote_type = wtforms.SelectField(
         label="Remote type",
-        choices={"": "All remote types"} | {cls.remote_type(): cls.info.noun_full for cls in Remote.iter_subclasses()},
+        choices=[("", "All remote types")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
         default="",
         validators=[wtforms.validators.Optional()],
     )
@@ -121,7 +121,7 @@ class WorkIndexArgs(PaginationArgs):
         validators=[wtforms.validators.Optional()],
     )
     search = wtforms.SearchField(
-        label="Query",
+        label="Search",
         validators=[wtforms.validators.Optional()],
     )
 
@@ -138,9 +138,10 @@ class WorkIndexArgs(PaginationArgs):
         )
 
     def paginate(self) -> Pagination:
-        stmt = self._statement()
-        query = select(aliased(Work, stmt.subquery()))
-        count = stmt.order_by(None).with_only_columns(func.count(Work.id.distinct()))
+        alias = aliased(Work, self._statement().subquery(name="w"))
+        query = select(alias)
+
+        count = query.with_only_columns(func.count(distinct(alias.id)))
         return self.query(db.session, query, count)
 
     def shelves(self) -> typing.Tuple[typing.Mapping[Shelf, list[Work]], int]:
@@ -179,14 +180,11 @@ class WorkIndexArgs(PaginationArgs):
         self.log.info("Constructing query")
         statement = (
             select(Work)
+            .distinct()
             .filter(Work.user_id == flask_login.current_user.id)
             .join(Record, isouter=True)
             .join(Remote, isouter=True)
-            .order_by(
-                nulls_last(desc(coalesce(Record.date_started, Record.date_stopped))),
-                nulls_last(desc(coalesce(Work.release_date, Remote.release_date))),
-                desc(Work.time_created),
-            )
+            .order_by(desc(Work.time_updated), desc(Work.time_created))
         )
 
         statement = statement.filter(self._filter_work_deleted(self.deleted.data))

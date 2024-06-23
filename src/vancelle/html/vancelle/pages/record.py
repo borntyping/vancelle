@@ -1,7 +1,7 @@
 from vancelle.forms.record import RecordForm
 from vancelle.html.bootstrap.forms.controls import form_control, form_control_check
 from vancelle.html.bootstrap.layout.grid import col, row
-from vancelle.html.vancelle.components.header import page_header
+from vancelle.html.vancelle.components.header import PageHeader
 from vancelle.html.vancelle.pages.base import page
 from vancelle.html.vancelle.components.work import return_to_work
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
@@ -48,7 +48,7 @@ def record_update_page(record: Record, record_form: RecordForm) -> Heavymetal:
     title = record.work.resolve_title()
     return page(
         [
-            page_header(
+            PageHeader(
                 "Edit record",
                 return_to_work(record.work),
                 form({"class": "btn-toolbar"}, [div({"class": "btn-group"}, [*_record_controls(record)])]),

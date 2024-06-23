@@ -10,7 +10,7 @@ def bi_font(name: str) -> Heavymetal:
 
     >>> from vancelle.lib.heavymetal import render
     >>> render(bi_font("bootstrap"))
-    '<i class="bi bi-bootstrap"></i>'
+    Markup('<i class="bi bi-bootstrap"></i>')
     """
     return ("i", {"class": f"bi bi-{name}"}, [])
 

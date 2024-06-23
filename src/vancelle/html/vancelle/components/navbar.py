@@ -27,8 +27,22 @@ def _works_dropdown() -> Heavymetal:
             _page_dropdown_item("All", "work.index"),
             dropdown_divider(),
             *(
-                _page_dropdown_item(cls.info.noun_plural_title, "work.index", work_type=cls.work_type())
+                _page_dropdown_item(cls.info.noun_plural_title, "work.index", type=cls.work_type())
                 for cls in Work.iter_subclasses()
+            ),
+        ],
+    )
+
+
+def _remotes_dropdown() -> Heavymetal:
+    return nav_item_dropdown(
+        "Remotes",
+        [
+            _page_dropdown_item("All", "remote.index"),
+            dropdown_divider(),
+            *(
+                _page_dropdown_item(cls.info.noun_full, "remote.index", type=cls.remote_type())
+                for cls in Remote.iter_subclasses()
             ),
         ],
     )
@@ -69,6 +83,7 @@ def page_navbar() -> Heavymetal:
             nav_item("Board", flask.url_for("board.index"), url_is_active("board.index")),
             _works_dropdown(),
             _new_works_dropdown(),
+            _remotes_dropdown(),
         ],
         [
             _user_dropdown(),

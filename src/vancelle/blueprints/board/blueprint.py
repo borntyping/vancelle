@@ -27,7 +27,7 @@ def index():
     form = WorkBoardArgs(formdata=flask.request.args)
     shelves, total = form.shelves()
     return BoardPage(
-        form=form,
+        work_index_args=form,
         shelves=shelves,
         total=total,
         layout=form.layout.data,

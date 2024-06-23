@@ -3,8 +3,11 @@ import typing
 
 import flask
 
+from vancelle.forms.remote import RemoteIndexArgs
+from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.details import details_description
-from vancelle.html.vancelle.components.header import page_header
+from vancelle.html.vancelle.components.header import PageHeader
+from vancelle.html.vancelle.components.index import IndexFormControls
 from vancelle.html.vancelle.components.optional import maybe_str, quote, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
@@ -13,11 +16,9 @@ from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import (
     a,
     button,
-    code,
     form,
     td,
     th,
-    tr,
 )
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Remote, Work
@@ -25,69 +26,7 @@ from vancelle.models import Remote, Work
 logger = logging.getLogger(__name__)
 
 
-def _remote_id(remote: Remote) -> Heavymetal:
-    return code({"class": "v-text-wrap-anywhere"}, [remote.remote_type(), ":", remote.id])
-
-
-def _remote_type(remote: Remote) -> Heavymetal:
-    return a({"class": "text-nowrap", "href": remote.url_for_type()}, [remote.info.noun_full])
-
-
-def remote_index_page_row(remote: Remote) -> Heavymetal:
-    remote_details = remote.into_details()
-    resolved_details = remote.work.resolve_details()
-    return tr(
-        {},
-        [
-            td({}, [_remote_type(remote)]),
-            td({}, [details_description(remote_details, remote.url_for())]),
-            td({}, [details_description(resolved_details, remote.work.url_for())]),
-        ],
-    )
-
-
-def remote_index_page(remote_type: typing.Type[Remote] | None, remotes: Pagination[Remote]) -> Heavymetal:
-    remotes_table = generate_table_from_pagination(
-        classes="table table-hover table-sm align-middle",
-        cols=[
-            {"style": "width: 20%;"},
-            {"style": "width: 40%;", "colspan": "2"},
-        ],
-        head=[
-            th({}, ["Source"]),
-            th({}, ["Title"]),
-            th({}, ["Work"]),
-        ],
-        body=lambda remote: [
-            td({}, [_remote_type(remote)]),
-            td({}, [details_description(remote.into_details(), remote.url_for())]),
-            td({}, [details_description(remote.work.resolve_details(), remote.work.url_for())]),
-        ],
-        pagination=remotes,
-    )
-
-    return page(
-        [
-            page_header("Remotes", f"Work details from {remote_type.info.source if remote_type else 'external sources'}"),
-            remotes_table,
-        ],
-        fluid=False,
-        title=["Remotes"],
-    )
-
-
-def remote_detail_page(remote: Remote, /, *, candidate_work: typing.Optional[Work]) -> Heavymetal:
-    details = remote.into_details()
-    return page(
-        [
-            page_header(maybe_str(details.title), f"{remote.info.noun_full} {remote.id}"),
-            RemoteDetailsPanel(remote, candidate_work=candidate_work),
-        ],
-        title=["Remote", maybe_str(details.title)],
-    )
-
-
-def create_work_button(remote: Remote) -> Heavymetal:
+def _create_work_button(remote: Remote) -> Heavymetal:
     action = flask.url_for("remote.create_work", remote_type=remote.type, remote_id=remote.id)
     return form(
         {"method": "post", "action": action},
@@ -105,7 +44,12 @@ def create_work_button(remote: Remote) -> Heavymetal:
     )
 
 
-def link_work_button(remote: Remote, candidate_work: Work) -> Heavymetal:
+def _view_work_button(remote: Remote) -> Heavymetal:
+    assert remote.work
+    return a({"class": "btn btn-sm btn-secondary", "href": remote.work.url_for()}, ["View work"])
+
+
+def _link_work_button(remote: Remote, candidate_work: Work) -> Heavymetal:
     details = candidate_work.resolve_details()
     return form(
         {
@@ -131,7 +75,79 @@ def link_work_button(remote: Remote, candidate_work: Work) -> Heavymetal:
     )
 
 
-def remote_search_page(
+def _RemoteIndexForm(remote_index_args: RemoteIndexArgs) -> Heavymetal:
+    return form(
+        {"class": "v-block", "method": "get"},
+        [
+            row(
+                {"class": "mb-3"},
+                [
+                    col({}, [remote_index_args.type()]),
+                    col({}, [remote_index_args.deleted()]),
+                ],
+            ),
+            row(
+                {},
+                [
+                    col({}, [IndexFormControls(search=remote_index_args.search)]),
+                ],
+            ),
+        ],
+    )
+
+
+def _RemoteTable(items: Pagination[Remote], candidate_work: typing.Optional[Work]) -> Heavymetal:
+    return generate_table_from_pagination(
+        attrs={},
+        table_classes="table table-hover align-middle",
+        cols=[
+            {"style": "width: 15%;"},
+            {"style": "width: 35%;"},
+            {"style": "width: 35%;"},
+            {"style": "width: 15%;"},
+        ],
+        head=[
+            th({}, ["Type"]),
+            th({}, ["Remote"]),
+            th({}, ["Work"]),
+            th({}, []),
+        ],
+        body=lambda remote: [
+            td({}, [a({"class": "text-nowrap", "href": remote.url_for_type()}, [remote.info.noun_full])]),
+            td({}, [details_description(remote.into_details(), remote.url_for(candidate_work=candidate_work))]),
+            td({}, [details_description(remote.work.resolve_details(), remote.work.url_for()) if remote.work else ...]),
+            td(
+                {"class": "text-end"},
+                [
+                    _view_work_button(remote)
+                    if remote.work
+                    else _link_work_button(remote, candidate_work)
+                    if candidate_work
+                    else _create_work_button(remote)
+                ],
+            ),
+        ],
+        pagination=items,
+    )
+
+
+def RemoteIndexPage(
+    items: Pagination[Remote],
+    remote_index_args: RemoteIndexArgs,
+    remote_type: typing.Type[Remote] | None,
+) -> Heavymetal:
+    return page(
+        [
+            PageHeader("Remotes", f"Work details from {remote_type.info.source if remote_type else 'external sources'}"),
+            _RemoteIndexForm(remote_index_args),
+            _RemoteTable(items, candidate_work=None),
+        ],
+        fluid=False,
+        title=["Remotes"],
+    )
+
+
+def RemoteSearchPage(
     *,
     remote_type: typing.Type[Remote],
     remote_items: Pagination[Remote],
@@ -143,26 +159,21 @@ def remote_search_page(
     else:
         subtitle = None
 
-    remotes_table = generate_table_from_pagination(
-        classes="table table-hover align-middle",
-        head=[
-            th({}, ["Title"]),
-            th({}, []),
-        ],
-        body=lambda remote: [
-            td({}, [details_description(remote.into_details(), remote.url_for(candidate_work=candidate_work))]),
-            td(
-                {"class": "text-end"},
-                [link_work_button(remote, candidate_work) if candidate_work else create_work_button(remote)],
-            ),
-        ],
-        pagination=remote_items,
-    )
-
     return page(
         [
-            page_header(f"Search {remote_type.info.source}", subtitle),
-            remotes_table,
+            PageHeader(f"Search {remote_type.info.source}", subtitle),
+            _RemoteTable(remote_items, candidate_work),
         ],
         title=[f"Search {remote_type.info.source}"],
+    )
+
+
+def RemoteDetailPage(remote: Remote, /, *, candidate_work: typing.Optional[Work]) -> Heavymetal:
+    details = remote.into_details()
+    return page(
+        [
+            PageHeader(maybe_str(details.title), f"{remote.info.noun_full} {remote.id}"),
+            RemoteDetailsPanel(remote, candidate_work=candidate_work),
+        ],
+        title=["Remote", maybe_str(details.title)],
     )

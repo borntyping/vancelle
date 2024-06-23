@@ -1,0 +1,6 @@
+@import "bootstrap/scss/variables";
+
+// Based on https://bulma.io/documentation/elements/block/
+.v-block:not(:last-child) {
+  margin-bottom: map-get($spacers, 5);
+}

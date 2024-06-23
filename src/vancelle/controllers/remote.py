@@ -15,11 +15,10 @@ from vancelle.controllers.sources.royalroad import RoyalroadFictionManager
 from vancelle.controllers.sources.steam import SteamApplicationManager
 from vancelle.controllers.sources.tmdb import TmdbMovieManager, TmdbTvSeriesManager
 from vancelle.extensions import db
-from vancelle.html.vancelle.pages.remote import remote_search_page
+from vancelle.html.vancelle.pages.remote import RemoteSearchPage
 from vancelle.lib.heavymetal import render
 from vancelle.lib.heavymetal.html import a, fragment
 from vancelle.lib.pagination import Pagination
-from vancelle.lib.pagination.flask import FlaskPaginationArgs
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
@@ -74,15 +73,6 @@ class RemotesController:
         remote = self.managers[remote_type].fetch(remote_id)
         log.debug("Fetched remote from source")
         return remote
-
-    def index(self, *, remote_type: typing.Type[Remote] | None) -> Pagination:
-        args = FlaskPaginationArgs()
-        query = sqlalchemy.select(Remote).join(Work)
-
-        if remote_type is not None:
-            query = query.filter(Remote.type == remote_type.__mapper__.polymorphic_identity)
-
-        return args.query(db.session, query)
 
     def refresh(self, remote_type: str, remote_id: str) -> Remote:
         old_remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
@@ -195,7 +185,7 @@ class RemotesController:
         else:
             remote_items = Pagination.empty()
 
-        return render(remote_search_page(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
+        return render(RemoteSearchPage(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
         # return flask.render_template(
         #     [f"remote/{remote_type}/search.html", "remote/search.html"],
         #     remote_type=remote_type,

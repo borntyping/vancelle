@@ -226,14 +226,16 @@ def render_static(node: _HeavymetalStatic, *, traces: typing.Sequence[Trace] = (
     if tag.lower() in VOID_ELEMENTS:
         if children:
             raise HeavymetalHtmlError("Void element cannot have children", traces, trace)
-        return "<{tag}{attrs}>".format(tag=html.escape(tag), attrs=html_attrs)
+        markup = "<{tag}{attrs}>".format(tag=html.escape(tag), attrs=html_attrs)
+    else:
+        nested = "".join(render_static(child, traces=traces) for child in children)
+        markup = "<{tag}{attrs}>{nested}</{tag}>".format(tag=html.escape(tag), attrs=html_attrs, nested=nested)
 
-    nested = "".join(render_static(child, traces=traces) for child in children)
-    return "<{tag}{attrs}>{nested}</{tag}>".format(tag=html.escape(tag), attrs=html_attrs, nested=nested)
+    return markupsafe.Markup(markup)
 
 
 @sentry_sdk.trace()
-def render(node: HeavymetalAnything, /) -> str:
+def render(node: HeavymetalAnything, /) -> markupsafe.Markup:
     with sentry_sdk.start_span(op="task", description=unpack_dynamic.__qualname__):
         expanded = unpack_dynamic(node)
 

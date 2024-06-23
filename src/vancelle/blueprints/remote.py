@@ -9,7 +9,8 @@ from werkzeug.exceptions import NotFound
 from ..clients.images.client import ImageCache
 from ..controllers.remote import RemotesController
 from ..extensions import db, htmx
-from ..html.vancelle.pages.remote import remote_detail_page, remote_index_page, remote_search_page
+from ..forms.remote import RemoteIndexArgs
+from ..html.vancelle.pages.remote import RemoteDetailPage, RemoteIndexPage, RemoteSearchPage
 from ..lib.heavymetal import render
 from ..lib.pagination import Pagination
 from ..models import Work
@@ -29,8 +30,10 @@ def before_request():
 @bp.route("/remotes/")
 @bp.route("/remotes/<remote_type:remote_type>/")
 def index(remote_type: typing.Type[Remote] | None = None):
-    remotes = controller.index(remote_type=remote_type)
-    return render(remote_index_page(remote_type, remotes))
+    remote_index_args = RemoteIndexArgs(formdata=flask.request.args)
+    remotes = remote_index_args.paginate()
+
+    return render(RemoteIndexPage(items=remotes, remote_type=remote_type, remote_index_args=remote_index_args))
 
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>")
@@ -40,7 +43,7 @@ def detail(remote_type: str, remote_id: str):
     candidate_work_id = flask.request.args.get("work_id", type=uuid.UUID)
     candidate_work = controller.get_work(work_id=candidate_work_id)
 
-    return render(remote_detail_page(remote, candidate_work=candidate_work))
+    return render(RemoteDetailPage(remote, candidate_work=candidate_work))
 
 
 @bp.route("/remotes/<string:remote_type>/<string:remote_id>/cover")
@@ -107,7 +110,7 @@ def search_source(remote_type: typing.Type[Remote]):
 
     remote_items = controller.managers[remote_type.remote_type()].search(query) if query else Pagination.empty()
 
-    return render(remote_search_page(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
+    return render(RemoteSearchPage(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
     # return flask.render_template(
     #     [f"remote/{remote_type}/search.html", "remote/search.html"],
     #     remote_type=remote_type,

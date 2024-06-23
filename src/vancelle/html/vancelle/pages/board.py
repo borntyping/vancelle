@@ -6,6 +6,7 @@ import markupsafe
 
 from vancelle.extensions import html
 from vancelle.forms.work import WorkIndexArgs
+from vancelle.html.vancelle.pages.work import WorkIndexArgsForm
 from vancelle.lib.heavymetal.html import a, div, figure, h3, p, section, span, img, fragment
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.html import html_classes
@@ -108,17 +109,9 @@ def shelf_board_item(shelf: Shelf, count: int) -> Heavymetal:
     )
 
 
-def vertical_board(items: typing.Sequence[Heavymetal]) -> Heavymetal:
-    return div({"class": "x-board x-board-vertical"}, items)
-
-
-def horizontal_board(items: typing.Sequence[Heavymetal]) -> Heavymetal:
-    return div({"class": "x-board x-board-horizontal"}, items)
-
-
 @dataclasses.dataclass()
 class BoardPage(HeavymetalComponent):
-    form: WorkIndexArgs
+    work_index_args: WorkIndexArgs
     layout: typing.Literal["vertical", "horizontal"]
     shelves: typing.Mapping[Shelf, list[Work]]
     total: int
@@ -131,10 +124,16 @@ class BoardPage(HeavymetalComponent):
                 items.append(work_board_item(shelf, work))
 
         if self.layout == "vertical":
-            board = vertical_board(items)
+            board = self.vertical_board(items)
         elif self.layout == "horizontal":
-            board = horizontal_board(items)
+            board = self.horizontal_board(items)
         else:
             raise ValueError
 
-        return page([section({}, [board])], title=["Board"])
+        return page([section({}, [WorkIndexArgsForm(self.work_index_args), board])], title=["Board"])
+
+    def vertical_board(self, items: typing.Sequence[Heavymetal]) -> Heavymetal:
+        return div({"class": "x-board x-board-vertical"}, items)
+
+    def horizontal_board(self, items: typing.Sequence[Heavymetal]) -> Heavymetal:
+        return div({"class": "x-board x-board-horizontal"}, items)

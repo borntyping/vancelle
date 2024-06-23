@@ -44,10 +44,10 @@ def create():
 
 @bp.route("/")
 def index():
-    works_index_form = WorkIndexArgs(formdata=flask.request.args)
-    works = works_index_form.paginate()
+    work_index_args = WorkIndexArgs(formdata=flask.request.args)
+    works = work_index_args.paginate()
 
-    return render(work_index_page(works, works_index_form))
+    return render(work_index_page(works, work_index_args))
 
     #
     # match form.layout.data:

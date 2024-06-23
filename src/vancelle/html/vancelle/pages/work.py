@@ -6,7 +6,7 @@ from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.details import details_description
-from vancelle.html.vancelle.components.header import page_header, section_header
+from vancelle.html.vancelle.components.header import PageHeader, SectionHeader
 from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
@@ -51,7 +51,7 @@ def _work_form_page(
             form(
                 {"method": "post", "action": action},
                 [
-                    page_header(
+                    PageHeader(
                         title,
                         subtitle,
                         div(
@@ -72,7 +72,7 @@ def _work_form_page(
                             col({}, [form_control(work_form.shelf)]),
                         ],
                     ),
-                    section_header("Details", "These details will overwrite any details provided by remote data"),
+                    SectionHeader("Details", "These details will overwrite any details provided by remote data"),
                     row(
                         {"class": "mb-3"},
                         [
@@ -157,21 +157,21 @@ def work_detail_page(work: Work, work_shelf_form: WorkShelfForm) -> Heavymetal:
             section(
                 {},
                 [
-                    page_header(title, subtitle, work_shelf_form_group(work, work_shelf_form)),
+                    PageHeader(title, subtitle, work_shelf_form_group(work, work_shelf_form)),
                     row({}, [col({}, [work_details_panel]), col({}, [work_records_panel])]),
                 ],
             ),
             section(
                 {},
                 [
-                    section_header("External data", external_data_subtitle),
+                    SectionHeader("External data", external_data_subtitle),
                     row({"class": "row-cols-2 g-4"}, [col({}, [RemoteDetailsPanel(r)]) for r in work.iter_remotes()]),
                 ],
             ),
             section(
                 {},
                 [
-                    section_header("Search external sources", f"Search external sources for {quote_str(details.title)}"),
+                    SectionHeader("Search external sources", f"Search external sources for {quote_str(details.title)}"),
                     row({}, [col({}, [_search_for_work(work)])]),
                 ],
             ),
@@ -243,9 +243,56 @@ def work_create_page(work_form: WorkForm, details: Details = EMPTY_DETAILS) -> H
     )
 
 
-def work_index_page(works: Pagination[Work], works_index_form: WorkIndexArgs) -> Heavymetal:
-    works_table = generate_table_from_pagination(
-        classes="table table-hover table-sm align-middle",
+def WorkIndexArgsForm(work_index_args: WorkIndexArgs) -> Heavymetal:
+    return form(
+        {"class": "v-block", "method": "get"},
+        [
+            row(
+                {"class": "mb-3"},
+                [
+                    col({}, [work_index_args.type()]),
+                    col({}, [work_index_args.shelf()]),
+                    col({}, [work_index_args.case()]),
+                ],
+            ),
+            row(
+                {"class": "mb-3"},
+                [
+                    col({}, [work_index_args.deleted()]),
+                    col({}, [work_index_args.has_remote_type()]),
+                    col({}, [work_index_args.has_remotes()]),
+                ],
+            ),
+            row(
+                {},
+                [
+                    col(
+                        {},
+                        [
+                            work_index_args.search.label(),
+                            div(
+                                {"class": "input-group"},
+                                [
+                                    work_index_args.search(label=False, placeholder="Search"),
+                                    a(
+                                        {"class": "btn btn-secondary", "href": flask.url_for(flask.request.endpoint)},
+                                        ["Clear"],
+                                    ),
+                                    button({"class": "btn btn-primary", "type": "submit"}, ["Search"]),
+                                ],
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def WorkTable(works: Pagination[Work]) -> Heavymetal:
+    return generate_table_from_pagination(
+        {"class": "v-block"},
+        table_classes="table table-hover table-sm align-middle",
         cols=[
             {"style": "width: 10%;"},
             {"style": "width: 70%;"},
@@ -271,10 +318,13 @@ def work_index_page(works: Pagination[Work], works_index_form: WorkIndexArgs) ->
         pagination=works,
     )
 
+
+def work_index_page(works: Pagination[Work], work_index_args: WorkIndexArgs) -> Heavymetal:
     return page(
         [
-            page_header("Works"),
-            works_table,
+            PageHeader("Works"),
+            WorkIndexArgsForm(work_index_args),
+            WorkTable(works),
         ],
         fluid=False,
         title=["Remotes"],

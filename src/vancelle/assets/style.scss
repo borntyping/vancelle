@@ -27,6 +27,7 @@ $font-sizes: map-merge($font-sizes, (
 @import "ext/bootstrap/scss/card";
 @import "ext/bootstrap/scss/type";
 
+@import "vancelle/block";
 @import "vancelle/colours";
 @import "vancelle/components/board";
 @import "vancelle/components/panel";

@@ -51,35 +51,6 @@ def index():
 
     return render(work_index_page(works, work_index_args))
 
-    #
-    # match form.layout.data:
-    #     case "board":
-    #         shelves, total = query.shelves()
-    #         page = flask.render_template(
-    #             "work/index_board.html",
-    #             form=form,
-    #             layout=form.layout.data,
-    #             work_shelf=form.work_shelf.data,
-    #             work_case=form.work_case.data,
-    #             shelves=shelves,
-    #             total=total,
-    #         )
-    #     case "list":
-    #         works = query.paginate()
-    #         page = flask.render_template(
-    #             "work/index_list.html",
-    #             form=form,
-    #             layout=form.layout.data,
-    #             works=works,
-    #             total=works.count,
-    #         )
-    #     case _:
-    #         raise werkzeug.exceptions.BadRequest(f"Unknown layout {form.layout.data!r}")
-    #
-    # response = flask.Response(page)
-    # response.delete_cookie("index")
-    # return response
-
 
 @bp.route("/<uuid:work_id>")
 def detail(work_id: uuid.UUID):

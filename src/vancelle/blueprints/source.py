@@ -61,3 +61,18 @@ def detail(remote_type: str, remote_id: str):
         remote=remote,
         candidate_work=candidate_work,
     )
+
+
+@bp.route("/<string:remote_type>/<string:remote_id>/-/import", endpoint="import")
+def import_remote(remote_type: str, remote_id: str):
+    remote_source = controller[remote_type]
+    remote = remote_source.fetch(remote_id)
+
+    candidate_work_id = flask.request.args.get("work_id", type=uuid.UUID)
+    candidate_work = work_controller.get(id=candidate_work_id)
+
+    return ExternalDetailPage(
+        remote_source=remote_source,
+        remote=remote,
+        candidate_work=candidate_work,
+    )

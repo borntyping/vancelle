@@ -4,6 +4,7 @@ import typing
 import flask
 import frozendict
 import svcs.flask
+import flask.templating
 
 from .blueprints.board.blueprint import bp as bp_board
 from .blueprints.data import bp as bp_data
@@ -25,15 +26,20 @@ from .clients.steam.client_web_api import SteamWebAPI
 from .clients.tmdb.client import TmdbAPI
 from .converters import RemoteTypeConverter, WorkTypeConverter
 from .ext.structlog import configure_logging
-from .extensions import alembic, cors, db, html, htmx, login_manager, sentry
+from .extensions import alembic, cors, db, htmx, login_manager, sentry
 
 root = pathlib.Path(__file__).parent
+
+
+class VancelleFlask(flask.Flask):
+    def create_jinja_environment(self) -> flask.templating.Environment:
+        return NotImplemented
 
 
 def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict(), /) -> flask.Flask:
     configure_logging()
 
-    app = flask.Flask("vancelle")
+    app = VancelleFlask("vancelle")
     app.config["ALEMBIC"] = {
         "script_location": (root / "migrations").as_posix(),
         "version_locations": [(root / "migrations" / "versions").as_posix()],
@@ -66,7 +72,6 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
     alembic.init_app(app)
     cors.init_app(app)
     db.init_app(app)
-    html.init_app(app)
     htmx.init_app(app)
     login_manager.init_app(app)
     sentry.init_app(app)

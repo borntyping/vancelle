@@ -81,9 +81,7 @@ class SentryExtension:
             """
         )
 
-        return fragment(
-            [
-                script({"type": "importmap"}, json.dumps(importmap)),
-                script({"type": "module"}, content),
-            ]
-        )
+        return fragment([
+            script({"type": "importmap"}, json.dumps(importmap)),
+            script({"type": "module"}, content),
+        ])

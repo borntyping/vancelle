@@ -40,7 +40,7 @@ class HtmxExtension:
             self.init_app(app)
 
     def init_app(self, app: flask.Flask):
-        app.jinja_env.globals["htmx"] = self
+        pass
 
     def __bool__(self):
         return self.hx_request and not self.hx_boosted

@@ -4,9 +4,9 @@ import typing
 
 import markupsafe
 
-from vancelle.extensions import html
 from vancelle.forms.work import WorkIndexArgs
 from vancelle.html.vancelle.pages.work import WorkIndexArgsForm
+from vancelle.inflect import count_plural
 from vancelle.lib.heavymetal.html import a, div, figure, h3, p, section, span, img, fragment
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.html import html_classes
@@ -104,7 +104,7 @@ def shelf_board_item(shelf: Shelf, count: int) -> Heavymetal:
         [
             h3({"class": "display-7"}, [shelf.title]),
             p({"class": "fs-7"}, [shelf.description]),
-            span({"class": "badge bg-primary rounded-pill"}, [html.count_plural("item", count)]),
+            span({"class": "badge bg-primary rounded-pill"}, [count_plural("item", count)]),
         ],
     )
 

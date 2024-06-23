@@ -111,14 +111,6 @@ def search_source(remote_type: typing.Type[Remote]):
     remote_items = controller.managers[remote_type.remote_type()].search(query) if query else Pagination.empty()
 
     return render(RemoteSearchPage(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
-    # return flask.render_template(
-    #     [f"remote/{remote_type}/search.html", "remote/search.html"],
-    #     remote_type=remote_type,
-    #     remote_info=self.managers[remote_type].remote_type.info,
-    #     work=candidate_work,
-    #     query=query,
-    #     items=remote_items,
-    # )
 
 
 @bp.route("/works/<uuid:work_id>/-/link-work", methods={"post"})

@@ -3,9 +3,8 @@ import flask_cors
 import flask_login
 import flask_sqlalchemy_lite
 
-from .ext_html import HtmlExtension
-from .ext_htmx import HtmxExtension
-from .ext_sentry import SentryExtension
+from .htmx import HtmxExtension
+from .sentry import SentryExtension
 from ..models import Base
 
 alembic = flask_alembic.Alembic(metadatas=Base.metadata, run_mkdir=False)
@@ -23,6 +22,5 @@ cors = flask_cors.CORS(
 )
 login_manager = flask_login.LoginManager()
 
-html = HtmlExtension()
 htmx = HtmxExtension()
 sentry = SentryExtension()

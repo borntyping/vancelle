@@ -3,7 +3,6 @@ import typing
 import flask
 
 from vancelle.controllers.sources.base import Source
-from vancelle.extensions import html
 from vancelle.forms.work import WorkForm, WorkShelfForm, WorkIndexArgs
 from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
@@ -16,6 +15,7 @@ from vancelle.html.vancelle.components.source import SourceListGroup
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.html.vancelle.components.work import return_to_work
 from vancelle.html.vancelle.pages.base import Page
+from vancelle.inflect import count_plural
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
 from vancelle.lib.heavymetal.html import a, button, div, form, section, td, th
 from vancelle.lib.pagination import Pagination
@@ -135,7 +135,7 @@ def work_detail_page(work: Work, work_shelf_form: WorkShelfForm, sources: typing
     work_details_panel = WorkDetailsPanel(work)
     work_records_panel = WorkRecordsPanel(work)
 
-    external_data_subtitle = f"Details sourced from {html.count_plural('remote', len(work.remotes))}"
+    external_data_subtitle = f"Details sourced from {count_plural('remote', len(work.remotes))}"
     if work.into_details():
         external_data_subtitle += " and manually entered metadata"
 
@@ -296,9 +296,9 @@ def WorkTable(works: Pagination[Work]) -> Heavymetal:
             td(
                 {"class": "text-body-secondary"},
                 [
-                    html.count_plural("remote", len(work.remotes)),
+                    count_plural("remote", len(work.remotes)),
                     ", ",
-                    html.count_plural("record", len(work.records)),
+                    count_plural("record", len(work.records)),
                 ],
             ),
         ],

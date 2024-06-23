@@ -1,6 +1,6 @@
 from vancelle.ext.flask import url_with
-from vancelle.extensions import html
 from vancelle.html.bootstrap.components.pagination import PageItem, Pagination as BootstrapPagination
+from vancelle.inflect import count_plural
 from vancelle.lib.heavymetal.html import nav, span
 from vancelle.lib.pagination import Pagination
 
@@ -25,9 +25,9 @@ def nav_pagination(pagination: Pagination) -> BootstrapPagination:
             span(
                 {"class": "text-body-tertiary"},
                 [
-                    html.count_plural("result", pagination.count),
+                    count_plural("result", pagination.count),
                     ", displaying ",
-                    html.count_plural("item", len(pagination.items)),
+                    count_plural("item", len(pagination.items)),
                     f" ({pagination.per_page} per page).",
                 ],
             ),

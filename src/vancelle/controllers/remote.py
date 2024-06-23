@@ -191,11 +191,3 @@ class RemotesController:
             remote_items = Pagination.empty()
 
         return render(RemoteSearchPage(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
-        # return flask.render_template(
-        #     [f"remote/{remote_type}/search.html", "remote/search.html"],
-        #     remote_type=remote_type,
-        #     remote_info=self.managers[remote_type].remote_type.info,
-        #     work=candidate_work,
-        #     query=query,
-        #     items=remote_items,
-        # )

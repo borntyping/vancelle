@@ -1,7 +1,7 @@
 import flask
 
 from vancelle.extensions import html
-from vancelle.forms.work import WorkForm, WorkShelfForm, WorksIndexForm
+from vancelle.forms.work import WorkForm, WorkShelfForm, WorkIndexArgs
 from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.bootstrap.layout.grid import col, row
@@ -243,20 +243,30 @@ def work_create_page(work_form: WorkForm, details: Details = EMPTY_DETAILS) -> H
     )
 
 
-def work_index_page(works: Pagination[Work], works_index_form: WorksIndexForm) -> Heavymetal:
+def work_index_page(works: Pagination[Work], works_index_form: WorkIndexArgs) -> Heavymetal:
     works_table = generate_table_from_pagination(
         classes="table table-hover table-sm align-middle",
         cols=[
+            {"style": "width: 10%;"},
+            {"style": "width: 70%;"},
             {"style": "width: 20%;"},
-            {"style": "width: 40%;", "colspan": "2"},
         ],
         head=[
             th({}, ["Type"]),
             th({}, ["Title"]),
+            th({}, ["Remote"]),
         ],
         body=lambda work: [
             td({}, [work.info.noun_title]),
             td({}, [details_description(work.resolve_details(), work.url_for())]),
+            td(
+                {"class": "text-body-secondary"},
+                [
+                    html.count_plural("remote", len(work.remotes)),
+                    ", ",
+                    html.count_plural("record", len(work.records)),
+                ],
+            ),
         ],
         pagination=works,
     )

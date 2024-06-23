@@ -22,7 +22,7 @@ Heavymetal = typing.Union["HeavymetalTuple", str, types.EllipsisType]
 
 # A less-friendly type that includes everything that can be rendered with Heavymetal,
 # used in the signature for 'render()'.
-HeavymetalAnything = typing.Union[HeavymetalTuple, "HeavymetalProtocol", HeavymetalCallable, str]
+HeavymetalAnything = typing.Union[Heavymetal, "HeavymetalProtocol", HeavymetalCallable]
 
 
 @typing.runtime_checkable

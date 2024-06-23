@@ -24,11 +24,16 @@ def before_request():
     pass
 
 
-@bp.route("/-/new", methods=["POST"])
-def new():
-    work_id = flask.request.args.get("work_uuid", type=uuid.UUID)
+@bp.route("/-/create", methods={"get", "post"})
+def create():
+    """TODO: record_create_page, matching work_create_page."""
+
+    work_id = flask.request.args.get("work_id", type=uuid.UUID)
     started = flask.request.args.get("started", type=RelativeDate)
     stopped = flask.request.args.get("stopped", type=RelativeDate)
+
+    if work_id is None:
+        raise BadRequest()
 
     record = controller.create(work_id, started=started, stopped=stopped)
     return htmx.redirect(record.url_for())

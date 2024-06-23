@@ -4,8 +4,8 @@ import flask.sansio.blueprints
 import flask_login
 import structlog
 
-from vancelle.forms.work import WorksIndexForm
-from vancelle.controllers.work import WorkController, WorkQuery
+from vancelle.forms.work import WorkBoardArgs
+from vancelle.controllers.work import WorkController
 from vancelle.html.vancelle.pages.board import BoardPage
 from vancelle.models import Work
 
@@ -24,20 +24,8 @@ def before_request():
 
 @bp.route("/", methods={"GET"})
 def index():
-    form = WorksIndexForm(formdata=flask.request.args, meta={"csrf": False})
-
-    query = WorkQuery(
-        user=flask_login.current_user,
-        work_type=form.work_type.data,
-        work_shelf=form.work_shelf.data,
-        work_case=form.work_case.data,
-        work_deleted=form.work_deleted.data,
-        remote_type=form.remote_type.data,
-        remote_data=form.remote_data.data,
-        search=form.search.data,
-    )
-
-    shelves, total = query.shelves()
+    form = WorkBoardArgs(formdata=flask.request.args)
+    shelves, total = form.shelves()
     return BoardPage(
         form=form,
         shelves=shelves,

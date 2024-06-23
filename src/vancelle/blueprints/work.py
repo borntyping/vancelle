@@ -10,7 +10,7 @@ from vancelle.clients.images.client import ImageCache
 from vancelle.controllers.work import WorkController
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db, htmx
-from vancelle.forms.work import WorkForm, WorksIndexForm, WorkShelfForm
+from vancelle.forms.work import WorkForm, WorkIndexArgs, WorkShelfForm
 from vancelle.html.vancelle.pages.work import work_create_page, work_detail_page, work_index_page, work_update_page
 from vancelle.lib.heavymetal import render
 from vancelle.models.work import Work
@@ -44,22 +44,11 @@ def create():
 
 @bp.route("/")
 def index():
-    works = controller.index()
-    works_index_form = WorksIndexForm(formdata=flask.request.args, meta={"csrf": False})
+    works_index_form = WorkIndexArgs(formdata=flask.request.args)
+    works = works_index_form.paginate()
 
     return render(work_index_page(works, works_index_form))
 
-    # form = WorkIndexForm(formdata=flask.request.args, meta={"csrf": False})
-    # query = WorkQuery(
-    #     user=flask_login.current_user,
-    #     work_type=form.work_type.data,
-    #     work_shelf=form.work_shelf.data,
-    #     work_case=form.work_case.data,
-    #     work_deleted=form.work_deleted.data,
-    #     remote_type=form.remote_type.data,
-    #     remote_data=form.remote_data.data,
-    #     search=form.search.data,
-    # )
     #
     # match form.layout.data:
     #     case "board":

@@ -37,16 +37,15 @@ class DetailsJSON(HeavymetalComponent):
 
 def details_description(details: Details, href: str) -> Heavymetal:
     return div(
-        {},
+        {"class": "position-relative"},
         [
-            div({}, [a({"href": href}, maybe_str(details.title))]),
+            div(
+                {"class": "text-body-primary"},
+                [a({"class": "stretched-link fw-semibold", "href": href}, maybe_str(details.title))],
+            ),
             div(
                 {"class": "text-body-tertiary"},
-                [
-                    maybe_year(details.release_date),
-                    ", ",
-                    maybe_str(details.author),
-                ],
+                [maybe_year(details.release_date), ", ", maybe_str(details.author)],
             ),
         ],
     )

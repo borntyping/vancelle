@@ -4,10 +4,11 @@ import typing
 
 import markupsafe
 
-from vancelle.forms.work import WorksIndexForm
+from vancelle.extensions import html
+from vancelle.forms.work import WorkIndexArgs
 from vancelle.lib.heavymetal.html import a, div, figure, h3, p, section, span, img, fragment
 from vancelle.lib.heavymetal import Heavymetal
-from vancelle.html.helpers import count_plural, html_classes
+from vancelle.lib.html import html_classes
 from vancelle.lib.heavymetal import HeavymetalComponent
 from vancelle.html.vancelle.components.metadata import span_date
 from vancelle.html.vancelle.components.optional import maybe_span, maybe_str, span_absent
@@ -102,7 +103,7 @@ def shelf_board_item(shelf: Shelf, count: int) -> Heavymetal:
         [
             h3({"class": "display-7"}, [shelf.title]),
             p({"class": "fs-7"}, [shelf.description]),
-            span({"class": "badge bg-primary rounded-pill"}, [count_plural("item", count)]),
+            span({"class": "badge bg-primary rounded-pill"}, [html.count_plural("item", count)]),
         ],
     )
 
@@ -117,7 +118,7 @@ def horizontal_board(items: typing.Sequence[Heavymetal]) -> Heavymetal:
 
 @dataclasses.dataclass()
 class BoardPage(HeavymetalComponent):
-    form: WorksIndexForm
+    form: WorkIndexArgs
     layout: typing.Literal["vertical", "horizontal"]
     shelves: typing.Mapping[Shelf, list[Work]]
     total: int

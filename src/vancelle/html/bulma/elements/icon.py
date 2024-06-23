@@ -1,5 +1,5 @@
 from vancelle.lib.heavymetal.html import span
-from vancelle.html.helpers import HtmlClasses, html_classes
+from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.lib.heavymetal import Heavymetal
 
 

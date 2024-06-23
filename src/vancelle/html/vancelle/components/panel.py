@@ -10,7 +10,7 @@ import humanize
 
 from vancelle.html.bootstrap.components.tabs import Tab, Tabs
 from vancelle.html.bootstrap_icons import bi_font, bi_svg
-from vancelle.html.helpers import HtmlClasses, html_classes
+from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.html.vancelle.components.details import DetailsDescription, DetailsJSON
 from vancelle.html.vancelle.components.optional import maybe_str, quote, span_absent
 from vancelle.html.vancelle.components.properties import PropertiesTable
@@ -91,10 +91,11 @@ class WorkRecordsPanel(Panel, HeavymetalComponent):
         midpoint = max(math.ceil(len(self.work.records) / 2), self.min_rows)
         rows = itertools.zip_longest(self.work.records[:midpoint], self.work.records[midpoint:], range(self.min_rows))
 
-        started_yesterday = a({"href": "#"}, ["yesterday"])
-        started_today = a({"href": "#"}, ["today"])
-        stopped_yesterday = a({"href": "#"}, ["yesterday"])
-        stopped_today = a({"href": "#"}, ["today"])
+        started_yesterday = flask.url_for("record.create", work_id=self.work.id, started="yesterday")
+        started_today = flask.url_for("record.create", work_id=self.work.id, started="today")
+        stopped_yesterday = flask.url_for("record.create", work_id=self.work.id, stopped="yesterday")
+        stopped_today = flask.url_for("record.create", work_id=self.work.id, stopped="today")
+        blank = flask.url_for("record.create", work_id=self.work.id)
 
         return div(
             {"class": "v-panel v-panel-records border rounded overflow-hidden"},
@@ -147,15 +148,15 @@ class WorkRecordsPanel(Panel, HeavymetalComponent):
                 div(
                     {"class": "text-center fs-7 p-2"},
                     [
-                        "new entry: started ",
-                        started_today,
+                        a({"href": blank}, ["new entry"]),
+                        ": started ",
+                        a({"href": started_today}, ["today"]),
                         " / ",
-                        started_yesterday,
+                        a({"href": started_yesterday}, ["yesterday"]),
                         ", stopped ",
-                        stopped_today,
+                        a({"href": stopped_today}, ["today"]),
                         " / ",
-                        stopped_yesterday,
-                        "",
+                        a({"href": stopped_yesterday}, ["yesterday"]),
                     ],
                 ),
             ],

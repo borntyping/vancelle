@@ -25,7 +25,7 @@
 import dataclasses
 import typing
 
-from vancelle.html.helpers import HtmlClasses, html_classes
+from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent, HeavymetalContent
 from vancelle.lib.heavymetal.html import a, div, fragment, nav
 

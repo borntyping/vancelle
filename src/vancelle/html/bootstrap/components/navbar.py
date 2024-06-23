@@ -4,7 +4,7 @@ https://getbootstrap.com/docs/5.3/components/navbar/
 
 import typing
 
-from vancelle.html.helpers import html_classes
+from vancelle.lib.html import html_classes
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
 from vancelle.lib.heavymetal.html import a, button, div, fragment, nav, span, ul
 

@@ -2,7 +2,7 @@ import flask
 import markupsafe
 
 from vancelle.extensions import htmx
-from vancelle.html.helpers import HtmlClasses, html_classes
+from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import aside, button, div, fragment, section, span, strong
 

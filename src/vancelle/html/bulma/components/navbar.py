@@ -1,6 +1,6 @@
 import typing
 
-from vancelle.html.helpers import html_classes
+from vancelle.lib.html import html_classes
 from vancelle.lib.heavymetal import Heavymetal
 
 

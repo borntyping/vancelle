@@ -59,7 +59,9 @@ class Record(Base):
         yield StringProperty("Stopped", self.date_stopped)
 
     def set_date_started(self, relative: RelativeDate | None, /):
-        if relative and self.date_started:
+        if relative is None:
+            return
+        elif self.date_started:
             raise ValueError("Record already has a started date")
         elif relative is RelativeDate.today:
             self.date_started = datetime.date.today()
@@ -69,7 +71,9 @@ class Record(Base):
             raise ValueError(f"Unexpected value {relative=}")
 
     def set_date_stopped(self, relative: RelativeDate | None, /):
-        if relative and self.date_stopped:
+        if relative is None:
+            return
+        elif self.date_stopped:
             raise ValueError("Record already has a stopped date")
         elif relative is RelativeDate.today:
             self.date_stopped = datetime.date.today()

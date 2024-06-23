@@ -9,7 +9,7 @@ import sentry_sdk.consts
 import structlog
 
 from .core import render
-from .types import Heavymetal, HeavymetalProtocol
+from .types import Heavymetal, HeavymetalProtocol, HeavymetalValue
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -31,7 +31,7 @@ class HeavymetalMutableElement(HeavymetalComponent):
     """Sometimes mutability is nice."""
 
     tag: str
-    attrs: dict[str, str | bool | None]
+    attrs: dict[str, HeavymetalValue]
     children: list[Heavymetal]
 
     def heavymetal(self) -> Heavymetal:

@@ -28,17 +28,14 @@ class FlaskPaginationArgs:
         self.page = page
         self.per_page = min(per_page, max_per_page)
 
-    @property
-    def offset(self) -> int:
-        return (self.page - 1) * self.per_page
-
     def query(
         self,
         session: sqlalchemy.orm.Session,
         query_statement: sqlalchemy.Select[tuple[T]],
         count_statement: sqlalchemy.Select[tuple[int]] | None = None,
     ) -> Pagination[T]:
-        items_query = query_statement.limit(self.per_page).offset(self.offset)
+        offset = (self.page - 1) * self.per_page
+        items_query = query_statement.limit(self.per_page).offset(offset)
         items = list(session.execute(items_query).unique().scalars())
 
         if count_statement:

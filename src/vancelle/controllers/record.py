@@ -26,9 +26,7 @@ class RecordController:
         return db.session.execute(stmt).scalar_one()
 
     def create(self, work_id: uuid.UUID, *, started: RelativeDate | None, stopped: RelativeDate | None) -> Record:
-        work = db.session.get(Work, work_id)
-
-        record = Record(id=uuid.uuid4(), work=work)
+        record = Record(id=uuid.uuid4(), work_id=work_id)
         record.set_date_started(started)
         record.set_date_stopped(stopped)
 

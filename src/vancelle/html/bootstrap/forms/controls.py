@@ -4,7 +4,7 @@ import markupsafe
 import wtforms
 from wtforms.widgets import CheckboxInput, RadioInput, Select
 
-from vancelle.html.helpers import html_classes
+from vancelle.lib.html import html_classes
 
 
 def _form_control_validation_class(field: wtforms.Field) -> str:
@@ -44,7 +44,7 @@ def form_control(field: wtforms.Field, *, label: bool = True, validation: bool =
     field_classes = html_classes(widget_classes, valid_classes, kwargs.pop("class_", None))
 
     label_element = field.label() if label else ""
-    field_element = field(class_=field_classes, **kwargs)
+    field_element = field.widget(field, class_=field_classes, **kwargs)
     valid_element = _form_control_validation_element(field) if validation else ""
 
     return markupsafe.Markup(f"{label_element}{field_element}{valid_element}")

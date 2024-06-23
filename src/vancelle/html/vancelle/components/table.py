@@ -1,6 +1,6 @@
 import typing
 
-from vancelle.html.helpers import HtmlClasses, html_classes
+from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.html.vancelle.components.pagination import nav_pagination
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs
 from vancelle.lib.heavymetal.html import col, colgroup, fragment, table, tbody, thead, tr

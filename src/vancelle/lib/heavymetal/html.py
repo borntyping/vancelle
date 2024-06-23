@@ -2,6 +2,7 @@
 Functions for building HTML elements.
 """
 
+import types
 import typing
 
 import markupsafe
@@ -22,7 +23,7 @@ def fragment(children: HeavymetalContent) -> HeavymetalTuple:
     return (None, {}, children)
 
 
-def nothing() -> Ellipsis:
+def nothing() -> types.EllipsisType:
     """
     An empty fragment.
 

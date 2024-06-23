@@ -1,8 +1,8 @@
 import dataclasses
 import typing
 
-from vancelle.html.helpers import HtmlClasses, html_classes
-from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
+from vancelle.lib.html import html_classes, html_attrs
+from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs, HeavymetalComponent
 from vancelle.lib.heavymetal.html import a, li, ul
 
 
@@ -19,9 +19,8 @@ class PageItem(HeavymetalComponent):
 
 @dataclasses.dataclass
 class Pagination(HeavymetalComponent):
+    attrs: HeavymetalAttrs
     items: typing.Sequence[PageItem]
-    center: bool = False
-    classes: HtmlClasses = ()
 
     def heavymetal(self) -> Heavymetal:
-        return ul({"class": html_classes("pagination", {"justify-content-center": self.center}, self.classes)}, self.items)
+        return ul(html_attrs({"class": "pagination"}, self.attrs), self.items)

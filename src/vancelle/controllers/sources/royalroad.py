@@ -1,13 +1,13 @@
 import svcs
 
-from .base import Manager
+from .base import Source
 from ...clients.royalroad.client import RoyalRoadScraper
 from ...lib.pagination import Pagination
 from ...models.remote import RoyalroadFiction
 from ...models.work import Book
 
 
-class RoyalroadFictionManager(Manager):
+class RoyalroadFictionSource(Source):
     remote_type = RoyalroadFiction
     work_type = Book
 

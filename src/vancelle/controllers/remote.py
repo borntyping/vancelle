@@ -7,13 +7,18 @@ import flask
 import sqlalchemy
 import structlog
 
-from vancelle.controllers.sources.base import Manager
-from vancelle.controllers.sources.goodreads import GoodreadsPrivateBookManager, GoodreadsPublicBookManager
-from vancelle.controllers.sources.imported import ImportedWorkManager
-from vancelle.controllers.sources.openlibrary import OpenlibraryEditionManager, OpenlibraryWorkManager
-from vancelle.controllers.sources.royalroad import RoyalroadFictionManager
-from vancelle.controllers.sources.steam import SteamApplicationManager
-from vancelle.controllers.sources.tmdb import TmdbMovieManager, TmdbTvSeriesManager
+from vancelle.controllers.sources import (
+    GoodreadsPublicBookSource,
+    ImportedWorkSource,
+    OpenlibraryEditionSource,
+    OpenlibraryWorkSource,
+    RoyalroadFictionSource,
+    Source,
+    SteamApplicationSource,
+    TmdbMovieSource,
+    TmdbTvSeriesSource,
+)
+from vancelle.controllers.sources.goodreads import GoodreadsPrivateBookSource
 from vancelle.extensions import db
 from vancelle.html.vancelle.pages.remote import RemoteSearchPage
 from vancelle.lib.heavymetal import render
@@ -28,23 +33,23 @@ logger = structlog.get_logger(logger_name=__name__)
 
 
 DEFAULT_MANAGERS = (
-    GoodreadsPrivateBookManager(),
-    GoodreadsPublicBookManager(),
-    OpenlibraryWorkManager(),
-    OpenlibraryEditionManager(),
-    ImportedWorkManager(),
-    RoyalroadFictionManager(),
-    SteamApplicationManager(),
-    TmdbMovieManager(),
-    TmdbTvSeriesManager(),
+    GoodreadsPrivateBookSource(),
+    GoodreadsPublicBookSource(),
+    OpenlibraryWorkSource(),
+    OpenlibraryEditionSource(),
+    ImportedWorkSource(),
+    RoyalroadFictionSource(),
+    SteamApplicationSource(),
+    TmdbMovieSource(),
+    TmdbTvSeriesSource(),
 )
 
 
 @dataclasses.dataclass(init=False)
 class RemotesController:
-    managers: typing.Mapping[str, Manager]
+    managers: typing.Mapping[str, Source]
 
-    def __init__(self, managers: typing.Iterable[Manager] = DEFAULT_MANAGERS) -> None:
+    def __init__(self, managers: typing.Iterable[Source] = DEFAULT_MANAGERS) -> None:
         self.managers = {m.remote_type.remote_type(): m for m in managers}
 
         for cls in Remote.iter_subclasses():

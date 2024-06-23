@@ -1,12 +1,12 @@
 from werkzeug.exceptions import BadRequest
 
-from .base import Manager
+from .base import Source
 from ...lib.pagination import Pagination
 from ...models import Work
 from ...models.remote import ImportedWork
 
 
-class ImportedWorkManager(Manager):
+class ImportedWorkSource(Source):
     remote_type = ImportedWork
     work_type = Work
 

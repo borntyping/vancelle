@@ -1,6 +1,6 @@
 import svcs
 
-from .base import Manager
+from .base import Source
 from ...clients.goodreads.http import GoodreadsPublicScraper
 from ...lib.pagination import Pagination
 
@@ -8,7 +8,7 @@ from ...models.remote import GoodreadsPrivateBook, GoodreadsPublicBook
 from ...models.work import Book
 
 
-class GoodreadsPrivateBookManager(Manager):
+class GoodreadsPrivateBookSource(Source):
     remote_type = GoodreadsPrivateBook
     work_type = Book
 
@@ -19,7 +19,7 @@ class GoodreadsPrivateBookManager(Manager):
         raise NotImplementedError("Private Goodreads books cannot be searched.")
 
 
-class GoodreadsPublicBookManager(Manager):
+class GoodreadsPublicBookSource(Source):
     remote_type = GoodreadsPublicBook
     work_type = Book
 

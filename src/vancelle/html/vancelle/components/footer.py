@@ -32,13 +32,11 @@ def openlibrary() -> Heavymetal:
     return a(
         {"id": "openlibrary", "href": "https://openlibrary.org", "title": "Open Library"},
         [
-            img(
-                {
-                    "height": "24",
-                    "src": flask.url_for("static", filename="img/openlibrary.svg"),
-                    "alt": "Open Library",
-                }
-            )
+            img({
+                "height": "24",
+                "src": flask.url_for("static", filename="img/openlibrary.svg"),
+                "alt": "Open Library",
+            })
         ],
     )
 
@@ -47,13 +45,11 @@ def tmdb() -> Heavymetal:
     return a(
         {"id": "tmdb", "href": "https://www.themoviedb.org", "title": "The Movie Database"},
         [
-            img(
-                {
-                    "height": "24",
-                    "src": flask.url_for("static", filename="img/tmdb.svg"),
-                    "alt": "The Movie Database",
-                }
-            )
+            img({
+                "height": "24",
+                "src": flask.url_for("static", filename="img/tmdb.svg"),
+                "alt": "The Movie Database",
+            })
         ],
     )
 
@@ -67,7 +63,7 @@ def steam() -> Heavymetal:
     )
 
 
-def page_footer() -> Heavymetal:
+def PageFooter() -> Heavymetal:
     """
     Open Library requests a "courtesy link". https://openlibrary.org/dev/docs/api/covers
     TMDB terms of use require a notice: https://developer.themoviedb.org/docs/faq

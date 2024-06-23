@@ -36,7 +36,7 @@ def PageHeader(title: Heavymetal, subtitle: Heavymetal | None = None, *controls:
         title=title,
         subtitle=subtitle,
         controls=controls,
-        header_classes="v-block",
+        header_classes="mb-4",
         title_classes="display-3",
         subtitle_classes="fs-4 ps-1",
     )

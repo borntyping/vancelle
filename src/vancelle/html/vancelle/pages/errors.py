@@ -1,13 +1,13 @@
 import flask
 
 from vancelle.html.vancelle.components.header import PageHeader, SectionHeader
-from vancelle.html.vancelle.pages.base import page
+from vancelle.html.vancelle.pages.base import Page
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import a, div, h1, p
 
 
 def error_page(title: str, description: str) -> Heavymetal:
-    return page(
+    return Page(
         [
             div(
                 {"id": "error"},
@@ -28,7 +28,7 @@ def debug_page():
         ("werkzeug.exceptions.HTTPException", flask.url_for("errors.raise_http_error")),
     ]
 
-    return page(
+    return Page(
         [
             PageHeader("Errors", "Trigger error messages for debugging"),
             SectionHeader("Error pages"),

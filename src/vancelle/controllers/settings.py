@@ -6,7 +6,7 @@ import pydantic
 import sqlalchemy
 import structlog
 
-from vancelle.controllers.sources.steam import SteamApplicationManager
+from vancelle.controllers.sources.steam import SteamApplicationSource
 from vancelle.extensions import db
 from vancelle.models import Record, Remote, User
 from ..models.work import Work
@@ -114,4 +114,4 @@ class UserSettingsController:
 
 class ApplicationSettingsController:
     def reload_steam_cache(self) -> None:
-        SteamApplicationManager.reload_appid_cache()
+        SteamApplicationSource.reload_appid_cache()

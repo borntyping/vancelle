@@ -4,20 +4,24 @@ import typing
 import flask
 import markupsafe
 
+from vancelle.controllers.source import ExternalRemoteController
 from vancelle.extensions import htmx, sentry
-from vancelle.html.vancelle.components.footer import page_footer
-from vancelle.html.vancelle.components.navbar import page_navbar
+from vancelle.html.vancelle.components.footer import PageFooter
+from vancelle.html.vancelle.components.navbar import PageNavbar
 from vancelle.html.vancelle.components.title import page_title
-from vancelle.html.vancelle.components.toast import toast_container
+from vancelle.html.vancelle.components.toast import ToastAside
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
 from vancelle.lib.heavymetal.html import html5, link, main, meta, script
+
+
+source_controller = ExternalRemoteController()
 
 
 def static(filename: str) -> str:
     return flask.url_for("static", filename=filename)
 
 
-def page(
+def Page(
     content: HeavymetalContent,
     *,
     fluid: bool = False,
@@ -45,10 +49,10 @@ def page(
     ]
 
     body = [
-        page_navbar(),
+        PageNavbar(sources=source_controller.sources),
         main({"class": "container-fluid my-5" if fluid else "container my-5"}, content),
-        toast_container(),
-        page_footer(),
+        ToastAside(),
+        PageFooter(),
         script({"src": static("dist/htmx.org/htmx.min.js")}),
         script({"src": static("dist/htmx-ext-loading-states/loading-states.js")}),
         script({"src": static("dist/hyperscript.org/_hyperscript.min.js")}),

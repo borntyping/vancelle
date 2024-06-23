@@ -14,6 +14,7 @@ from .blueprints.record import bp as bp_record
 from .blueprints.remote import bp as bp_remote
 from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
+from .blueprints.source import bp as bp_remote_source
 from .clients.client import HttpClientBuilder
 from .clients.goodreads.http import GoodreadsPublicScraper
 from .clients.images.client import ImageCache
@@ -80,5 +81,6 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
     app.register_blueprint(bp_works)
     app.register_blueprint(bp_record)
     app.register_blueprint(bp_remote)
+    app.register_blueprint(bp_remote_source)
 
     return app

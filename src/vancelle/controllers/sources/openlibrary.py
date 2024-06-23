@@ -2,14 +2,14 @@ import typing
 
 import svcs
 
-from .base import Manager
+from .base import Source
 from ...clients.openlibrary.client import OpenLibraryAPI
 from ...lib.pagination import Pagination
 from ...models.remote import OpenlibraryEdition, OpenlibraryWork
 from ...models.work import Book
 
 
-class OpenlibraryWorkManager(Manager):
+class OpenlibraryWorkSource(Source):
     remote_type = OpenlibraryWork
     work_type = Book
 
@@ -26,7 +26,7 @@ class OpenlibraryWorkManager(Manager):
         return {"editions": openlibrary.work_editions(remote.id)}
 
 
-class OpenlibraryEditionManager(Manager):
+class OpenlibraryEditionSource(Source):
     remote_type = OpenlibraryEdition
     work_type = Book
 

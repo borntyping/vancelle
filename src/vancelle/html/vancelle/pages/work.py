@@ -1,5 +1,8 @@
+import typing
+
 import flask
 
+from vancelle.controllers.sources.base import Source
 from vancelle.extensions import html
 from vancelle.forms.work import WorkForm, WorkShelfForm, WorkIndexArgs
 from vancelle.html.bootstrap.components.button_group import btn_group
@@ -9,31 +12,15 @@ from vancelle.html.vancelle.components.details import details_description
 from vancelle.html.vancelle.components.header import PageHeader, SectionHeader
 from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
+from vancelle.html.vancelle.components.source import SourceListGroup
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.html.vancelle.components.work import return_to_work
-from vancelle.html.vancelle.pages.base import page
+from vancelle.html.vancelle.pages.base import Page
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
 from vancelle.lib.heavymetal.html import a, button, div, form, section, td, th
 from vancelle.lib.pagination import Pagination
-from vancelle.models import Remote, Work
+from vancelle.models import Work
 from vancelle.models.details import Details, EMPTY_DETAILS
-
-
-def _search_for_work(work: Work) -> Heavymetal:
-    subclasses = Remote.iter_subclasses_interactive()
-    return div(
-        {"class": "list-group"},
-        [
-            a(
-                {
-                    "class": "list-group-item list-group-item-action",
-                    "href": flask.url_for("remote.search_source", remote_type=remote_type, work_id=work.id),
-                },
-                ["Search ", remote_type.info.noun_full_plural],
-            )
-            for remote_type in subclasses
-        ],
-    )
 
 
 def _work_form_page(
@@ -46,7 +33,7 @@ def _work_form_page(
     page_title: list[str],
     btn_groups: HeavymetalContent,
 ) -> Heavymetal:
-    return page(
+    return Page(
         [
             form(
                 {"method": "post", "action": action},
@@ -139,7 +126,7 @@ def work_shelf_form_group(work: Work, work_shelf_form: WorkShelfForm) -> Heavyme
     )
 
 
-def work_detail_page(work: Work, work_shelf_form: WorkShelfForm) -> Heavymetal:
+def work_detail_page(work: Work, work_shelf_form: WorkShelfForm, sources: typing.Sequence[Source]) -> Heavymetal:
     details = work.resolve_details()
 
     title = work.resolve_title()
@@ -152,27 +139,27 @@ def work_detail_page(work: Work, work_shelf_form: WorkShelfForm) -> Heavymetal:
     if work.into_details():
         external_data_subtitle += " and manually entered metadata"
 
-    return page(
+    return Page(
         [
             section(
-                {},
+                {"class": "v-block"},
                 [
                     PageHeader(title, subtitle, work_shelf_form_group(work, work_shelf_form)),
                     row({}, [col({}, [work_details_panel]), col({}, [work_records_panel])]),
                 ],
             ),
             section(
-                {},
+                {"class": "v-block"},
                 [
                     SectionHeader("External data", external_data_subtitle),
                     row({"class": "row-cols-2 g-4"}, [col({}, [RemoteDetailsPanel(r)]) for r in work.iter_remotes()]),
                 ],
             ),
             section(
-                {},
+                {"class": "v-block"},
                 [
                     SectionHeader("Search external sources", f"Search external sources for {quote_str(details.title)}"),
-                    row({}, [col({}, [_search_for_work(work)])]),
+                    row({}, [col({}, [SourceListGroup(sources, candidate_work=work)])]),
                 ],
             ),
         ],
@@ -320,7 +307,7 @@ def WorkTable(works: Pagination[Work]) -> Heavymetal:
 
 
 def work_index_page(works: Pagination[Work], work_index_args: WorkIndexArgs) -> Heavymetal:
-    return page(
+    return Page(
         [
             PageHeader("Works"),
             WorkIndexArgsForm(work_index_args),

@@ -12,7 +12,7 @@ from vancelle.inflect import p
 from vancelle.models import User
 from vancelle.models.remote import Remote
 from vancelle.models.work import Work
-from .base import page
+from .base import Page
 
 
 @dataclasses.dataclass()
@@ -111,4 +111,4 @@ class HomePageHero(HeavymetalComponent):
 @dataclasses.dataclass()
 class HomePage(HeavymetalComponent):
     def heavymetal(self) -> Heavymetal:
-        return page([HomePageHero(), HomePageGauges()], title=())
+        return Page([HomePageHero(), HomePageGauges()], title=())

@@ -7,11 +7,11 @@ from vancelle.forms.remote import RemoteIndexArgs
 from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.details import details_description
 from vancelle.html.vancelle.components.header import PageHeader
-from vancelle.html.vancelle.components.index import IndexFormControls
+from vancelle.html.vancelle.components.index import SearchFormControls
 from vancelle.html.vancelle.components.optional import maybe_str, quote, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
-from vancelle.html.vancelle.pages.base import page
+from vancelle.html.vancelle.pages.base import Page
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import (
     a,
@@ -89,7 +89,7 @@ def _RemoteIndexForm(remote_index_args: RemoteIndexArgs) -> Heavymetal:
             row(
                 {},
                 [
-                    col({}, [IndexFormControls(search=remote_index_args.search)]),
+                    col({}, [SearchFormControls(field=remote_index_args.search)]),
                 ],
             ),
         ],
@@ -136,7 +136,7 @@ def RemoteIndexPage(
     remote_index_args: RemoteIndexArgs,
     remote_type: typing.Type[Remote] | None,
 ) -> Heavymetal:
-    return page(
+    return Page(
         [
             PageHeader("Remotes", f"Work details from {remote_type.info.source if remote_type else 'external sources'}"),
             _RemoteIndexForm(remote_index_args),
@@ -153,13 +153,15 @@ def RemoteSearchPage(
     remote_items: Pagination[Remote],
     candidate_work: typing.Optional[Work],
 ) -> Heavymetal:
+    raise Exception("deprecated")
+
     if candidate_work:
         details = candidate_work.resolve_details()
         subtitle = f"Link {remote_type.info.noun_full} to {quote_str(details.title)}"
     else:
         subtitle = None
 
-    return page(
+    return Page(
         [
             PageHeader(f"Search {remote_type.info.source}", subtitle),
             _RemoteTable(remote_items, candidate_work),
@@ -170,7 +172,7 @@ def RemoteSearchPage(
 
 def RemoteDetailPage(remote: Remote, /, *, candidate_work: typing.Optional[Work]) -> Heavymetal:
     details = remote.into_details()
-    return page(
+    return Page(
         [
             PageHeader(maybe_str(details.title), f"{remote.info.noun_full} {remote.id}"),
             RemoteDetailsPanel(remote, candidate_work=candidate_work),

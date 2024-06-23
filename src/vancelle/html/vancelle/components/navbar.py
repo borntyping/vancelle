@@ -1,6 +1,9 @@
+import typing
+
 import flask
 import flask_login
 
+from vancelle.controllers.sources import Source
 from vancelle.ext.flask import url_is_active
 from vancelle.html.bootstrap.components.navbar import (
     dropdown_divider,
@@ -48,15 +51,15 @@ def _remotes_dropdown() -> Heavymetal:
     )
 
 
-def _new_works_dropdown() -> Heavymetal:
+def _new_works_dropdown(sources: typing.Sequence[Source]) -> Heavymetal:
     return nav_item_dropdown(
         "Add new work",
         [
             _page_dropdown_item("Create new work", "work.create"),
             dropdown_divider(),
             *(
-                _page_dropdown_item(remote_type.info.noun_full, "remote.search_source", remote_type=remote_type)
-                for remote_type in Remote.iter_subclasses_interactive()
+                _page_dropdown_item(source.name, "source.search", remote_type=source.remote_type.polymorphic_identity())
+                for source in sources
             ),
         ],
     )
@@ -76,13 +79,13 @@ def _user_dropdown() -> Heavymetal:
     )
 
 
-def page_navbar() -> Heavymetal:
+def PageNavbar(sources: typing.Sequence[Source]) -> Heavymetal:
     return navbar(
         navbar_brand(name="Vancelle", href=flask.url_for("home.home")),
         [
             nav_item("Board", flask.url_for("board.index"), url_is_active("board.index")),
             _works_dropdown(),
-            _new_works_dropdown(),
+            _new_works_dropdown(sources=sources),
             _remotes_dropdown(),
         ],
         [

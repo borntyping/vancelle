@@ -13,7 +13,7 @@ _HeavymetalStatic = typing.Union[_HeavymetalStaticTuple, str, types.EllipsisType
 
 # Dynamic heavymetal can include callables that unpack to more heavymetal.
 HeavymetalCallable = typing.Callable[[], "Heavymetal"]
-HeavymetalContent = typing.Sequence["HeavymetalAnything"]
+HeavymetalContent = typing.Iterable["HeavymetalAnything"]
 HeavymetalTuple = typing.Tuple[HeavymetalTag, HeavymetalAttrs, HeavymetalContent]
 
 # A 'friendly' return type that can be used in most places, especially in return signatures.

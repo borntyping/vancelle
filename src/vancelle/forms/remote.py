@@ -1,23 +1,20 @@
 import flask_login
 import werkzeug.exceptions
-import markupsafe
 import wtforms.validators
 from sqlalchemy import ColumnElement, Select, True_, desc, select
 from sqlalchemy.orm import joinedload
 
 from vancelle.extensions import db
-from vancelle.forms.pagination import PaginationArgs
-from vancelle.html.bootstrap.forms.controls import form_control
+
+from .bootstrap import BootstrapMeta
+from .pagination import PaginationArgs
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Remote, Work
 
 
 class RemoteIndexArgs(PaginationArgs):
-    class Meta:
+    class Meta(BootstrapMeta):
         csrf = False
-
-        def render_field(self, field: wtforms.Field, kwargs) -> markupsafe.Markup:
-            return form_control(field, **kwargs)
 
     type = wtforms.SelectField(
         label="Remote type",

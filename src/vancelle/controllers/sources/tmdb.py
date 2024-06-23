@@ -1,7 +1,7 @@
 import svcs
 
 from vancelle.clients.tmdb.client import TmdbAPI
-from vancelle.controllers.sources.base import Manager
+from vancelle.controllers.sources.base import Source
 from ...lib.pagination import Pagination
 from vancelle.inflect import p
 from vancelle.models.remote import TmdbMovie, TmdbTvSeries
@@ -9,7 +9,7 @@ from vancelle.models.work import Film, Show
 from ...lib.pagination.flask import FlaskPaginationArgs
 
 
-class TmdbMovieManager(Manager[TmdbMovie]):
+class TmdbMovieSource(Source[TmdbMovie]):
     remote_type = TmdbMovie
     work_type = Film
 
@@ -47,7 +47,7 @@ class TmdbMovieManager(Manager[TmdbMovie]):
         return Pagination(items=items, count=search["total_results"], page=args.page, per_page=args.per_page)
 
 
-class TmdbTvSeriesManager(Manager[TmdbTvSeries]):
+class TmdbTvSeriesSource(Source[TmdbTvSeries]):
     remote_type = TmdbTvSeries
     work_type = Show
 

@@ -2,6 +2,7 @@ import abc
 import dataclasses
 import typing
 
+
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Work
 from vancelle.models.remote import Remote
@@ -10,9 +11,19 @@ R = typing.TypeVar("R", bound=Remote)
 
 
 @dataclasses.dataclass()
-class Manager(typing.Generic[R], abc.ABC):
-    remote_type: typing.ClassVar[typing.Type[Remote]]
+class Source(typing.Generic[R], abc.ABC):
+    """All sources have a remote type, but not all remote types have a source."""
+
     work_type: typing.ClassVar[typing.Type[Work]]
+    remote_type: typing.ClassVar[typing.Type[Remote]]
+
+    @property
+    def name(self) -> str:
+        return self.remote_type.info.noun_full_plural
+
+    @property
+    def priority(self) -> int:
+        return self.remote_type.info.priority
 
     @abc.abstractmethod
     def fetch(self, remote_id: str) -> R:

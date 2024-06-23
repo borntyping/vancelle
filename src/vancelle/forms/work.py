@@ -3,7 +3,6 @@ import typing
 
 import flask_login
 import flask_wtf
-import markupsafe
 import structlog
 import werkzeug.exceptions
 import wtforms.csrf.core
@@ -15,8 +14,8 @@ from sqlalchemy.sql.functions import func
 from vancelle.exceptions import ApplicationError
 from vancelle.ext.wtforms import NoneFilter
 from vancelle.extensions import db
+from vancelle.forms.bootstrap import BootstrapMeta
 from vancelle.forms.pagination import PaginationArgs
-from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Record
 from vancelle.models.remote import ImportedWork, Remote
@@ -67,11 +66,8 @@ class WorkForm(flask_wtf.FlaskForm):
 
 
 class WorkIndexArgs(PaginationArgs):
-    class Meta:
+    class Meta(BootstrapMeta):
         csrf = False
-
-        def render_field(self, field: wtforms.Field, kwargs) -> markupsafe.Markup:
-            return form_control(field, **kwargs)
 
     type = wtforms.SelectField(
         label="Work type",

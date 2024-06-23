@@ -4,7 +4,7 @@ from sqlalchemy import desc, func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import Manager
+from .base import Source
 from ...clients.steam.client_store_api import SteamStoreAPI
 from ...clients.steam.client_web_api import SteamWebAPI
 from ...lib.pagination import Pagination
@@ -25,7 +25,7 @@ class SteamAppID(Base):
     name: Mapped[str]
 
 
-class SteamApplicationManager(Manager):
+class SteamApplicationSource(Source):
     remote_type = SteamApplication
     work_type = Game
 

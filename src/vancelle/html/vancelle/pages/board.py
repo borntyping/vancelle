@@ -13,7 +13,7 @@ from vancelle.lib.html import html_classes
 from vancelle.lib.heavymetal import HeavymetalComponent
 from vancelle.html.vancelle.components.metadata import span_date
 from vancelle.html.vancelle.components.optional import maybe_span, maybe_str, span_absent
-from vancelle.html.vancelle.pages.base import page
+from vancelle.html.vancelle.pages.base import Page
 from vancelle.models import Work
 from vancelle.shelf import Shelf
 
@@ -130,7 +130,7 @@ class BoardPage(HeavymetalComponent):
         else:
             raise ValueError
 
-        return page([section({}, [WorkIndexArgsForm(self.work_index_args), board])], title=["Board"])
+        return Page([section({}, [WorkIndexArgsForm(self.work_index_args), board])], title=["Board"])
 
     def vertical_board(self, items: typing.Sequence[Heavymetal]) -> Heavymetal:
         return div({"class": "x-board x-board-vertical"}, items)

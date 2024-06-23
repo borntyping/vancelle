@@ -6,7 +6,7 @@ import flask_login
 from vancelle.forms.user import ImportForm, LoginForm
 from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.vancelle.components.header import PageHeader, SectionHeader
-from vancelle.html.vancelle.pages.base import page
+from vancelle.html.vancelle.pages.base import Page
 from vancelle.inflect import p as inf
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.lib.heavymetal.html import a, button, code, div, form, p, section
@@ -17,7 +17,7 @@ class LoginPage(HeavymetalComponent):
     login_form: LoginForm
 
     def heavymetal(self) -> Heavymetal:
-        return page(
+        return Page(
             [
                 div(
                     {"class": "container is-max-desktop"},
@@ -45,7 +45,7 @@ class SettingsPage(HeavymetalComponent):
     filename: str
 
     def heavymetal(self) -> Heavymetal:
-        return page(
+        return Page(
             [
                 section(
                     {},

@@ -18,7 +18,7 @@ from ..models.remote import Remote
 
 controller = RemotesController()
 
-bp = flask.Blueprint("remote", __name__)
+bp = flask.Blueprint("remote", __name__, url_prefix="/remotes")
 
 
 @bp.before_request
@@ -27,8 +27,8 @@ def before_request():
     pass
 
 
-@bp.route("/remotes/")
-@bp.route("/remotes/<remote_type:remote_type>/")
+@bp.route("/")
+@bp.route("/<remote_type:remote_type>/")
 def index(remote_type: typing.Type[Remote] | None = None):
     remote_index_args = RemoteIndexArgs(formdata=flask.request.args)
     remotes = remote_index_args.paginate()
@@ -36,7 +36,7 @@ def index(remote_type: typing.Type[Remote] | None = None):
     return render(RemoteIndexPage(items=remotes, remote_type=remote_type, remote_index_args=remote_index_args))
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>")
+@bp.route("/<string:remote_type>/<string:remote_id>")
 def detail(remote_type: str, remote_id: str):
     remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
 
@@ -46,7 +46,7 @@ def detail(remote_type: str, remote_id: str):
     return render(RemoteDetailPage(remote, candidate_work=candidate_work))
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>/cover")
+@bp.route("/<string:remote_type>/<string:remote_id>/cover")
 def cover(remote_type: str, remote_id: str):
     images = svcs.flask.get(ImageCache)
     remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
@@ -55,7 +55,7 @@ def cover(remote_type: str, remote_id: str):
     return images.as_response(remote.cover)
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>/background")
+@bp.route("/<string:remote_type>/<string:remote_id>/background")
 def background(remote_type: str, remote_id: str):
     images = svcs.flask.get(ImageCache)
     remote = controller.get_remote(remote_type=remote_type, remote_id=remote_id)
@@ -64,38 +64,38 @@ def background(remote_type: str, remote_id: str):
     return images.as_response(remote.background)
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/create-work", methods={"post"})
+@bp.route("/<string:remote_type>/<string:remote_id>/-/create-work", methods={"post"})
 def create_work(remote_type: str, remote_id: str):
     work = controller.create_work(remote_type=remote_type, remote_id=remote_id, user=flask_login.current_user)
     return htmx.redirect(work.url_for())
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/refresh", methods={"post"})
+@bp.route("/<string:remote_type>/<string:remote_id>/-/refresh", methods={"post"})
 def refresh(remote_type: str, remote_id: str):
     controller.refresh(remote_type=remote_type, remote_id=remote_id)
 
     return htmx.refresh()
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/delete", methods={"post"})
+@bp.route("/<string:remote_type>/<string:remote_id>/-/delete", methods={"post"})
 def delete(remote_type: str, remote_id: str):
     controller.delete(remote_type=remote_type, remote_id=remote_id)
     return htmx.refresh()
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/restore", methods={"post"})
+@bp.route("/<string:remote_type>/<string:remote_id>/-/restore", methods={"post"})
 def restore(remote_type: str, remote_id: str):
     controller.restore(remote_type=remote_type, remote_id=remote_id)
     return htmx.refresh()
 
 
-@bp.route("/remotes/<string:remote_type>/<string:remote_id>/-/permanently-delete", methods={"post"})
+@bp.route("/<string:remote_type>/<string:remote_id>/-/permanently-delete", methods={"post"})
 def permanently_delete(remote_type: str, remote_id: str):
     controller.permanently_delete(remote_type=remote_type, remote_id=remote_id)
     return htmx.refresh()
 
 
-@bp.route("/remotes/-/search/<remote_type:remote_type>")
+@bp.route("/-/search/<remote_type:remote_type>")
 def search_source(remote_type: typing.Type[Remote]):
     query = flask.request.args.get("query", default="", type=str)
 

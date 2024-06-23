@@ -180,19 +180,18 @@ def render_static(node: _HeavymetalStatic, *, traces: typing.Sequence[Trace] = (
 
     # This is where hotmetal tripped me up a lot.
     if not isinstance(node, tuple) or not len(node) == 3:
-        raise HeavymetalSyntaxError("Expected a tuple with three elements", traces=traces, value=node)
+        raise HeavymetalSyntaxError("Expected a tuple with three elements", traces, node)
 
     tag, attrs, children = node
+
+    if not isinstance(attrs, typing.Mapping):
+        raise HeavymetalSyntaxError("Expected a mapping for the attrs= parameter", traces, node)
+
+    if not isinstance(children, typing.Sequence):
+        raise HeavymetalSyntaxError("Expected a sequence for the children= parameter", traces, node)
+
     trace = Trace(node)
     traces = (*traces, trace)
-
-    # This might not always be a tuple, but it should be an ordered sequence.
-    # That might be too restrictive — should this allow a generator/iterable?
-    if isinstance(children, typing.Iterable) and not isinstance(children, typing.Sequence):
-        children = tuple(children)
-
-    if not isinstance(children, typing.Iterable):
-        raise HeavymetalSyntaxError("Expected a list or sequence for the children= parameter", traces, node)
 
     # We can safely do this check as no child element should ever be a dict.
     if (

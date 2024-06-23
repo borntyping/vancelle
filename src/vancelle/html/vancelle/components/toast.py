@@ -9,7 +9,7 @@ from vancelle.lib.heavymetal.html import aside, button, div, fragment, section, 
 TOAST_CONTAINER_ID = "v-notifications"
 
 
-def toast(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavymetal:
+def Toast(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavymetal:
     return div(
         {"class": html_classes("toast show", classes)},
         [
@@ -25,22 +25,12 @@ def toast(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavymetal:
     )
 
 
-def toast_response(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavymetal:
-    return fragment([
-        span({}, [title, ": ", body]),
-        section(
-            {"id": TOAST_CONTAINER_ID, "hx-swap-oob": "beforeend"},
-            [toast(title, body, classes=classes)],
-        ),
-    ])
-
-
-def toast_container() -> Heavymetal:
+def ToastAside() -> Heavymetal:
     if htmx:
         toasts = []
     else:
         toasts = [
-            toast(category, markupsafe.Markup(message))
+            Toast(category, markupsafe.Markup(message))
             for category, message in flask.get_flashed_messages(with_categories=True)
         ]
 
@@ -53,3 +43,13 @@ def toast_container() -> Heavymetal:
         },
         toasts,
     )
+
+
+def ToastPage(title: str, body: str, *, classes: HtmlClasses = ()) -> Heavymetal:
+    return fragment([
+        span({}, [title, ": ", body]),
+        section(
+            {"id": TOAST_CONTAINER_ID, "hx-swap-oob": "beforeend"},
+            [Toast(title, body, classes=classes)],
+        ),
+    ])

@@ -41,9 +41,7 @@ class RemoteInfo(IntoProperties):
     colour: ThemeColor  # Used in CSS
     priority: int = 0
 
-    can_search: bool = True
-    can_link: bool = True
-    can_refresh: bool = True
+    is_external_source: bool = True
 
     def __init__(
         self,
@@ -55,9 +53,7 @@ class RemoteInfo(IntoProperties):
         noun_full: str | None = None,
         noun_full_plural: str | None = None,
         priority: int = 0,
-        can_search: bool = True,
-        can_link: bool = True,
-        can_refresh: bool = True,
+        is_external_source: bool = True,
     ) -> None:
         self.colour = colour
         self.source = source
@@ -66,9 +62,7 @@ class RemoteInfo(IntoProperties):
         self.noun_full = noun_full or f"{self.source} {self.noun}"
         self.noun_full_plural = noun_full_plural or f"{self.source} {self.noun_plural}"
         self.priority = priority
-        self.can_search = can_search
-        self.can_link = can_link
-        self.can_refresh = can_refresh
+        self.is_external_source = is_external_source
 
     def __str__(self) -> str:
         return self.noun_full
@@ -167,13 +161,16 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
         yield ExternalUrlProperty("Cover", self.cover)
         yield ExternalUrlProperty("Background", self.background)
 
+    def resolve_title(self) -> str:
+        return self.title if self.title else f"Remote {self.id}"
+
     @classmethod
     def remote_type(cls) -> str:
         return cls.polymorphic_identity()
 
     @classmethod
-    def iter_subclasses_interactive(cls) -> typing.Sequence[typing.Type[typing.Self]]:
-        return [remote_type for remote_type in cls.iter_subclasses() if remote_type.info.can_search]
+    def iter_subclasses_external(cls) -> typing.Sequence[typing.Type[typing.Self]]:
+        return [remote_type for remote_type in cls.iter_subclasses() if remote_type.info.is_external_source]
 
 
 class ImportedWorkAttributes(typing.TypedDict):
@@ -187,9 +184,7 @@ class ImportedWork(Remote):
         source="Imported",
         noun="work",
         priority=-1,
-        can_search=False,
-        can_link=False,
-        can_refresh=False,
+        is_external_source=False,
     )
 
     def into_properties(self) -> typing.Iterable[Property]:
@@ -209,7 +204,7 @@ class GoodreadsPrivateBook(Remote):
         noun_full="Goodreads book (imported)",
         noun_full_plural="Goodreads books (imported)",
         priority=10,
-        can_search=False,
+        is_external_source=False,
     )
 
     def external_url(self) -> str | None:
@@ -273,7 +268,7 @@ class OpenlibraryEdition(Remote):
         source="Open Library",
         noun="edition",
         priority=12,
-        can_search=False,
+        is_external_source=False,
     )
 
     def external_url(self) -> str:

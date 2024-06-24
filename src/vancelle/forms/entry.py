@@ -20,7 +20,7 @@ class EntryIndexArgs(PaginationArgs):
         label="Entry type",
         choices=[("any", "Any entry type")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
         default="all",
-        validators=[wtforms.validators.Optional()],
+        validators=[wtforms.validators.InputRequired()],
     )
     deleted = wtforms.SelectField(
         label="Deleted entries",
@@ -30,7 +30,7 @@ class EntryIndexArgs(PaginationArgs):
             ("yes", "Only deleted entries"),
         ],
         default="no",
-        validators=[wtforms.validators.DataRequired()],
+        validators=[wtforms.validators.InputRequired()],
     )
     search = wtforms.SearchField(
         label="Search",
@@ -75,7 +75,7 @@ class EntryIndexArgs(PaginationArgs):
     @staticmethod
     def _filter_search(value: str) -> ColumnElement[bool]:
         match value:
-            case "":
+            case None | "":
                 return True_()
             case _:
                 return sqlalchemy.or_(

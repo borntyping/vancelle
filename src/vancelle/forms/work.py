@@ -73,21 +73,21 @@ class WorkIndexArgs(PaginationArgs):
         choices=[("any", "Any work type")]
         + [(cls.polymorphic_identity(), cls.info.noun_plural_title) for cls in Work.subclasses()],
         default="any",
-        validators=[wtforms.validators.Optional()],
+        validators=[wtforms.validators.InputRequired()],
     )
     shelf = wtforms.SelectField(
         label="Shelf",
         coerce=lambda x: None if x == "any" else Shelf(x),
         choices=[("any", "Any shelf")] + [(s.value, s.title) for s in Shelf],
         default="any",
-        validators=[wtforms.validators.Optional()],
+        validators=[wtforms.validators.InputRequired()],
     )
     case = wtforms.SelectField(
         label="Case",
         coerce=lambda x: None if x == "any" else Case(x),
         choices=[("any", "Any case")] + [(g.value, g.title) for g in Case],
         default="any",
-        validators=[wtforms.validators.Optional()],
+        validators=[wtforms.validators.InputRequired()],
     )
     deleted = wtforms.SelectField(
         label="Deleted",
@@ -97,13 +97,13 @@ class WorkIndexArgs(PaginationArgs):
             ("yes", "Only deleted works"),
         ],
         default="no",
-        validators=[wtforms.validators.DataRequired()],
+        validators=[wtforms.validators.InputRequired()],
     )
     has_entry_type = wtforms.SelectField(
         label="Entry type",
         choices=[("any", "Any entry types")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
         default="any",
-        validators=[wtforms.validators.Optional()],
+        validators=[wtforms.validators.InputRequired()],
     )
     has_entries = wtforms.SelectField(
         label="Has entries",
@@ -115,7 +115,7 @@ class WorkIndexArgs(PaginationArgs):
             ("no", "Works without entries"),
         ],
         default="any",
-        validators=[wtforms.validators.Optional()],
+        validators=[wtforms.validators.InputRequired()],
     )
     search = wtforms.SearchField(
         label="Search",
@@ -236,9 +236,9 @@ class WorkIndexArgs(PaginationArgs):
                 return Work.entries.any(Entry.type == value)
 
     @staticmethod
-    def _filter_search(value: str) -> ColumnElement[bool]:
+    def _filter_search(value: str | None) -> ColumnElement[bool]:
         match value:
-            case "":
+            case None | "":
                 return True_()
             case query:
                 return or_(

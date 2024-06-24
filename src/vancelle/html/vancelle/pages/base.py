@@ -51,7 +51,7 @@ def Page(
     ]
 
     body = [
-        PageNavbar(sources=source_controller.sources),
+        PageNavbar(),
         *before,
         main({"class": "container-fluid my-5" if fluid else "container my-5"}, content),
         *after,

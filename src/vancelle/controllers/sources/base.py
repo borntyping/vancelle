@@ -12,7 +12,7 @@ E = typing.TypeVar("E", bound=Entry)
 
 @dataclasses.dataclass()
 class Source(typing.Generic[E], abc.ABC):
-    """All sources have a remote type, but not all remote types have a source."""
+    """All sources have an entry type, but not all entry types have a source."""
 
     work_type: typing.ClassVar[typing.Type[Work]]
     entry_type: typing.ClassVar[typing.Type[Entry]]
@@ -20,7 +20,7 @@ class Source(typing.Generic[E], abc.ABC):
     @abc.abstractmethod
     def fetch(self, entry_id: str) -> E:
         """
-        Return a single Remote, fetched from an external source.
+        Return a single Entry, fetched from an external source.
 
         May implement caching if desired.
         """

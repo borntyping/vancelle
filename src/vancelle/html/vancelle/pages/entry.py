@@ -107,12 +107,12 @@ def EntrySearchPage(
     )
 
 
-def EntryDetailPage(entry: Entry, /, *, candidate_work: typing.Optional[Work]) -> Heavymetal:
+def EntryDetailPage(entry: Entry) -> Heavymetal:
     details = entry.into_details()
     return Page(
         [
             PageHeader(maybe_str(details.title), f"{entry.info.noun_full} {entry.id}"),
-            EntryDetailsPanel(entry, candidate_work=candidate_work),
+            EntryDetailsPanel(entry),
         ],
         title=["Entry", maybe_str(details.title)],
     )

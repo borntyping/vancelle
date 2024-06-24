@@ -1,8 +1,5 @@
-import typing
-
 import flask
 
-from vancelle.controllers.sources.base import Source
 from vancelle.forms.work import WorkForm, WorkShelfForm, WorkIndexArgs
 from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
@@ -126,7 +123,7 @@ def work_shelf_form_group(work: Work, work_shelf_form: WorkShelfForm) -> Heavyme
     )
 
 
-def work_detail_page(work: Work, work_shelf_form: WorkShelfForm, sources: typing.Sequence[Source]) -> Heavymetal:
+def work_detail_page(work: Work, work_shelf_form: WorkShelfForm) -> Heavymetal:
     details = work.resolve_details()
 
     title = work.resolve_title()
@@ -159,7 +156,7 @@ def work_detail_page(work: Work, work_shelf_form: WorkShelfForm, sources: typing
                 {"class": "v-block"},
                 [
                     SectionHeader("Search external sources", f"Search external sources for {quote_str(details.title)}"),
-                    row({}, [col({}, [SourceListGroup(sources, candidate_work=work)])]),
+                    row({}, [col({}, [SourceListGroup(work=work)])]),
                 ],
             ),
         ],

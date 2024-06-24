@@ -23,17 +23,17 @@ def before_request():
 
 @bp.route("/")
 def index():
-    return render(ExternalIndexPage(sources=controller.sources))
+    return render(ExternalIndexPage())
 
 
 @bp.route("/<string:entry_type>")
 def search(entry_type: str):
     args = SourceSearchArgs(formdata=flask.request.args)
 
-    candidate_work_id = flask.request.args.get("candidate_work_id", type=uuid.UUID)
-    candidate_work = work_controller.get(candidate_work_id)
+    work_id = flask.request.args.get("work_id", type=uuid.UUID)
+    work = work_controller.get(work_id)
 
-    query = args.search.data or (candidate_work and candidate_work.resolve_title()) or ""
+    query = args.search.data or (work and work.resolve_title()) or ""
     items = controller[entry_type].search(query)
 
     return render(
@@ -42,28 +42,33 @@ def search(entry_type: str):
             source=controller[entry_type],
             args=args,
             items=items,
-            candidate_work=candidate_work,
+            work=work,
         )
     )
 
 
 @bp.route("/<string:entry_type>/<string:entry_id>", methods={"get"})
 def detail(entry_type: str, entry_id: str):
+    work_id = flask.request.args.get("work_id", type=uuid.UUID)
+
     source = controller[entry_type]
     entry = source.fetch(entry_id)
+    work = work_controller.get(work_id)
 
-    candidate_work_id = flask.request.args.get("work_id", type=uuid.UUID)
-    candidate_work = work_controller.get(candidate_work_id)
-
-    return SourceDetailPage(source=source, entry=entry, candidate_work=candidate_work)
+    return SourceDetailPage(source=source, entry=entry, work=work)
 
 
 @bp.route("/<string:entry_type>/<string:entry_id>/-/import", methods={"post"}, endpoint="import")
-def import_from_source(entry_type: str, entry_id: str):
-    source = controller[entry_type]
-    entry = source.fetch(entry_id)
+def import_(entry_type: str, entry_id: str):
+    work_id = flask.request.args.get("work_id", type=uuid.UUID)
 
-    candidate_work_id = flask.request.args.get("work_id", type=uuid.UUID)
-    candidate_work = work_controller.get(candidate_work_id)
+    work = controller.import_entry(entry_type=entry_type, entry_id=entry_id, work_id=work_id)
 
-    raise NotImplementedError
+    return flask.redirect(work.url_for())
+
+
+@bp.route("/<string:entry_type>/<string:entry_id>/-/refresh", methods={"post"})
+def refresh(entry_type: str, entry_id: str):
+    entry = controller.refresh(entry_type=entry_type, entry_id=entry_id)
+
+    return flask.redirect(entry.url_for())

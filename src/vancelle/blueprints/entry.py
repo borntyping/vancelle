@@ -44,12 +44,9 @@ def index(entry_type: str | None):
 
 @bp.route("/<string:entry_type>/<string:entry_id>")
 def detail(entry_type: str, entry_id: str):
-    candidate_work_id = flask.request.args.get("work_id", type=uuid.UUID)
-
     entry = controller.get_or_404(entry_type, entry_id)
-    candidate_work = work_controller.get(candidate_work_id)
 
-    return render(EntryDetailPage(entry, candidate_work=candidate_work))
+    return render(EntryDetailPage(entry))
 
 
 @bp.route("/<string:entry_type>/<string:entry_id>/cover")

@@ -41,7 +41,7 @@ def create():
 
 @bp.route("/<uuid:record_id>/", methods={"GET", "POST"})
 def detail(record_id: uuid.UUID):
-    record = controller.select(record_id)
+    record = controller.get(record_id)
     record_form = RecordForm(obj=record)
 
     if record_form.validate_on_submit():

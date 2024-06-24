@@ -54,15 +54,15 @@ def index():
 
 @bp.route("/<uuid:work_id>")
 def detail(work_id: uuid.UUID):
-    work = controller.get_or_error(id=work_id)
+    work = controller.get_or_404(work_id)
     work_shelf_form = WorkShelfForm(obj=work)
-    return render(work_detail_page(work=work, work_shelf_form=work_shelf_form, sources=source_controller.sources))
+    return render(work_detail_page(work=work, work_shelf_form=work_shelf_form))
 
 
 @bp.route("/<uuid:work_id>/cover")
 def cover(work_id: uuid.UUID):
     images = svcs.flask.get(ImageCache)
-    work = controller.get_or_error(id=work_id)
+    work = controller.get_or_404(work_id)
     if not work.cover:
         raise werkzeug.exceptions.NotFound("Work has no cover image.")
     return images.as_response(work.cover)
@@ -71,7 +71,7 @@ def cover(work_id: uuid.UUID):
 @bp.route("/<uuid:work_id>/background")
 def background(work_id: uuid.UUID):
     images = svcs.flask.get(ImageCache)
-    work = controller.get_or_error(id=work_id)
+    work = controller.get_or_404(work_id)
     if not work.background:
         raise werkzeug.exceptions.NotFound("Work has no background image.")
     return images.as_response(work.background)
@@ -79,7 +79,7 @@ def background(work_id: uuid.UUID):
 
 @bp.route("/<uuid:work_id>/-/shelve", methods={"post"})
 def shelve(work_id: uuid.UUID):
-    work = controller.get_or_error(id=work_id)
+    work = controller.get_or_404(work_id)
     work_shelf_form = WorkShelfForm(obj=work)
 
     if work_shelf_form.validate_on_submit():
@@ -93,7 +93,7 @@ def shelve(work_id: uuid.UUID):
 
 @bp.route("/<uuid:work_id>/-/update", methods={"get", "post"})
 def update(work_id: uuid.UUID):
-    work = controller.get_or_error(id=work_id)
+    work = controller.get_or_404(work_id)
     work_form = WorkForm(obj=work)
 
     if work_form.validate_on_submit():
@@ -106,17 +106,17 @@ def update(work_id: uuid.UUID):
 
 @bp.route("/<uuid:work_id>/-/delete", methods={"post"})
 def delete(work_id: uuid.UUID):
-    controller.delete(controller.get_or_error(id=work_id))
+    controller.delete(controller.get_or_404(work_id))
     return htmx.refresh()
 
 
 @bp.route("/<uuid:work_id>/-/restore", methods={"post"})
 def restore(work_id: uuid.UUID):
-    controller.restore(controller.get_or_error(id=work_id))
+    controller.restore(controller.get_or_404(work_id))
     return htmx.refresh()
 
 
 @bp.route("/<uuid:work_id>/-/permanently-delete", methods={"post"})
 def permanently_delete(work_id: uuid.UUID):
-    controller.permanently_delete(controller.get_or_error(id=work_id))
+    controller.permanently_delete(controller.get_or_404(work_id))
     return htmx.redirect(flask.url_for(".index"))

@@ -1,5 +1,3 @@
-import typing
-
 import flask
 import flask_login
 
@@ -64,7 +62,7 @@ def _EntryDropdown() -> Heavymetal:
     )
 
 
-def _NewWorksDropdown(sources: typing.Sequence[Source]) -> Heavymetal:
+def _NewWorksDropdown() -> Heavymetal:
     return nav_item_dropdown(
         "Add new work",
         [
@@ -92,14 +90,14 @@ def _UserDropdown() -> Heavymetal:
     )
 
 
-def PageNavbar(sources: typing.Sequence[Source]) -> Heavymetal:
+def PageNavbar() -> Heavymetal:
     return navbar(
         navbar_brand(name="Vancelle", href=flask.url_for("home.home")),
         [
             _BoardDropdown(),
             _WorkDropdown(),
             _EntryDropdown(),
-            _NewWorksDropdown(sources=sources),
+            _NewWorksDropdown(),
         ],
         [
             _UserDropdown(),

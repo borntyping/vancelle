@@ -5,6 +5,7 @@ import uuid
 import flask_login
 import structlog
 from sqlalchemy import select
+from werkzeug.exceptions import NotFound
 
 from vancelle.extensions import db
 from vancelle.models import User
@@ -15,11 +16,14 @@ logger = structlog.get_logger(logger_name=__name__)
 
 @dataclasses.dataclass()
 class WorkController:
-    def get(self, id: uuid.UUID, /, *, user: User = flask_login.current_user) -> Work:
-        return db.session.execute(select(Work).filter_by(user_id=user.id, id=id)).scalar_one_or_none()
+    def get(self, work_id: uuid.UUID, /, *, user: User = flask_login.current_user) -> Work:
+        return db.session.execute(select(Work).filter_by(user_id=user.id, id=work_id)).scalar_one_or_none()
 
-    def get_or_error(self, *, user: User = flask_login.current_user, id: uuid.UUID) -> Work:
-        return db.session.execute(select(Work).filter_by(user_id=user.id, id=id)).scalar_one()
+    def get_or_404(self, work_id: uuid.UUID, /, *, user: User = flask_login.current_user):
+        if work := self.get(work_id, user=user):
+            return work
+
+        raise NotFound(f"Work {work_id} not found")
 
     def delete(self, work: Work) -> Work:
         work.time_deleted = datetime.datetime.now()

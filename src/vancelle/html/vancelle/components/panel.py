@@ -367,11 +367,6 @@ class WorkDetailsPanel(DetailsPanel):
 @dataclasses.dataclass()
 class EntryDetailsPanel(DetailsPanel):
     entry: Entry
-    candidate_work: typing.Optional[Work] = None
-
-    def __post_init__(self):
-        if self.entry.work_id and self.candidate_work:
-            raise Exception("Don't do this.")
 
     def id(self) -> str:
         return f"entry-{self.entry.id}"

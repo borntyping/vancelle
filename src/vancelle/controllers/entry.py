@@ -4,8 +4,10 @@ import typing
 import uuid
 
 import flask
+import flask_login
 import sqlalchemy
 import structlog
+from werkzeug.exceptions import NotFound
 
 from vancelle.controllers.sources import (
     GoodreadsPublicBookSource,
@@ -20,12 +22,12 @@ from vancelle.controllers.sources import (
 )
 from vancelle.controllers.sources.goodreads import GoodreadsPrivateBookSource
 from vancelle.extensions import db
-from vancelle.html.vancelle.pages.remote import RemoteSearchPage
+from vancelle.html.vancelle.pages.entry import EntrySearchPage
 from vancelle.lib.heavymetal import render
 from vancelle.lib.heavymetal.html import a, fragment
 from vancelle.lib.pagination import Pagination
 from vancelle.models import User
-from vancelle.models.remote import Remote
+from vancelle.models.entry import Entry
 from vancelle.models.work import Work
 from vancelle.shelf import Shelf
 
@@ -46,41 +48,53 @@ DEFAULT_MANAGERS = (
 
 
 @dataclasses.dataclass(init=False)
-class RemotesController:
+class EntryController:
     managers: typing.Mapping[str, Source]
 
     def __init__(self, managers: typing.Iterable[Source] = DEFAULT_MANAGERS) -> None:
-        self.managers = {m.remote_type.remote_type(): m for m in managers}
+        self.managers = {m.entry_type.polymorphic_identity(): m for m in managers}
 
-        for cls in Remote.subclasses():
-            if cls.remote_type() not in self.managers:
-                raise NotImplementedError(f"No manager registered for {cls.remote_type()} ({cls.info=})")
+        for cls in Entry.subclasses():
+            if cls.polymorphic_identity() not in self.managers:
+                raise NotImplementedError(f"No manager registered for {cls.polymorphic_identity()} ({cls.info=})")
 
-    def _get_remote_from_db(self, *, remote_type: str, remote_id: str) -> Remote:
-        return db.session.execute(self._get_remote_query(remote_type=remote_type, remote_id=remote_id)).scalar_one()
+    def _get_entry_from_db(self, *, entry_type: str, entry_id: str) -> Entry:
+        return db.session.execute(self._statement(entry_type, entry_id, flask_login.current_user)).scalar_one()
 
-    def _get_remote_from_db_or_none(self, *, remote_type: str, remote_id: str) -> Remote | None:
-        return db.session.execute(self._get_remote_query(remote_type=remote_type, remote_id=remote_id)).scalar_one_or_none()
+    def _get_entry_from_db_or_none(self, *, entry_type: str, entry_id: str) -> Entry | None:
+        return db.session.execute(self._statement(entry_type, entry_id, flask_login.current_user)).scalar_one_or_none()
 
-    def _get_remote_query(self, remote_type: str, remote_id: str) -> sqlalchemy.Select:
-        return sqlalchemy.select(Remote).filter(Remote.type == remote_type, Remote.id == remote_id)
+    def _statement(self, entry_type: str, entry_id: str, user: User) -> sqlalchemy.Select[tuple[Entry]]:
+        return (
+            sqlalchemy.select(Entry)
+            .join(Work)
+            .options(sqlalchemy.joinedload(Entry.work))
+            .filter(
+                Entry.type == entry_type,
+                Entry.id == entry_id,
+                Work.user_id == user.id,
+            )
+        )
 
-    def get_work(self, work_id: int | None) -> Work | None:
-        return db.session.get(Work, work_id) if work_id else None
+    def get_or_404(self, entry_type: str, entry_id: str, *, user: User = flask_login.current_user) -> Entry:
+        if entry := db.session.execute(self._statement(entry_type, entry_id, user=user)).scalar_one_or_none():
+            return entry
 
-    def get_remote(self, remote_type: str, remote_id: str) -> Remote:
-        log = logger.bind(remote_type=remote_type, remote_id=remote_id)
+        raise NotFound(f"Entry {entry_type!r}:{entry_id!r} not found")
 
-        if remote := self._get_remote_from_db_or_none(remote_type=remote_type, remote_id=remote_id):
-            log.debug("Fetched remote from database")
-            return remote
+    # def get_entry(self, entry_type: str, entry_id: str) -> Entry:
+    #     log = logger.bind(entry_type=entry_type, entry_id=entry_id)
+    #
+    #     if remote := self._get_remote_from_db_or_none(entry_type=entry_type, entry_id=entry_id):
+    #         log.debug("Fetched remote from database")
+    #         return remote
+    #
+    #     remote = self.managers[entry_type].fetch(entry_id)
+    #     log.debug("Fetched remote from source")
+    #     return remote
 
-        remote = self.managers[remote_type].fetch(remote_id)
-        log.debug("Fetched remote from source")
-        return remote
-
-    def refresh(self, remote_type: str, remote_id: str) -> Remote:
-        old_remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+    def refresh(self, entry_type: str, entry_id: str) -> Entry:
+        old_remote = self._get_entry_from_db(entry_type=entry_type, entry_id=entry_id)
 
         new_remote = self.managers[old_remote.type].fetch(old_remote.id)
         new_remote.work_id = old_remote.work_id
@@ -93,32 +107,34 @@ class RemotesController:
         flask.flash(f"Refreshed {new_remote.info.noun_full} {new_remote.id}.", "Refreshed remote")
         return new_remote
 
-    def delete(self, *, remote_type: str, remote_id: str) -> Remote:
-        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+    def delete(self, *, entry_type: str, entry_id: str) -> Entry:
+        remote = self._get_entry_from_db(entry_type=entry_type, entry_id=entry_id)
         remote.time_deleted = sqlalchemy.func.now()
         db.session.add(remote)
         db.session.commit()
         return remote
 
-    def restore(self, *, remote_type: str, remote_id: str) -> Remote:
-        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+    def restore(self, *, entry_type: str, entry_id: str) -> Entry:
+        remote = self._get_entry_from_db(entry_type=entry_type, entry_id=entry_id)
         remote.time_deleted = None
         db.session.add(remote)
         db.session.commit()
         return remote
 
-    def permanently_delete(self, *, remote_type: str, remote_id: str) -> None:
-        remote = self._get_remote_from_db(remote_type=remote_type, remote_id=remote_id)
+    def permanently_delete(self, *, entry_type: str, entry_id: str) -> None:
+        remote = self._get_entry_from_db(entry_type=entry_type, entry_id=entry_id)
         db.session.delete(remote)
         db.session.commit()
         return None
 
-    def create_work(self, *, remote_id: str, remote_type: str, user: User) -> Work:
+    def create_work(self, *, entry_id: str, entry_type: str, user: User) -> Work:
         """
         Create a new remote and a new work.
+
+        TODO: Move this to the SourceController.
         """
 
-        if remote := self._get_remote_from_db_or_none(remote_type=remote_type, remote_id=remote_id):
+        if remote := self._get_entry_from_db_or_none(entry_type=entry_type, entry_id=entry_id):
             logger.info("Instructed to create a remote that already exists")
             flask.flash(
                 render(fragment([a({"href": remote.url_for()}, [remote.title]), "is already attached to a work."])),
@@ -127,8 +143,8 @@ class RemotesController:
             assert remote.work
             return remote.work
 
-        manager = self.managers[remote_type]
-        remote = manager.fetch(remote_id)
+        manager = self.managers[entry_type]
+        remote = manager.fetch(entry_id)
         assert not remote.work
 
         work = manager.work_type(
@@ -141,7 +157,7 @@ class RemotesController:
         db.session.commit()
         return work
 
-    def _assign_shelf(self, remote: Remote) -> Shelf:
+    def _assign_shelf(self, remote: Entry) -> Shelf:
         if remote.shelf is not None:
             return remote.shelf
 
@@ -150,20 +166,20 @@ class RemotesController:
 
         return Shelf.UNSORTED
 
-    def link_work(self, *, remote_id: str, remote_type: str, work_id: uuid.UUID) -> Work:
+    def link_work(self, *, entry_id: str, entry_type: str, work_id: uuid.UUID) -> Work:
         """Create a new remote, linked to an existing work."""
-        log = logger.bind(remote_id=remote_id, remote_type=remote_type, work_id=work_id)
+        log = logger.bind(entry_id=entry_id, entry_type=entry_type, work_id=work_id)
         work = db.session.get(Work, work_id)
 
         # if remote := db.session.execute(
-        #     select(Remote).filter(Remote.work_id == work_id, Remote.type == remote_type)
+        #     select(Remote).filter(Remote.work_id == work_id, Remote.type == entry_type)
         # ).scalar_one_or_none():
         #     log.info("Remote already exists in database", remote=remote)
-        #     raise Exception(f"Work already has a {remote_type} remote attached.")
+        #     raise Exception(f"Work already has a {entry_type} remote attached.")
 
-        remote = self.managers[remote_type].fetch(remote_id)
+        remote = self.managers[entry_type].fetch(entry_id)
         log.info("Fetched remote", remote=remote)
-        work.remotes.append(remote)
+        work.entries.append(remote)
         db.session.add(work)
         db.session.commit()
         return work
@@ -171,7 +187,7 @@ class RemotesController:
     def render_search(
         self,
         *,
-        remote_type: typing.Type[Remote],
+        entry_type: typing.Type[Entry],
         candidate_work_id: uuid.UUID | None,
         query: str | None,
     ) -> str:
@@ -186,8 +202,8 @@ class RemotesController:
             candidate_work = None
 
         if query:
-            remote_items = self.managers[remote_type.remote_type()].search(query)
+            remote_items = self.managers[entry_type.polymorphic_identity()].search(query)
         else:
             remote_items = Pagination.empty()
 
-        return render(RemoteSearchPage(remote_type=remote_type, candidate_work=candidate_work, remote_items=remote_items))
+        return render(EntrySearchPage(entry_type=entry_type, candidate_work=candidate_work, entry_items=remote_items))

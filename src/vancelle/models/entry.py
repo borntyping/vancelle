@@ -32,20 +32,20 @@ T = typing.TypeVar("T")
 
 
 @dataclasses.dataclass(kw_only=True)
-class RemoteInfo(IntoProperties):
-    source: str  # Name of the source these remotes come from
-    noun: str  # Noun for this type of remote
-    noun_plural: str
-    noun_full: str  # Source and noun combined
+class EntryInfo(IntoProperties):
+    origin: str  # 'imported'
+    noun: str  # 'book'
+    noun_plural: str  # 'books'
+    noun_full: str  # 'imported book'
 
-    colour: ThemeColor  # Used in CSS
     priority: int = 0
+    colour: ThemeColor  # Used in CSS
 
     is_external_source: bool = True
 
     def __init__(
         self,
-        source: str,
+        origin: str,
         noun: str,
         *,
         colour: ThemeColor,
@@ -56,11 +56,11 @@ class RemoteInfo(IntoProperties):
         is_external_source: bool = True,
     ) -> None:
         self.colour = colour
-        self.source = source
+        self.origin = origin
         self.noun = noun
         self.noun_plural = noun_plural if noun_plural is not None else p.plural(noun)
-        self.noun_full = noun_full or f"{self.source} {self.noun}"
-        self.noun_full_plural = noun_full_plural or f"{self.source} {self.noun_plural}"
+        self.noun_full = noun_full or f"{self.origin} {self.noun}"
+        self.noun_full_plural = noun_full_plural or f"{self.origin} {self.noun_plural}"
         self.priority = priority
         self.is_external_source = is_external_source
 
@@ -71,18 +71,26 @@ class RemoteInfo(IntoProperties):
         return self.noun if count == 1 else self.noun_plural
 
     def plural_full(self, count: int) -> str:
-        return f"{self.source} {self.plural(count)}"
+        return f"{self.origin} {self.plural(count)}"
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield StringProperty("Name", self.noun_full, title="Type of remote metadata.")
-        yield StringProperty("Priority", self.priority, title="Priority for this type of remote metadata.")
+        yield StringProperty("Name", self.noun_full, title="Entry type.")
+        yield StringProperty("Priority", self.priority, title="Priority for this entry type.")
 
 
-class Remote(PolymorphicBase, IntoDetails, IntoProperties):
+class Entry(PolymorphicBase, IntoDetails, IntoProperties):
+    """
+    An entry in our catalogue.
+
+    Works are made up of multiple entries.
+
+    An entry *may* represent remote data from an external source.
+    """
+
     __tablename__ = "remote"
     __mapper_args__ = {"polymorphic_on": "type"}
 
-    info: typing.ClassVar[RemoteInfo]
+    info: typing.ClassVar[EntryInfo]
 
     work_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("work.id", ondelete="cascade"))
     type: Mapped[str] = mapped_column(primary_key=True)
@@ -105,36 +113,32 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
     # The 'shelf' column is vestigial and can be removed. Check for data loss first.
     shelf: Mapped[typing.Optional[Shelf]] = mapped_column(ShelfEnum, default=None)
 
-    work: Mapped["Work"] = relationship(back_populates="remotes", lazy="selectin")
+    work: Mapped["Work"] = relationship(back_populates="entries", lazy="selectin")
 
-    def url_for(self, candidate_work: typing.Optional["Work"] = None) -> str:
-        return url_for(
-            "remote.detail",
-            remote_type=self.type,
-            remote_id=self.id,
-            candidate_work_id=candidate_work.id if candidate_work else None,
-        )
+    def url_for(self) -> str:
+        return url_for("entry.detail", entry_type=self.type, entry_id=self.id)
 
     def url_for_cover(self) -> str | None:
-        return url_for("remote.cover", remote_type=self.type, remote_id=self.id) if self.cover else None
+        return url_for("entry.cover", entry_type=self.type, entry_id=self.id) if self.cover else None
 
     def url_for_background(self) -> str | None:
-        return url_for("remote.background", remote_type=self.type, remote_id=self.id) if self.background else None
+        return url_for("entry.background", entry_type=self.type, entry_id=self.id) if self.background else None
 
-    def url_for_type(self) -> str:
-        return flask.url_for("remote.index", remote_type=type(self))
+    def url_for_index(self) -> str:
+        return flask.url_for("entry.index", entry_type=self.type)
 
     def url_for_delete(self) -> str:
-        return flask.url_for("remote.delete", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+        return flask.url_for("entry.delete", entry_type=self.type, entry_id=self.id)
 
     def url_for_restore(self) -> str:
-        return flask.url_for("remote.restore", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+        return flask.url_for("entry.restore", entry_type=self.type, entry_id=self.id)
 
     def url_for_permanently_delete(self) -> str:
-        return flask.url_for("remote.permanently_delete", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+        return flask.url_for("entry.permanently_delete", entry_type=self.type, entry_id=self.id)
 
     def url_for_refresh(self) -> str:
-        return flask.url_for("remote.refresh", work_id=self.work_id, remote_type=self.type, remote_id=self.id)
+        assert self.info.is_external_source, "Entry type is not an external source"
+        return flask.url_for("source.refresh", entry_type=self.type, entry_id=self.id)
 
     @property
     def deleted(self) -> bool:
@@ -157,31 +161,23 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
         )
 
     def into_properties(self) -> typing.Iterable[Property]:
-        yield CodeProperty("ID", self.id, title="Unique ID for this remote metadata.")
+        yield CodeProperty("ID", self.id, title="Unique ID for this entry.")
         yield ExternalUrlProperty("Cover", self.cover)
         yield ExternalUrlProperty("Background", self.background)
 
     def resolve_title(self) -> str:
-        return self.title if self.title else f"Remote {self.id}"
-
-    @classmethod
-    def remote_type(cls) -> str:
-        return cls.polymorphic_identity()
-
-    @classmethod
-    def iter_subclasses_external(cls) -> typing.Sequence[typing.Type[typing.Self]]:
-        return [remote_type for remote_type in cls.subclasses() if remote_type.info.is_external_source]
+        return self.title if self.title else f"Entry {self.type}:{self.id}"
 
 
 class ImportedWorkAttributes(typing.TypedDict):
     filename: str
 
 
-class ImportedWork(Remote):
+class ImportedWork(Entry):
     __mapper_args__ = {"polymorphic_identity": "imported"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="dark",
-        source="Imported",
+        origin="Imported",
         noun="work",
         priority=-1,
         is_external_source=False,
@@ -193,13 +189,13 @@ class ImportedWork(Remote):
         yield StringProperty("External URL", self.data.get("url"))
 
 
-class GoodreadsPrivateBook(Remote):
+class GoodreadsPrivateBook(Entry):
     """A Goodreads book imported from a CSV export or HTML dump of a user's books list."""
 
     __mapper_args__ = {"polymorphic_identity": "goodreads.book"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="dark",
-        source="Goodreads",
+        origin="Goodreads",
         noun="book (imported)",
         noun_full="Goodreads book (imported)",
         noun_full_plural="Goodreads books (imported)",
@@ -221,13 +217,13 @@ class GoodreadsPrivateBook(Remote):
         yield StringProperty("ASIN", self.data.get("asin"))
 
 
-class GoodreadsPublicBook(Remote):
+class GoodreadsPublicBook(Entry):
     """A Goodreads book scraped from the Goodreads website, without logging in."""
 
     __mapper_args__ = {"polymorphic_identity": "goodreads.book.public"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="success",
-        source="Goodreads",
+        origin="Goodreads",
         noun="book",
         noun_full="Goodreads book",
         priority=13,
@@ -248,11 +244,11 @@ class GoodreadsPublicBook(Remote):
             yield StringProperty("Series", scraped.get("series"))
 
 
-class OpenlibraryWork(Remote):
+class OpenlibraryWork(Entry):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.work"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="success",
-        source="Open Library",
+        origin="Open Library",
         noun="work",
         priority=11,
     )
@@ -261,11 +257,11 @@ class OpenlibraryWork(Remote):
         return f"https://openlibrary.org/works/{self.id}"
 
 
-class OpenlibraryEdition(Remote):
+class OpenlibraryEdition(Entry):
     __mapper_args__ = {"polymorphic_identity": "openlibrary.edition"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="success",
-        source="Open Library",
+        origin="Open Library",
         noun="edition",
         priority=12,
         is_external_source=False,
@@ -281,11 +277,11 @@ class OpenlibraryEdition(Remote):
         yield ExternalUrlProperty("API", self.data.get("url"))
 
 
-class RoyalroadFiction(Remote):
+class RoyalroadFiction(Entry):
     __mapper_args__ = {"polymorphic_identity": "royalroad.fiction"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="success",
-        source="Royal Road",
+        origin="Royal Road",
         noun="fiction",
         noun_plural="fictions",
         priority=20,
@@ -295,11 +291,11 @@ class RoyalroadFiction(Remote):
         return f"https://www.royalroad.com/fiction/{self.id}"
 
 
-class SteamApplication(Remote):
+class SteamApplication(Entry):
     __mapper_args__ = {"polymorphic_identity": "steam.application"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="danger",
-        source="Steam",
+        origin="Steam",
         noun="app",
         priority=99,
     )
@@ -312,12 +308,12 @@ class SteamApplication(Remote):
         yield ExternalUrlProperty("Website", self.data.get("website"))
 
         if fullgame := self.data.get("fullgame"):
-            url = url_for("remote.detail", remote_type=self.remote_type(), remote_id=fullgame["appid"])
+            url = url_for("entry.detail", entry_type=self.type, entry_id=fullgame["appid"])
             yield InternalUrlProperty("Full game", url, fullgame["name"])
 
         if dlc := self.data.get("dlc"):
             for appid in dlc:
-                url = url_for("remote.detail", remote_type=self.remote_type(), remote_id=appid)
+                url = url_for("entry.detail", entry_type=self.type, entry_id=appid)
                 yield InternalUrlProperty("DLC", url, str(appid))
 
         yield IterableProperty("Developers", [d for d in self.data.get("developers", []) if d])
@@ -331,11 +327,11 @@ class SteamApplication(Remote):
         yield ExternalUrlProperty("Header image", self.data.get("header_image"))
 
 
-class TmdbMovie(Remote):
+class TmdbMovie(Entry):
     __mapper_args__ = {"polymorphic_identity": "tmdb.movie"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="info",
-        source="TMDB",
+        origin="TMDB",
         noun="movie",
         priority=40,
     )
@@ -344,11 +340,11 @@ class TmdbMovie(Remote):
         return f"https://www.themoviedb.org/movie/{self.id}"
 
 
-class TmdbTvSeries(Remote):
+class TmdbTvSeries(Entry):
     __mapper_args__ = {"polymorphic_identity": "tmdb.tv"}
-    info = RemoteInfo(
+    info = EntryInfo(
         colour="info",
-        source="TMDB",
+        origin="TMDB",
         noun="series",
         priority=31,
     )

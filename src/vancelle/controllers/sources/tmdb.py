@@ -4,18 +4,18 @@ from vancelle.clients.tmdb.client import TmdbAPI
 from vancelle.controllers.sources.base import Source
 from ...lib.pagination import Pagination
 from vancelle.inflect import p
-from vancelle.models.remote import TmdbMovie, TmdbTvSeries
+from vancelle.models.entry import TmdbMovie, TmdbTvSeries
 from vancelle.models.work import Film, Show
 from ...lib.pagination.flask import FlaskPaginationArgs
 
 
 class TmdbMovieSource(Source[TmdbMovie]):
-    remote_type = TmdbMovie
+    entry_type = TmdbMovie
     work_type = Film
 
-    def fetch(self, remote_id: str) -> TmdbMovie:
+    def fetch(self, entry_id: str) -> TmdbMovie:
         client = svcs.flask.get(TmdbAPI)
-        data = client.movie(remote_id)
+        data = client.movie(entry_id)
         return TmdbMovie(
             id=str(data["id"]),
             title=data["title"],
@@ -48,12 +48,12 @@ class TmdbMovieSource(Source[TmdbMovie]):
 
 
 class TmdbTvSeriesSource(Source[TmdbTvSeries]):
-    remote_type = TmdbTvSeries
+    entry_type = TmdbTvSeries
     work_type = Show
 
-    def fetch(self, remote_id: str) -> TmdbTvSeries:
+    def fetch(self, entry_id: str) -> TmdbTvSeries:
         client = svcs.flask.get(TmdbAPI)
-        data = client.tv(remote_id)
+        data = client.tv(entry_id)
         return TmdbTvSeries(
             id=str(data["id"]),
             title=data["name"],

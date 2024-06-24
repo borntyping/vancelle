@@ -15,7 +15,7 @@ logger = structlog.get_logger(logger_name=__name__)
 
 @dataclasses.dataclass()
 class WorkController:
-    def get(self, *, user: User = flask_login.current_user, id: uuid.UUID) -> Work:
+    def get(self, id: uuid.UUID, /, *, user: User = flask_login.current_user) -> Work:
         return db.session.execute(select(Work).filter_by(user_id=user.id, id=id)).scalar_one_or_none()
 
     def get_or_error(self, *, user: User = flask_login.current_user, id: uuid.UUID) -> Work:

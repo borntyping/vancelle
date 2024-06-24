@@ -20,7 +20,7 @@ def SourceListGroup(sources: typing.Sequence[Source], *, candidate_work: typing.
                     "class": "list-group-item list-group-item-action",
                     "href": flask.url_for(
                         "source.search",
-                        remote_type=source.remote_type.polymorphic_identity(),
+                        entry_type=source.polymorphic_identity(),
                         candidate_work=candidate_work,
                     ),
                 },

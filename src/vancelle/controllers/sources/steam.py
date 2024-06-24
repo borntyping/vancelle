@@ -12,7 +12,7 @@ from ...extensions import db
 from ...inflect import p
 from ...lib.pagination.flask import FlaskPaginationArgs
 from ...models import Base
-from ...models.remote import SteamApplication
+from ...models.entry import SteamApplication
 from ...models.work import Game
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -26,16 +26,16 @@ class SteamAppID(Base):
 
 
 class SteamApplicationSource(Source):
-    remote_type = SteamApplication
+    entry_type = SteamApplication
     work_type = Game
 
-    def fetch(self, remote_id: str) -> SteamApplication:
+    def fetch(self, entry_id: str) -> SteamApplication:
         api = svcs.flask.get(SteamStoreAPI)
 
-        appdetails = api.appdetails(remote_id)
+        appdetails = api.appdetails(entry_id)
 
         if appdetails is None:
-            return SteamApplication(id=remote_id, data={})
+            return SteamApplication(id=entry_id, data={})
 
         release_date = api.parse_release_date(appdetails["release_date"])
         vertical_capsule = api.vertical_capsule(appdetails, check=True)

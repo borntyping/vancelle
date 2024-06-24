@@ -1,6 +1,7 @@
 import typing
 
 import sqlalchemy.orm
+from werkzeug.exceptions import NotFound
 
 
 class Base(sqlalchemy.orm.DeclarativeBase):
@@ -27,4 +28,11 @@ class PolymorphicBase(Base):
 
     @classmethod
     def get_subclass(cls, name: str) -> typing.Type[typing.Self]:
+        return cls.__mapper__.polymorphic_map[name].class_
+
+    @classmethod
+    def get_subclass_or_404(cls, name: str) -> typing.Type[typing.Self]:
+        if name not in cls.__mapper__.polymorphic_map:
+            raise NotFound(f"No {cls.__name__} type {name!r}")
+
         return cls.__mapper__.polymorphic_map[name].class_

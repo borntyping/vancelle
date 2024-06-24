@@ -4,7 +4,6 @@ import typing
 import flask_login
 import flask_wtf
 import structlog
-import werkzeug.exceptions
 import wtforms.csrf.core
 import wtforms.validators
 from sqlalchemy import ColumnElement, Select, True_, desc, distinct, or_, select
@@ -18,7 +17,7 @@ from vancelle.forms.bootstrap import BootstrapMeta
 from vancelle.forms.pagination import PaginationArgs
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Record
-from vancelle.models.remote import ImportedWork, Remote
+from vancelle.models.entry import ImportedWork, Entry
 from vancelle.models.work import Book, Work
 from vancelle.shelf import Case, Shelf
 
@@ -27,7 +26,7 @@ SHELF_FORM_CHOICES = {
     for group, items in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
 }
 
-TYPE_FORM_CHOICES = [(cls.work_type(), cls.info.noun_title) for cls in Work.subclasses()]
+TYPE_FORM_CHOICES = [(cls.polymorphic_identity(), cls.info.noun_title) for cls in Work.subclasses()]
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -71,7 +70,7 @@ class WorkIndexArgs(PaginationArgs):
 
     type = wtforms.SelectField(
         label="Work type",
-        choices=[("", "All works")] + [(cls.work_type(), cls.info.noun_plural_title) for cls in Work.subclasses()],
+        choices=[("", "All works")] + [(cls.polymorphic_identity(), cls.info.noun_plural_title) for cls in Work.subclasses()],
         default="",
         validators=[wtforms.validators.Optional()],
     )
@@ -99,19 +98,20 @@ class WorkIndexArgs(PaginationArgs):
         default="no",
         validators=[wtforms.validators.DataRequired()],
     )
-    has_remote_type = wtforms.SelectField(
-        label="Remote type",
-        choices=[("", "All remote types")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.subclasses()],
+    has_entry_type = wtforms.SelectField(
+        label="Entry type",
+        choices=[("", "All entry types")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
         default="",
         validators=[wtforms.validators.Optional()],
     )
-    has_remotes = wtforms.SelectField(
-        label="Has remote metadata",
+    has_entries = wtforms.SelectField(
+        label="Has entries",
         choices=[
-            ("", "All works"),
-            ("yes", "Works with remote metadata"),
-            ("imported", "Works with imported metadata"),
-            ("no", "Works without remote metadata"),
+            ("any", "Works with and without entries"),
+            ("yes", "Works with entries"),
+            ("external", "Works with external entries"),
+            ("imported", "Works with imported entries"),
+            ("no", "Works without entries"),
         ],
         default="",
         validators=[wtforms.validators.Optional()],
@@ -128,8 +128,8 @@ class WorkIndexArgs(PaginationArgs):
             shelf=repr(self.shelf.data),
             case=repr(self.case.data),
             deleted=repr(self.deleted.data),
-            has_remote_type=repr(self.has_remote_type.data),
-            has_remotes=repr(self.has_remotes.data),
+            has_entry_type=repr(self.has_entry_type.data),
+            has_entries=repr(self.has_entries.data),
             search=repr(self.search.data),
         )
 
@@ -179,11 +179,11 @@ class WorkIndexArgs(PaginationArgs):
             .distinct()
             .filter(Work.user_id == flask_login.current_user.id)
             .join(Record, isouter=True)
-            .join(Remote, isouter=True)
+            .join(Entry, isouter=True)
             .order_by(desc(Work.time_updated), desc(Work.time_created))
         )
 
-        statement = statement.filter(self._filter_work_deleted(self.deleted.data))
+        statement = statement.filter(self._filter_deleted(self.deleted.data))
 
         if self.type.data:
             statement = statement.filter(Work.type == self.type.data)
@@ -191,10 +191,10 @@ class WorkIndexArgs(PaginationArgs):
             statement = statement.filter(Work.shelf == self.shelf.data)
         if self.case.data:
             statement = statement.filter(Work.shelf.in_(self.case.data))
-        if self.has_remote_type.data:
-            statement = statement.filter(Remote.type == self.has_remote_type.data)
-        if self.has_remotes.data:
-            statement = statement.filter(self._filter_has_remotes(self.has_remotes.data))
+        if self.has_entry_type.data:
+            statement = statement.filter(Entry.type == self.has_entry_type.data)
+        if self.has_entries.data:
+            statement = statement.filter(self._filter_has_entries(self.has_entries.data))
         if self.search.data:
             statement = statement.filter(self._filter_search(self.search.data))
 
@@ -209,14 +209,14 @@ class WorkIndexArgs(PaginationArgs):
             Work.author.ilike(other),
             Work.series.ilike(other),
             Work.description.ilike(other),
-            Remote.title.ilike(other),
-            Remote.author.ilike(other),
-            Remote.series.ilike(other),
-            Remote.description.ilike(other),
+            Entry.title.ilike(other),
+            Entry.author.ilike(other),
+            Entry.series.ilike(other),
+            Entry.description.ilike(other),
         )
 
     @staticmethod
-    def _filter_work_deleted(value: str) -> ColumnElement[bool]:
+    def _filter_deleted(value: str) -> ColumnElement[bool]:
         match value:
             case "yes":
                 return Work.time_deleted.is_not(None)
@@ -225,22 +225,26 @@ class WorkIndexArgs(PaginationArgs):
             case "any":
                 return True_()
 
-        raise werkzeug.exceptions.BadRequest("Invalid work deleted filter")
+        raise ValueError(f"Invalid deleted filter: {value!r}")
 
     @staticmethod
-    def _filter_has_remotes(value: str) -> ColumnElement[bool]:
+    def _filter_has_entries(value: str) -> ColumnElement[bool]:
         imported = ImportedWork.__mapper__.polymorphic_identity
         match value:
+            case "any":
+                return True_()
             case "yes":
-                return Work.remotes.any()
-            case "remote":
-                return ~Work.remotes.any(Remote.type == imported)
+                return Work.entries.any()
+            case "external":
+                return Work.entries.any(Entry.type != imported)
             case "imported":
-                return ~Work.remotes.any(Remote.type != imported)
+                return Work.entries.any(Entry.type == imported)
             case "no":
-                return ~Work.remotes.any()
+                return ~Work.entries.any()
+            case _:
+                return Work.entries.any(Entry.type == value)
 
-        raise werkzeug.exceptions.BadRequest("Invalid remote data filter")
+        raise ValueError(f"Invalid has_entries filter: {value!r}")
 
 
 class WorkBoardArgs(WorkIndexArgs):

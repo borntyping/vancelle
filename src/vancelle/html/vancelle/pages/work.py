@@ -7,10 +7,10 @@ from vancelle.forms.work import WorkForm, WorkShelfForm, WorkIndexArgs
 from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.bootstrap.layout.grid import col, row
-from vancelle.html.vancelle.components.details import details_description
+from vancelle.html.vancelle.components.details import DetailsBox
 from vancelle.html.vancelle.components.layout import PageHeader, Section, SectionHeader
 from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote_str
-from vancelle.html.vancelle.components.panel import RemoteDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
+from vancelle.html.vancelle.components.panel import EntryDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
 from vancelle.html.vancelle.components.source import SourceListGroup
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.html.vancelle.components.work import return_to_work
@@ -59,7 +59,7 @@ def _work_form_page(
                             col({}, [form_control(work_form.shelf)]),
                         ],
                     ),
-                    SectionHeader("Details", "These details will overwrite any details provided by remote data"),
+                    SectionHeader("Details", "These details will overwrite any details provided by entries."),
                     row(
                         {"class": "mb-3"},
                         [
@@ -135,7 +135,7 @@ def work_detail_page(work: Work, work_shelf_form: WorkShelfForm, sources: typing
     work_details_panel = WorkDetailsPanel(work)
     work_records_panel = WorkRecordsPanel(work)
 
-    external_data_subtitle = f"Details sourced from {count_plural('remote', len(work.remotes))}"
+    external_data_subtitle = f"Details sourced from {count_plural('entry', len(work.entries))}"
     if work.into_details():
         external_data_subtitle += " and manually entered metadata"
 
@@ -152,7 +152,7 @@ def work_detail_page(work: Work, work_shelf_form: WorkShelfForm, sources: typing
                 {"class": "v-block"},
                 [
                     SectionHeader("External data", external_data_subtitle),
-                    row({"class": "row-cols-2 g-4"}, [col({}, [RemoteDetailsPanel(r)]) for r in work.iter_remotes()]),
+                    row({"class": "row-cols-2 g-4"}, [col({}, [EntryDetailsPanel(r)]) for r in work.iter_entries()]),
                 ],
             ),
             section(
@@ -246,8 +246,8 @@ def WorkIndexArgsForm(work_index_args: WorkIndexArgs) -> Heavymetal:
                 {"class": "mb-3"},
                 [
                     col({}, [work_index_args.deleted()]),
-                    col({}, [work_index_args.has_remote_type()]),
-                    col({}, [work_index_args.has_remotes()]),
+                    col({}, [work_index_args.has_entry_type()]),
+                    col({}, [work_index_args.has_entries()]),
                 ],
             ),
             row(
@@ -285,17 +285,17 @@ def WorkTable(works: Pagination[Work]) -> Heavymetal:
             {"style": "width: 20%;"},
         ],
         head=[
-            th({}, ["Type"]),
-            th({}, ["Title"]),
-            th({}, ["Remote"]),
+            th({}, ["Work Type"]),
+            th({}, ["Work"]),
+            th({}, ["Attachments"]),
         ],
         body=lambda work: [
             td({}, [work.info.noun_title]),
-            td({}, [details_description(work.resolve_details(), work.url_for())]),
+            td({}, [DetailsBox(work.resolve_details(), work.url_for())]),
             td(
                 {"class": "text-body-secondary"},
                 [
-                    count_plural("remote", len(work.remotes)),
+                    count_plural("entry", len(work.entries)),
                     ", ",
                     count_plural("record", len(work.records)),
                 ],
@@ -312,5 +312,5 @@ def work_index_page(works: Pagination[Work], work_index_args: WorkIndexArgs) -> 
             Section(WorkIndexArgsForm(work_index_args)),
             Section(WorkTable(works)),
         ],
-        title=["Remotes"],
+        title=["Works"],
     )

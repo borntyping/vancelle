@@ -10,7 +10,7 @@ from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.lib.heavymetal.html import a, div, h1, section
 from vancelle.inflect import p
 from vancelle.models import User
-from vancelle.models.remote import Remote
+from vancelle.models.entry import Entry
 from vancelle.models.work import Work
 from .base import Page
 
@@ -53,17 +53,17 @@ class HomePageGauges(HeavymetalComponent):
         )
         return db.session.execute(query).scalar_one()
 
-    def _count_remotes(self) -> int:
+    def _count_entries(self) -> int:
         query = (
             sqlalchemy.select(sqlalchemy.func.count())
-            .select_from(Remote)
+            .select_from(Entry)
             .join(Work)
             .join(User)
             .filter(User.id == flask_login.current_user.id)
         )
         return db.session.execute(query).scalar_one()
 
-    def _count_by_type(self, cls: typing.Type[Work | Remote]) -> dict[typing.Type[Work | Remote], int]:
+    def _count_by_type(self, cls: typing.Type[Work | Entry]) -> dict[typing.Type[Work | Entry], int]:
         subclasses = cls.subclasses()
 
         count = sqlalchemy.func.count().label("count")
@@ -76,15 +76,15 @@ class HomePageGauges(HeavymetalComponent):
         works = self._count_works()
         yield HomePageGauge(works, p.plural("Work", works), flask.url_for("work.index"), "primary")
 
-        remotes = self._count_remotes()
-        yield HomePageGauge(remotes, p.plural("Remote", remotes), flask.url_for("remote.index"), "primary")
+        entries = self._count_entries()
+        yield HomePageGauge(entries, p.plural("Entry", entries), flask.url_for("entry.index"), "primary")
 
         for cls, count in self._count_by_type(Work).items():
-            url = flask.url_for("work.index", work_type=cls.work_type())
+            url = flask.url_for("work.index", work_type=cls.polymorphic_identity())
             yield HomePageGauge(count, cls.info.noun_plural_title, url, "info")
 
-        for cls, count in self._count_by_type(Remote).items():
-            url = flask.url_for("work.index", remote_type=cls.remote_type())
+        for cls, count in self._count_by_type(Entry).items():
+            url = flask.url_for("work.index", entry_type=cls.polymorphic_identity())
             yield HomePageGauge(count, cls.info.noun_full_plural, url, cls.info.colour)
 
     def heavymetal(self) -> Heavymetal:

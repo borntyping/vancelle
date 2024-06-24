@@ -35,7 +35,7 @@ class DetailsJSON(HeavymetalComponent):
         return div({"class": "p-2"}, [pre({"class": "bg-body-tertiary rounded p-2"}, [code({}, [data])])])
 
 
-def details_description(details: Details, href: str) -> Heavymetal:
+def DetailsBox(details: Details, href: str) -> Heavymetal:
     return div(
         {"class": "position-relative"},
         [

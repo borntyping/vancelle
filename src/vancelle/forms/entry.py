@@ -9,25 +9,25 @@ from vancelle.extensions import db
 from .bootstrap import BootstrapMeta
 from .pagination import PaginationArgs
 from vancelle.lib.pagination import Pagination
-from vancelle.models import Remote, Work
+from vancelle.models import Entry, Work
 
 
-class RemoteIndexArgs(PaginationArgs):
+class EntryIndexArgs(PaginationArgs):
     class Meta(BootstrapMeta):
         csrf = False
 
     type = wtforms.SelectField(
-        label="Remote type",
-        choices=[("all", "All remotes")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Remote.subclasses()],
+        label="Entry type",
+        choices=[("all", "All entries")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
         default="all",
         validators=[wtforms.validators.Optional()],
     )
     deleted = wtforms.SelectField(
-        label="Deleted remotes",
+        label="Deleted entries",
         choices=[
-            ("no", "Exclude deleted remotes"),
-            ("any", "Include all remotes"),
-            ("yes", "Only deleted remotes"),
+            ("no", "Exclude deleted entries"),
+            ("any", "Include all entries"),
+            ("yes", "Only deleted entries"),
         ],
         default="no",
         validators=[wtforms.validators.DataRequired()],
@@ -40,15 +40,15 @@ class RemoteIndexArgs(PaginationArgs):
     def paginate(self) -> Pagination:
         return self.query(db.session, self._statement())
 
-    def _statement(self) -> Select[tuple[Remote]]:
+    def _statement(self) -> Select[tuple[Entry]]:
         return (
-            select(Remote)
-            .options(joinedload(Remote.work))
+            select(Entry)
+            .options(joinedload(Entry.work))
             .join(Work)
             .filter(Work.user_id == flask_login.current_user.id)
             .filter(self._filter_type(self.type.data))
             .filter(self._filter_deleted(self.deleted.data))
-            .order_by(desc(Remote.time_updated), desc(Remote.time_created))
+            .order_by(desc(Entry.time_updated), desc(Entry.time_created))
         )
 
     @staticmethod
@@ -57,16 +57,16 @@ class RemoteIndexArgs(PaginationArgs):
             case "all":
                 return True_()
             case _:
-                return Remote.type == value
+                return Entry.type == value
 
     @staticmethod
     def _filter_deleted(value: str) -> ColumnElement[bool]:
         match value:
             case "no":
-                return Remote.time_deleted.is_(None)
+                return Entry.time_deleted.is_(None)
             case "any":
                 return True_()
             case "yes":
-                return Remote.time_deleted.is_not(None)
+                return Entry.time_deleted.is_not(None)
 
         raise werkzeug.exceptions.BadRequest("Invalid work deleted filter")

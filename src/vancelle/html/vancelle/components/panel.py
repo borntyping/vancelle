@@ -35,7 +35,7 @@ from vancelle.lib.heavymetal.html import (
     thead,
     tr,
 )
-from vancelle.models import Record, Remote, Work
+from vancelle.models import Record, Entry, Work
 from vancelle.models.details import Details
 from vancelle.models.properties import Properties
 
@@ -342,8 +342,8 @@ class WorkDetailsPanel(DetailsPanel):
                 name="Permanently delete",
                 icon="trash",
                 title=(
-                    "Permanently delete this work and any attached records and remotes. "
-                    "It will not be possible to recover any details or records of this work."
+                    "Permanently delete this work and any attached records and entries. "
+                    "It will not be possible to recover this work."
                 ),
                 button_classes="text-danger",
             )
@@ -354,7 +354,7 @@ class WorkDetailsPanel(DetailsPanel):
                 name="Delete",
                 icon="trash",
                 title=(
-                    "Delete this work and any attached records and remotes. "
+                    "Delete this work and any attached records and entries. "
                     "Confirmation will be required before any data is permanently deleted."
                 ),
             )
@@ -365,63 +365,65 @@ class WorkDetailsPanel(DetailsPanel):
 
 
 @dataclasses.dataclass()
-class RemoteDetailsPanel(DetailsPanel):
-    remote: Remote
+class EntryDetailsPanel(DetailsPanel):
+    entry: Entry
     candidate_work: typing.Optional[Work] = None
 
     def __post_init__(self):
-        if self.remote.work_id and self.candidate_work:
+        if self.entry.work_id and self.candidate_work:
             raise Exception("Don't do this.")
 
     def id(self) -> str:
-        return f"remote-{self.remote.id}"
+        return f"entry-{self.entry.id}"
 
     def background_image(self) -> str | None:
-        return self.remote.background
+        return self.entry.background
 
     def details(self) -> Details:
-        return self.remote.into_details()
+        return self.entry.into_details()
 
     def properties(self) -> Properties:
-        return list(self.remote.into_properties())
+        return list(self.entry.into_properties())
 
     def type_properties(self) -> Properties:
-        return list(self.remote.info.into_properties())
+        return list(self.entry.info.into_properties())
 
     def data(self) -> str | None:
-        return self.remote.data
+        return self.entry.data
 
     def controls(self) -> typing.Sequence[PanelControl]:
         yield PanelControl(
-            href=self.remote.url_for(),
+            href=self.entry.url_for(),
             icon="database",
             name="Permalink",
             title="Permalink.",
         )
-        yield PanelControl(
-            post=True,
-            href=self.remote.url_for_refresh(),
-            icon="arrow-clockwise",
-            name="Refresh",
-            title="Update this remote data from it's source.",
-        )
 
-        if self.remote.deleted:
+        if self.entry.info.is_external_source:
             yield PanelControl(
                 post=True,
-                href=self.remote.url_for_restore(),
+                href=self.entry.url_for_refresh(),
+                icon="arrow-clockwise",
+                name="Refresh",
+                title="Update this entry from it's source.",
+            )
+
+        if self.entry.deleted:
+            yield PanelControl(
+                post=True,
+                href=self.entry.url_for_restore(),
                 icon="trash",
                 name="Restore",
-                title="Restore this remote data.",
+                title="Restore this entry.",
                 button_classes="text-success",
             )
             yield PanelControl(
                 post=True,
-                href=self.remote.url_for_permanently_delete(),
+                href=self.entry.url_for_permanently_delete(),
                 name="Permanently delete",
                 icon="trash",
                 title=(
-                    "Delete this remote data. "
+                    "Delete this entry. "
                     "It will not be possible to recover these details without fetching them from the original source."
                 ),
                 button_classes="text-danger",
@@ -430,29 +432,29 @@ class RemoteDetailsPanel(DetailsPanel):
         else:
             yield PanelControl(
                 post=True,
-                href=self.remote.url_for_delete(),
+                href=self.entry.url_for_delete(),
                 icon="trash",
                 name="Delete",
-                title="Delete this remote data. You will be able to restore it.",
+                title="Delete this entry. You will be able to restore it.",
             )
         yield PanelControl(
-            href=self.remote.work.url_for(),
+            href=self.entry.work.url_for(),
             icon="easel",
             name="View linked work",
-            title="View the work linked to this remote.",
+            title="View the work linked to this entry.",
         )
 
     def description(self) -> Heavymetal:
         link = a(
             {
                 "class": "link-body-emphasis",
-                "href": self.remote.external_url(),
+                "href": self.entry.external_url(),
                 "rel": "noopener noreferrer nofollow",
                 "target": "_blank",
             },
-            [f"{self.remote.info.noun_full} ", code({}, self.remote.id)],
+            [f"{self.entry.info.noun_full} ", code({}, self.entry.id)],
         )
-        released = [f", released {self.remote.release_date}"] if self.remote.release_date else []
+        released = [f", released {self.entry.release_date}"] if self.entry.release_date else []
         description = p({}, [link, *released, "."])
 
         attached_to = (
@@ -460,11 +462,11 @@ class RemoteDetailsPanel(DetailsPanel):
                 {},
                 [
                     "Attached to ",
-                    quote([a({"href": self.remote.work.url_for()}, [self.remote.work.resolve_details().title])]),
+                    quote([a({"href": self.entry.work.url_for()}, [self.entry.work.resolve_details().title])]),
                     ".",
                 ],
             )
-            if self.remote.work
+            if self.entry.work
             else ...
         )
 

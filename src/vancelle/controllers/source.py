@@ -9,7 +9,7 @@ class SourceController:
     mapping: typing.Mapping[str, Source]
 
     def __init__(self) -> None:
-        self.mapping = {source.remote_type.polymorphic_identity(): source for source in Source.subclasses()}
+        self.mapping = {source.entry_type.polymorphic_identity(): source for source in Source.subclasses()}
 
     def __iter__(self) -> typing.Iterable[Source]:
         return self.mapping.values()

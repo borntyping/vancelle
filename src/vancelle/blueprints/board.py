@@ -1,5 +1,3 @@
-import typing
-
 import flask.sansio.blueprints
 import flask_login
 import structlog
@@ -8,7 +6,6 @@ from vancelle.forms.work import WorkBoardArgs
 from vancelle.controllers.work import WorkController
 from vancelle.html.vancelle.pages.board import BoardPage
 from vancelle.lib.heavymetal import render
-from vancelle.models import Work
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -35,8 +32,3 @@ def index():
             layout=form.layout.data,
         )
     )
-
-
-@bp.route("/<work_type:work_type>/", methods={"GET"})
-def work_type_index(work_type: typing.Type[Work]):
-    raise NotImplementedError

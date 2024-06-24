@@ -9,7 +9,7 @@ import svcs.flask
 
 from vancelle.clients.client import HttpClient, HttpClientBuilder
 from vancelle.clients.common import parse_date
-from vancelle.models.remote import GoodreadsPublicBook
+from vancelle.models.entry import GoodreadsPublicBook
 
 logger = structlog.get_logger(logger_name=__name__)
 

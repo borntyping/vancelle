@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm.attributes import flag_modified
 
 from vancelle.models import User
-from vancelle.models.remote import GoodreadsPrivateBook
+from vancelle.models.entry import GoodreadsPrivateBook
 from vancelle.models.record import Record
 from vancelle.models.work import Book
 from vancelle.extensions import db
@@ -47,8 +47,8 @@ class GoodreadsImporter:
         db.session.commit()
         logger.warning("Imported books from Goodreads", count=len(items))
 
-    def get_remote(self, remote_id: str) -> GoodreadsPrivateBook | None:
-        return db.session.execute(select(GoodreadsPrivateBook).filter_by(id=remote_id)).scalar_one_or_none()
+    def get_entry(self, entry_id: str) -> GoodreadsPrivateBook | None:
+        return db.session.execute(select(GoodreadsPrivateBook).filter_by(id=entry_id)).scalar_one_or_none()
 
     def get_record(self, record_id: uuid.UUID) -> Record | None:
         return db.session.get(Record, record_id)
@@ -56,7 +56,7 @@ class GoodreadsImporter:
     def _create_or_update(
         self,
         *,
-        remote_id: str,
+        entry_id: str,
         title: str,
         author: str,
         release_date: datetime.date | None,
@@ -68,47 +68,47 @@ class GoodreadsImporter:
         isbn13: str | None,
         data: typing.Mapping[str, typing.Any],
     ):
-        log = logger.bind(remote_id=remote_id, title=title, author=author)
-        if remote := self.get_remote(remote_id):
+        log = logger.bind(entry_id=entry_id, title=title, author=author)
+        if entry := self.get_entry(entry_id):
             log.info("Updating existing Goodreads book")
         else:
             log.info("Creating new Goodreads book")
-            remote = GoodreadsPrivateBook(id=remote_id)
+            entry = GoodreadsPrivateBook(id=entry_id)
 
         if title:
-            remote.title = title
+            entry.title = title
         if author:
-            remote.author = author
+            entry.author = author
         if release_date:
-            remote.release_date = release_date
+            entry.release_date = release_date
         if cover:
-            remote.cover = cover
+            entry.cover = cover
         if shelf:
-            remote.shelf = shelf
+            entry.shelf = shelf
         if tags:
-            remote.tags = tags
+            entry.tags = tags
 
-        if remote.data is None:
-            remote.data = {}
+        if entry.data is None:
+            entry.data = {}
 
-        remote.data.update(data)  # type: ignore
-        flag_modified(remote, "data")
+        entry.data.update(data)  # type: ignore
+        flag_modified(entry, "data")
 
         if isbn13:
-            remote.data["isbn13"] = isbn13  # type: ignore
-            flag_modified(remote, "data")
+            entry.data["isbn13"] = isbn13  # type: ignore
+            flag_modified(entry, "data")
 
-        if not remote.work:
-            work_id = self.reproducible_uuid(remote_id)
-            remote.work = Book(user_id=self.user.id, id=work_id, shelf=shelf)
+        if not entry.work:
+            work_id = self.reproducible_uuid(entry_id)
+            entry.work = Book(user_id=self.user.id, id=work_id, shelf=shelf)
 
         if date_started or date_stopped:
-            record_id = self.reproducible_uuid(remote_id)
+            record_id = self.reproducible_uuid(entry_id)
             record = self.get_record(record_id) or Record(id=record_id)
             if date_started:
                 record.date_started = date_started
             if date_stopped:
                 record.date_stopped = date_stopped
-            remote.work.records.append(record)
+            entry.work.records.append(record)
 
-        return remote
+        return entry

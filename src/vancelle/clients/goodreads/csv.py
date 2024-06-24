@@ -8,7 +8,7 @@ import structlog
 
 from .common import GoodreadsImporter
 from .types import GoodreadsCsvRow
-from ...models.remote import GoodreadsPrivateBook
+from ...models.entry import GoodreadsPrivateBook
 from ...types import Sentinel, sentinel
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -43,7 +43,7 @@ class GoodreadsCsvImporter(GoodreadsImporter):
         isbn13 = self.parse_isbn(row["ISBN13"])
 
         return self._create_or_update(
-            remote_id=id,
+            entry_id=id,
             title=title,
             author=author,
             release_date=release_date,

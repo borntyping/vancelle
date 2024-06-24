@@ -7,7 +7,7 @@ import structlog
 import svcs
 
 from vancelle.clients.client import HttpClient, HttpClientBuilder
-from vancelle.models.remote import RoyalroadFiction
+from vancelle.models.entry import RoyalroadFiction
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -18,11 +18,11 @@ class RoyalRoadScraper(HttpClient):
         builder = svcs_container.get(HttpClientBuilder)
         return cls(client=hishel.CacheClient(storage=builder.sqlite_storage_for(cls)))
 
-    def fiction(self, remote_id: str) -> RoyalroadFiction:
-        response = self.get(f"https://www.royalroad.com/fiction/{remote_id}")
+    def fiction(self, id: str) -> RoyalroadFiction:
+        response = self.get(f"https://www.royalroad.com/fiction/{id}")
         soup = bs4.BeautifulSoup(response.text, features="html.parser")
         return RoyalroadFiction(
-            id=remote_id,
+            id=id,
             title=soup.select_one(".page-content-inner .fic-title h1").string,
             author=soup.select_one(".page-content-inner .fic-title h4 a").string,
             description=soup.select_one(".fiction-info .description p").string,

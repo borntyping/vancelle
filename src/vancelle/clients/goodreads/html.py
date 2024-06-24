@@ -10,7 +10,7 @@ import bs4.element
 import structlog
 
 from .common import GoodreadsImporter
-from ...models.remote import GoodreadsPrivateBook
+from ...models.entry import GoodreadsPrivateBook
 from ...types import Sentinel, sentinel
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -153,7 +153,7 @@ class GoodreadsHtmlImporter(GoodreadsImporter):
         shelf = self.parse_shelf(exclusive_shelf, release_date)
 
         return self._create_or_update(
-            remote_id=resource_id,
+            entry_id=resource_id,
             title=title,
             author=author,
             release_date=release_date,

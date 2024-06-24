@@ -13,7 +13,7 @@ from .base import PolymorphicBase
 from .details import Details, IntoDetails
 from .properties import CodeProperty, IntoProperties, Property, ShelfProperty, StringProperty, DatetimeProperty
 from .record import Record
-from .remote import Remote
+from .entry import Entry
 from .types import ShelfEnum
 from .user import User
 from ..inflect import p
@@ -90,9 +90,9 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
-    remotes: Mapped[typing.List["Remote"]] = relationship(
+    entries: Mapped[typing.List["Entry"]] = relationship(
         back_populates="work",
-        order_by="desc(Remote.id)",
+        order_by="desc(Entry.id)",
         cascade="all, delete-orphan",
         lazy="selectin",
     )
@@ -146,11 +146,11 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
     def url_for_permanently_delete(self) -> str:
         return url_for("work.permanently_delete", work_id=self.id)
 
-    def iter_remotes(self) -> typing.Iterable["Remote"]:
-        return reversed(sorted(self.remotes, key=lambda remote: remote.info.priority))
+    def iter_entries(self) -> typing.Iterable["Entry"]:
+        return reversed(sorted(self.entries, key=lambda entry: entry.info.priority))
 
-    def iter_active_remotes(self) -> typing.Iterable["Remote"]:
-        return (remote for remote in self.iter_remotes() if not remote.deleted)
+    def iter_active_entries(self) -> typing.Iterable["Entry"]:
+        return (entry for entry in self.iter_entries() if not entry.deleted)
 
     def into_details(self) -> Details:
         return Details(
@@ -175,13 +175,14 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
         yield DatetimeProperty("Stopped", self.date_last, title="Date stopped for this work's most recent record.")
 
     def resolve_title(self) -> str:
-        items = [self.title, *(remote.title for remote in self.iter_active_remotes()), f"Work {self.id}"]
-        return next((item for item in items if item))
+        entry_titles = (entry.title for entry in self.iter_active_entries())
+        titles = [self.title, *entry_titles, f"Work {self.id}"]
+        return next((title for title in titles if title))
 
     # @sentry_sdk.trace
     def resolve_details(self) -> Details:
         """Collapse the chain into a single Details instance, including details from the work."""
-        items: list[IntoDetails] = [self, *self.iter_active_remotes()]
+        items: list[IntoDetails] = [self, *self.iter_active_entries()]
         details = [item.into_details() for item in items]
         return Details(
             title=next((d.title for d in details if d.title), None),
@@ -194,10 +195,6 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
             tags=next((d.tags for d in details if d.tags), set()),
             external_url=next((d.external_url for d in details if d.external_url), None),
         )
-
-    @classmethod
-    def work_type(cls) -> str:
-        return cls.polymorphic_identity()
 
 
 class Book(Work):

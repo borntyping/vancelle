@@ -4,15 +4,15 @@ from .base import Source
 from ...clients.goodreads.http import GoodreadsPublicScraper
 from ...lib.pagination import Pagination
 
-from ...models.remote import GoodreadsPrivateBook, GoodreadsPublicBook
+from ...models.entry import GoodreadsPrivateBook, GoodreadsPublicBook
 from ...models.work import Book
 
 
 class GoodreadsPrivateBookSource(Source):
-    remote_type = GoodreadsPrivateBook
+    entry_type = GoodreadsPrivateBook
     work_type = Book
 
-    def fetch(self, remote_id: str) -> GoodreadsPrivateBook:
+    def fetch(self, entry_id: str) -> GoodreadsPrivateBook:
         raise NotImplementedError("Private Goodreads books cannot be fetched.")
 
     def search(self, query: str) -> Pagination[GoodreadsPrivateBook]:
@@ -20,12 +20,12 @@ class GoodreadsPrivateBookSource(Source):
 
 
 class GoodreadsPublicBookSource(Source):
-    remote_type = GoodreadsPublicBook
+    entry_type = GoodreadsPublicBook
     work_type = Book
 
-    def fetch(self, remote_id: str) -> GoodreadsPublicBook:
+    def fetch(self, entry_id: str) -> GoodreadsPublicBook:
         goodreads = svcs.flask.get(GoodreadsPublicScraper)
-        return goodreads.fetch(remote_id)
+        return goodreads.fetch(entry_id)
 
     def search(self, query: str) -> Pagination[GoodreadsPublicBook]:
         goodreads = svcs.flask.get(GoodreadsPublicScraper)

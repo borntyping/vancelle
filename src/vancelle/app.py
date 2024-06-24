@@ -2,20 +2,20 @@ import pathlib
 import typing
 
 import flask
+import flask.templating
 import frozendict
 import svcs.flask
-import flask.templating
 
 from vancelle.blueprints.board import bp as bp_board
 from .blueprints.data import bp as bp_data
+from .blueprints.entry import bp as bp_entry
 from .blueprints.errors import bp as bp_errors
 from .blueprints.health import bp as bp_health
 from .blueprints.home import bp as bp_home
 from .blueprints.record import bp as bp_record
-from .blueprints.remote import bp as bp_remote
+from .blueprints.source import bp as bp_source
 from .blueprints.user import bp as bp_user
 from .blueprints.work import bp as bp_works
-from .blueprints.source import bp as bp_remote_source
 from .clients.client import HttpClientBuilder
 from .clients.goodreads.http import GoodreadsPublicScraper
 from .clients.images.client import ImageCache
@@ -24,7 +24,6 @@ from .clients.royalroad.client import RoyalRoadScraper
 from .clients.steam.client_store_api import SteamStoreAPI
 from .clients.steam.client_web_api import SteamWebAPI
 from .clients.tmdb.client import TmdbAPI
-from .converters import RemoteTypeConverter, WorkTypeConverter
 from .ext.structlog import configure_logging
 from .extensions import alembic, cors, db, htmx, login_manager, sentry
 
@@ -54,8 +53,8 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
     if default := app.config.get("SQLALCHEMY_ENGINES_DEFAULT"):
         app.config["SQLALCHEMY_ENGINES"] = {"default": default}
 
-    app.url_map.converters["work_type"] = WorkTypeConverter
-    app.url_map.converters["remote_type"] = RemoteTypeConverter
+    # app.url_map.converters["work_type"] = WorkTypeConverter
+    # app.url_map.converters["entry_type"] = EntryTypeConverter
 
     svcs.flask.init_app(app)
 
@@ -85,7 +84,7 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
 
     app.register_blueprint(bp_works)
     app.register_blueprint(bp_record)
-    app.register_blueprint(bp_remote)
-    app.register_blueprint(bp_remote_source)
+    app.register_blueprint(bp_entry)
+    app.register_blueprint(bp_source)
 
     return app

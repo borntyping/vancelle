@@ -1,5 +1,5 @@
 import flask_login
-import werkzeug.exceptions
+import sqlalchemy
 import wtforms.validators
 from sqlalchemy import ColumnElement, Select, True_, desc, select
 from sqlalchemy.orm import joinedload
@@ -16,9 +16,9 @@ class EntryIndexArgs(PaginationArgs):
     class Meta(BootstrapMeta):
         csrf = False
 
-    type = wtforms.SelectField(
+    entry_type = wtforms.SelectField(
         label="Entry type",
-        choices=[("all", "All entries")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
+        choices=[("any", "Any entry type")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
         default="all",
         validators=[wtforms.validators.Optional()],
     )
@@ -46,15 +46,16 @@ class EntryIndexArgs(PaginationArgs):
             .options(joinedload(Entry.work))
             .join(Work)
             .filter(Work.user_id == flask_login.current_user.id)
-            .filter(self._filter_type(self.type.data))
+            .filter(self._filter_type(self.entry_type.data))
             .filter(self._filter_deleted(self.deleted.data))
+            .filter(self._filter_search(self.search.data))
             .order_by(desc(Entry.time_updated), desc(Entry.time_created))
         )
 
     @staticmethod
     def _filter_type(value: str) -> ColumnElement[bool]:
         match value:
-            case "all":
+            case "any":
                 return True_()
             case _:
                 return Entry.type == value
@@ -69,4 +70,17 @@ class EntryIndexArgs(PaginationArgs):
             case "yes":
                 return Entry.time_deleted.is_not(None)
 
-        raise werkzeug.exceptions.BadRequest("Invalid work deleted filter")
+        raise ValueError(f"Invalid deleted filter ({value=})")
+
+    @staticmethod
+    def _filter_search(value: str) -> ColumnElement[bool]:
+        match value:
+            case "":
+                return True_()
+            case _:
+                return sqlalchemy.or_(
+                    Entry.title.ilike(f"%{value}%"),
+                    Entry.author.ilike(f"%{value}%"),
+                    Entry.series.ilike(f"%{value}%"),
+                    Entry.description.ilike(f"%{value}%"),
+                )

@@ -27,7 +27,7 @@ def _BoardDropdown() -> Heavymetal:
             _DropdownItem("All", "board.index"),
             dropdown_divider(),
             *(
-                _DropdownItem(cls.info.noun_plural_title, "board.index", type=cls.polymorphic_identity())
+                _DropdownItem(cls.info.noun_plural_title, "board.index", work_type=cls.polymorphic_identity())
                 for cls in Work.subclasses()
             ),
         ],
@@ -41,7 +41,7 @@ def _WorkDropdown() -> Heavymetal:
             _DropdownItem("All", "work.index"),
             dropdown_divider(),
             *(
-                _DropdownItem(cls.info.noun_plural_title, "work.index", type=cls.polymorphic_identity())
+                _DropdownItem(cls.info.noun_plural_title, "work.index", work_type=cls.polymorphic_identity())
                 for cls in Work.subclasses()
             ),
         ],

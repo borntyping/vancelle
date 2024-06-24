@@ -68,28 +68,29 @@ class WorkIndexArgs(PaginationArgs):
     class Meta(BootstrapMeta):
         csrf = False
 
-    type = wtforms.SelectField(
+    work_type = wtforms.SelectField(
         label="Work type",
-        choices=[("", "All works")] + [(cls.polymorphic_identity(), cls.info.noun_plural_title) for cls in Work.subclasses()],
-        default="",
+        choices=[("any", "Any work type")]
+        + [(cls.polymorphic_identity(), cls.info.noun_plural_title) for cls in Work.subclasses()],
+        default="any",
         validators=[wtforms.validators.Optional()],
     )
     shelf = wtforms.SelectField(
-        label="Exact shelf",
-        coerce=lambda x: Shelf(x) if x else None,
-        choices=[("", "All shelves")] + [(s.value, s.title) for s in Shelf],
-        default="",
+        label="Shelf",
+        coerce=lambda x: None if x == "any" else Shelf(x),
+        choices=[("any", "Any shelf")] + [(s.value, s.title) for s in Shelf],
+        default="any",
         validators=[wtforms.validators.Optional()],
     )
     case = wtforms.SelectField(
-        label="Shelves",
-        coerce=lambda x: Case(x) if x else None,
-        choices=[("", "All shelves")] + [(g.value, g.title) for g in Case],
-        default="",
+        label="Case",
+        coerce=lambda x: None if x == "any" else Case(x),
+        choices=[("any", "Any case")] + [(g.value, g.title) for g in Case],
+        default="any",
         validators=[wtforms.validators.Optional()],
     )
     deleted = wtforms.SelectField(
-        label="Deleted works",
+        label="Deleted",
         choices=[
             ("no", "Exclude deleted works"),
             ("any", "Include all works"),
@@ -100,8 +101,8 @@ class WorkIndexArgs(PaginationArgs):
     )
     has_entry_type = wtforms.SelectField(
         label="Entry type",
-        choices=[("", "All entry types")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
-        default="",
+        choices=[("any", "Any entry types")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Entry.subclasses()],
+        default="any",
         validators=[wtforms.validators.Optional()],
     )
     has_entries = wtforms.SelectField(
@@ -113,7 +114,7 @@ class WorkIndexArgs(PaginationArgs):
             ("imported", "Works with imported entries"),
             ("no", "Works without entries"),
         ],
-        default="",
+        default="any",
         validators=[wtforms.validators.Optional()],
     )
     search = wtforms.SearchField(
@@ -124,7 +125,7 @@ class WorkIndexArgs(PaginationArgs):
     @property
     def log(self) -> structlog.BoundLogger:
         return logger.bind(
-            type=repr(self.type.data),
+            type=repr(self.work_type.data),
             shelf=repr(self.shelf.data),
             case=repr(self.case.data),
             deleted=repr(self.deleted.data),
@@ -173,57 +174,47 @@ class WorkIndexArgs(PaginationArgs):
         return tuple(Shelf)
 
     def _statement(self) -> Select[tuple[Work]]:
-        self.log.info("Constructing query")
-        statement = (
+        return (
             select(Work)
             .distinct()
             .filter(Work.user_id == flask_login.current_user.id)
+            .filter(self._filter_work_type(self.work_type.data))
+            .filter(self._filter_shelf(self.shelf.data))
+            .filter(self._filter_case(self.case.data))
+            .filter(self._filter_deleted(self.deleted.data))
+            .filter(self._filter_has_entries(self.has_entries.data))
+            .filter(self._filter_entry_type(self.has_entry_type.data))
+            .filter(self._filter_search(self.search.data))
             .join(Record, isouter=True)
             .join(Entry, isouter=True)
             .order_by(desc(Work.time_updated), desc(Work.time_created))
         )
 
-        statement = statement.filter(self._filter_deleted(self.deleted.data))
-
-        if self.type.data:
-            statement = statement.filter(Work.type == self.type.data)
-        if self.shelf.data:
-            statement = statement.filter(Work.shelf == self.shelf.data)
-        if self.case.data:
-            statement = statement.filter(Work.shelf.in_(self.case.data))
-        if self.has_entry_type.data:
-            statement = statement.filter(Entry.type == self.has_entry_type.data)
-        if self.has_entries.data:
-            statement = statement.filter(self._filter_has_entries(self.has_entries.data))
-        if self.search.data:
-            statement = statement.filter(self._filter_search(self.search.data))
-
-        self.log.info("Constructed query", statement=str(statement))
-        return statement
+    @staticmethod
+    def _filter_work_type(value: str) -> ColumnElement[bool]:
+        return True_() if value == "any" else Work.type == value
 
     @staticmethod
-    def _filter_search(query: str) -> ColumnElement[bool]:
-        other = f"%{query}%"
-        return or_(
-            Work.title.ilike(other),
-            Work.author.ilike(other),
-            Work.series.ilike(other),
-            Work.description.ilike(other),
-            Entry.title.ilike(other),
-            Entry.author.ilike(other),
-            Entry.series.ilike(other),
-            Entry.description.ilike(other),
-        )
+    def _filter_shelf(shelf: Shelf | None) -> ColumnElement[bool]:
+        return Work.shelf == shelf if shelf else True_()
+
+    @staticmethod
+    def _filter_case(case: Case) -> ColumnElement[bool]:
+        return Work.shelf.in_(case.shelves) if case else True_()
+
+    @staticmethod
+    def _filter_entry_type(value: str) -> ColumnElement[bool]:
+        return True_() if value == "any" else Entry.type == value
 
     @staticmethod
     def _filter_deleted(value: str) -> ColumnElement[bool]:
         match value:
-            case "yes":
-                return Work.time_deleted.is_not(None)
             case "no":
                 return Work.time_deleted.is_(None)
             case "any":
                 return True_()
+            case "yes":
+                return Work.time_deleted.is_not(None)
 
         raise ValueError(f"Invalid deleted filter: {value!r}")
 
@@ -244,7 +235,22 @@ class WorkIndexArgs(PaginationArgs):
             case _:
                 return Work.entries.any(Entry.type == value)
 
-        raise ValueError(f"Invalid has_entries filter: {value!r}")
+    @staticmethod
+    def _filter_search(value: str) -> ColumnElement[bool]:
+        match value:
+            case "":
+                return True_()
+            case query:
+                return or_(
+                    Work.title.ilike(f"%{query}%"),
+                    Work.author.ilike(f"%{query}%"),
+                    Work.series.ilike(f"%{query}%"),
+                    Work.description.ilike(f"%{query}%"),
+                    Entry.title.ilike(f"%{query}%"),
+                    Entry.author.ilike(f"%{query}%"),
+                    Entry.series.ilike(f"%{query}%"),
+                    Entry.description.ilike(f"%{query}%"),
+                )
 
 
 class WorkBoardArgs(WorkIndexArgs):

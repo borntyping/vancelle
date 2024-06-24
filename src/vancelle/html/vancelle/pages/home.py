@@ -84,7 +84,7 @@ class HomePageGauges(HeavymetalComponent):
             yield HomePageGauge(count, cls.info.noun_plural_title, url, "info")
 
         for cls, count in self._count_by_type(Entry).items():
-            url = flask.url_for("work.index", entry_type=cls.polymorphic_identity())
+            url = flask.url_for("entry.index", entry_type=cls.polymorphic_identity())
             yield HomePageGauge(count, cls.info.noun_full_plural, url, cls.info.colour)
 
     def heavymetal(self) -> Heavymetal:

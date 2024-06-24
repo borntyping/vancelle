@@ -2,6 +2,7 @@ import abc
 import dataclasses
 import typing
 
+import flask
 
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Work
@@ -46,6 +47,9 @@ class Source(typing.Generic[E], abc.ABC):
     def context(self, entry: E) -> typing.Mapping[str, typing.Any]:
         """Context for detail pages."""
         return {}
+
+    def url_for_search(self, work: Work | None) -> str:
+        return flask.url_for("source.search", entry_type=self.polymorphic_identity(), work_id=work.id if work else None)
 
     @classmethod
     def subclasses(cls) -> typing.Sequence["Source"]:

@@ -1,5 +1,3 @@
-import uuid
-
 import flask
 import flask_login
 import svcs
@@ -27,19 +25,22 @@ def before_request():
 
 
 @bp.route("/")
-@bp.route("/<string:entry_type>/")
-def index(entry_type: str | None):
-    entry_type = Entry.get_subclass_or_404(entry_type)
+def index():
     entry_index_args = EntryIndexArgs(formdata=flask.request.args)
-    items = entry_index_args.paginate()
+    entry_class = Entry.get_subclass_or_404(entry_index_args.entry_type.data)
 
     return render(
         EntryIndexPage(
-            items=items,
-            entry_type=entry_type,
+            items=entry_index_args.paginate(),
+            entry_class=entry_class,
             entry_index_args=entry_index_args,
         )
     )
+
+
+@bp.route("/<string:entry_type>/")
+def redirect(entry_type: str):
+    return flask.redirect(flask.url_for(".index", entry_type=entry_type))
 
 
 @bp.route("/<string:entry_type>/<string:entry_id>")
@@ -65,19 +66,6 @@ def background(entry_type: str, entry_id: str):
     return svcs.flask.get(ImageCache).as_response(entry.background)
 
 
-@bp.route("/<string:entry_type>/<string:entry_id>/-/create-work", methods={"post"})
-def create_work(entry_type: str, entry_id: str):
-    work = controller.create_work(entry_type=entry_type, entry_id=entry_id, user=flask_login.current_user)
-    return htmx.redirect(work.url_for())
-
-
-@bp.route("/<string:entry_type>/<string:entry_id>/-/refresh", methods={"post"})
-def refresh(entry_type: str, entry_id: str):
-    controller.refresh(entry_type=entry_type, entry_id=entry_id)
-
-    return htmx.refresh()
-
-
 @bp.route("/<string:entry_type>/<string:entry_id>/-/delete", methods={"post"})
 def delete(entry_type: str, entry_id: str):
     controller.delete(entry_type=entry_type, entry_id=entry_id)
@@ -94,12 +82,3 @@ def restore(entry_type: str, entry_id: str):
 def permanently_delete(entry_type: str, entry_id: str):
     controller.permanently_delete(entry_type=entry_type, entry_id=entry_id)
     return htmx.refresh()
-
-
-@bp.route("/works/<uuid:work_id>/-/link-work", methods={"post"})
-def link_work(work_id: uuid.UUID):
-    entry_type = flask.request.args["entry_type"]
-    entry_id = flask.request.args["entry_id"]
-
-    work = controller.link_work(work_id=work_id, entry_type=entry_type, entry_id=entry_id)
-    return htmx.redirect(work.url_for())

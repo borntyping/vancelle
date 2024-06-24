@@ -234,7 +234,7 @@ def WorkIndexArgsForm(work_index_args: WorkIndexArgs) -> Heavymetal:
             row(
                 {"class": "mb-3"},
                 [
-                    col({}, [work_index_args.type()]),
+                    col({}, [work_index_args.work_type()]),
                     col({}, [work_index_args.shelf()]),
                     col({}, [work_index_args.case()]),
                 ],

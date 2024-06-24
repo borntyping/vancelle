@@ -31,7 +31,7 @@ def _EntryIndexForm(entry_index_args: EntryIndexArgs) -> Heavymetal:
             row(
                 {"class": "mb-3"},
                 [
-                    col({}, [entry_index_args.type()]),
+                    col({}, [entry_index_args.entry_type()]),
                     col({}, [entry_index_args.deleted()]),
                 ],
             ),
@@ -71,11 +71,11 @@ def _EntryTable(items: Pagination[Entry]) -> Heavymetal:
 def EntryIndexPage(
     items: Pagination[Entry],
     entry_index_args: EntryIndexArgs,
-    entry_type: typing.Type[Entry] | None,
+    entry_class: typing.Type[Entry] | None,
 ) -> Heavymetal:
     return Page(
         [
-            PageHeader("Entries", f"Entries from {entry_type.info.origin if entry_type else 'external sources'}"),
+            PageHeader("Entries", f"Entries from {entry_class.info.origin}" if entry_class else "All entries"),
             _EntryIndexForm(entry_index_args),
             _EntryTable(items),
         ],

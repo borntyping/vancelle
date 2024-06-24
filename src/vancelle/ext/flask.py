@@ -21,7 +21,7 @@ def url_is_active(endpoint: str, **kwargs: typing.Any) -> bool:
     """
     Compare an endpoint and it's arguments to the current request, returning true if they match.
 
-    `/works/?work_type='books'&work_shelf='upcoming'` should match `url_is_active('works.index', work_type='books')`.
+    `/works/?type='books'&shelf='upcoming'` should match `url_is_active('works.index', type='books')`.
     """
     return compare_endpoints(
         request_endpoint=flask.request.endpoint,

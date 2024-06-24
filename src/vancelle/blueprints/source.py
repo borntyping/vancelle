@@ -5,6 +5,7 @@ import flask_login
 
 from vancelle.controllers.source import SourceController
 from vancelle.controllers.work import WorkController
+from vancelle.extensions import htmx
 from vancelle.forms.source import SourceSearchArgs
 from vancelle.html.vancelle.pages.source import SourceDetailPage, ExternalSearchPage, ExternalIndexPage
 from vancelle.lib.heavymetal import render
@@ -64,11 +65,11 @@ def import_(entry_type: str, entry_id: str):
 
     work = controller.import_entry(entry_type=entry_type, entry_id=entry_id, work_id=work_id)
 
-    return flask.redirect(work.url_for())
+    return htmx.redirect(work.url_for())
 
 
 @bp.route("/<string:entry_type>/<string:entry_id>/-/refresh", methods={"post"})
 def refresh(entry_type: str, entry_id: str):
-    entry = controller.refresh(entry_type=entry_type, entry_id=entry_id)
+    controller.refresh(entry_type=entry_type, entry_id=entry_id)
 
-    return flask.redirect(entry.url_for())
+    return htmx.refresh()

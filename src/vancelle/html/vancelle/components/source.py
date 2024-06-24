@@ -20,10 +20,7 @@ def SourceListGroup(work: typing.Optional[Work]) -> Heavymetal:
         {"class": "list-group"},
         [
             a(
-                {
-                    "class": "list-group-item list-group-item-action",
-                    "href": flask.url_for("source.search", entry_type=source.polymorphic_identity(), work_id=work.id),
-                },
+                {"class": "list-group-item list-group-item-action", "href": source.url_for_search(work)},
                 ["Search ", source.info.noun_full_plural],
             )
             for source in Source.subclasses()
@@ -72,7 +69,7 @@ def _EntryTable(items: Pagination[Entry], work: typing.Optional[Work]) -> Heavym
                         entry.into_details(),
                         flask.url_for(
                             "source.detail",
-                            entry_type=entry.type,
+                            entry_type=entry.entry_type,
                             entry_id=entry.id,
                             work_id=work.id if work else None,
                         ),

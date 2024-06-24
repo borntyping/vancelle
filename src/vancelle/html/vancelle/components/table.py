@@ -3,7 +3,7 @@ import typing
 from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.html.vancelle.components.pagination import nav_pagination
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalAttrs
-from vancelle.lib.heavymetal.html import col, colgroup, div, table, tbody, thead, tr
+from vancelle.lib.heavymetal.html import col, colgroup, fragment, table, tbody, thead, tr
 from vancelle.lib.pagination import Pagination
 
 T = typing.TypeVar("T")
@@ -28,7 +28,6 @@ def generate_table(
 
 
 def generate_table_from_pagination(
-    attrs: HeavymetalAttrs,
     *,
     cols: typing.Sequence[HeavymetalAttrs] = (),
     head: typing.Sequence[Heavymetal],
@@ -36,10 +35,7 @@ def generate_table_from_pagination(
     pagination: Pagination[T],
     table_classes: HtmlClasses = "table align-middle",
 ) -> Heavymetal:
-    return div(
-        attrs,
-        [
-            generate_table(cols=cols, head=head, body=body, items=pagination.items, table_classes=table_classes),
-            nav_pagination(pagination=pagination),
-        ],
-    )
+    return fragment([
+        generate_table(cols=cols, head=head, body=body, items=pagination.items, table_classes=table_classes),
+        nav_pagination(pagination=pagination),
+    ])

@@ -1,7 +1,7 @@
 from vancelle.forms.record import RecordForm
 from vancelle.html.bootstrap.forms.controls import form_control, form_control_check
 from vancelle.html.bootstrap.layout.grid import col, row
-from vancelle.html.vancelle.components.header import PageHeader
+from vancelle.html.vancelle.components.layout import PageHeader
 from vancelle.html.vancelle.pages.base import Page
 from vancelle.html.vancelle.components.work import return_to_work
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent

@@ -6,7 +6,7 @@ import frozendict
 import svcs.flask
 import flask.templating
 
-from .blueprints.board.blueprint import bp as bp_board
+from vancelle.blueprints.board import bp as bp_board
 from .blueprints.data import bp as bp_data
 from .blueprints.errors import bp as bp_errors
 from .blueprints.health import bp as bp_health

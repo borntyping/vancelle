@@ -3,7 +3,7 @@ import uuid
 import flask
 import flask_login
 
-from vancelle.controllers.source import ExternalRemoteController
+from vancelle.controllers.source import SourceController
 from vancelle.controllers.work import WorkController
 from vancelle.forms.source import SourceSearchArgs
 from vancelle.html.vancelle.pages.source import ExternalDetailPage, ExternalSearchPage, ExternalIndexPage
@@ -11,7 +11,7 @@ from vancelle.lib.heavymetal import render
 
 bp = flask.Blueprint("source", __name__, url_prefix="/sources")
 
-controller = ExternalRemoteController()
+controller = SourceController()
 work_controller = WorkController()
 
 
@@ -57,7 +57,7 @@ def detail(remote_type: str, remote_id: str):
     candidate_work = work_controller.get(id=candidate_work_id)
 
     return ExternalDetailPage(
-        remote_source=remote_source,
+        source=remote_source,
         remote=remote,
         candidate_work=candidate_work,
     )
@@ -72,7 +72,7 @@ def import_remote(remote_type: str, remote_id: str):
     candidate_work = work_controller.get(id=candidate_work_id)
 
     return ExternalDetailPage(
-        remote_source=remote_source,
+        source=remote_source,
         remote=remote,
         candidate_work=candidate_work,
     )

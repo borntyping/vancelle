@@ -27,7 +27,7 @@ SHELF_FORM_CHOICES = {
     for group, items in itertools.groupby(Shelf, key=lambda shelf: shelf.group)
 }
 
-TYPE_FORM_CHOICES = [(cls.work_type(), cls.info.noun_title) for cls in Work.iter_subclasses()]
+TYPE_FORM_CHOICES = [(cls.work_type(), cls.info.noun_title) for cls in Work.subclasses()]
 
 logger = structlog.get_logger(logger_name=__name__)
 
@@ -71,7 +71,7 @@ class WorkIndexArgs(PaginationArgs):
 
     type = wtforms.SelectField(
         label="Work type",
-        choices=[("", "All works")] + [(cls.work_type(), cls.info.noun_plural_title) for cls in Work.iter_subclasses()],
+        choices=[("", "All works")] + [(cls.work_type(), cls.info.noun_plural_title) for cls in Work.subclasses()],
         default="",
         validators=[wtforms.validators.Optional()],
     )
@@ -101,7 +101,7 @@ class WorkIndexArgs(PaginationArgs):
     )
     has_remote_type = wtforms.SelectField(
         label="Remote type",
-        choices=[("", "All remote types")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
+        choices=[("", "All remote types")] + [(cls.remote_type(), cls.info.noun_full) for cls in Remote.subclasses()],
         default="",
         validators=[wtforms.validators.Optional()],
     )

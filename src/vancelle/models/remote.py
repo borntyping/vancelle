@@ -170,7 +170,7 @@ class Remote(PolymorphicBase, IntoDetails, IntoProperties):
 
     @classmethod
     def iter_subclasses_external(cls) -> typing.Sequence[typing.Type[typing.Self]]:
-        return [remote_type for remote_type in cls.iter_subclasses() if remote_type.info.is_external_source]
+        return [remote_type for remote_type in cls.subclasses() if remote_type.info.is_external_source]
 
 
 class ImportedWorkAttributes(typing.TypedDict):

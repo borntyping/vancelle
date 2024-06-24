@@ -6,7 +6,7 @@ import flask
 from vancelle.forms.remote import RemoteIndexArgs
 from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.details import details_description
-from vancelle.html.vancelle.components.header import PageHeader
+from vancelle.html.vancelle.components.layout import PageHeader
 from vancelle.html.vancelle.components.index import SearchFormControls
 from vancelle.html.vancelle.components.optional import maybe_str, quote, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel
@@ -98,7 +98,6 @@ def _RemoteIndexForm(remote_index_args: RemoteIndexArgs) -> Heavymetal:
 
 def _RemoteTable(items: Pagination[Remote], candidate_work: typing.Optional[Work]) -> Heavymetal:
     return generate_table_from_pagination(
-        attrs={},
         table_classes="table table-hover align-middle",
         cols=[
             {"style": "width: 15%;"},

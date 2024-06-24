@@ -52,7 +52,7 @@ class RemotesController:
     def __init__(self, managers: typing.Iterable[Source] = DEFAULT_MANAGERS) -> None:
         self.managers = {m.remote_type.remote_type(): m for m in managers}
 
-        for cls in Remote.iter_subclasses():
+        for cls in Remote.subclasses():
             if cls.remote_type() not in self.managers:
                 raise NotImplementedError(f"No manager registered for {cls.remote_type()} ({cls.info=})")
 

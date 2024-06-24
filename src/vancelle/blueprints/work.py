@@ -7,7 +7,7 @@ import svcs
 import werkzeug.exceptions
 
 from vancelle.clients.images.client import ImageCache
-from vancelle.controllers.source import ExternalRemoteController
+from vancelle.controllers.source import SourceController
 from vancelle.controllers.work import WorkController
 from vancelle.exceptions import ApplicationError
 from vancelle.extensions import db, htmx
@@ -19,7 +19,7 @@ from vancelle.models.work import Work
 logger = structlog.get_logger(logger_name=__name__)
 
 controller = WorkController()
-source_controller = ExternalRemoteController()
+source_controller = SourceController()
 
 bp = flask.Blueprint("work", __name__, url_prefix="/works")
 

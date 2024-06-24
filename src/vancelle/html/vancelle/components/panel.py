@@ -177,11 +177,16 @@ class WorkRecordsPanel(Panel, HeavymetalComponent):
                 [record.notes] if record and record.notes else [],
             ),
             td(
-                {"class": "c"},
+                {"class": ""},
                 (
                     [a({"href": record.url_for()}, [bi_svg("pencil")])]
                     if record
-                    else [a({"class": "text-light", "href": "#"}, [bi_svg("pencil")])]
+                    else [
+                        a(
+                            {"class": "text-body-tertiary", "href": flask.url_for("record.create", work_id=self.work.id)},
+                            [bi_svg("pencil")],
+                        )
+                    ]
                 ),
             ),
         ])

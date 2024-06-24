@@ -8,7 +8,7 @@ from vancelle.html.bootstrap.components.button_group import btn_group
 from vancelle.html.bootstrap.forms.controls import form_control
 from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.details import details_description
-from vancelle.html.vancelle.components.header import PageHeader, SectionHeader
+from vancelle.html.vancelle.components.layout import PageHeader, Section, SectionHeader
 from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote_str
 from vancelle.html.vancelle.components.panel import RemoteDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
 from vancelle.html.vancelle.components.source import SourceListGroup
@@ -232,7 +232,7 @@ def work_create_page(work_form: WorkForm, details: Details = EMPTY_DETAILS) -> H
 
 def WorkIndexArgsForm(work_index_args: WorkIndexArgs) -> Heavymetal:
     return form(
-        {"class": "v-block", "method": "get"},
+        {"class": "", "method": "get"},
         [
             row(
                 {"class": "mb-3"},
@@ -278,7 +278,6 @@ def WorkIndexArgsForm(work_index_args: WorkIndexArgs) -> Heavymetal:
 
 def WorkTable(works: Pagination[Work]) -> Heavymetal:
     return generate_table_from_pagination(
-        {"class": "v-block"},
         table_classes="table table-hover table-sm align-middle",
         cols=[
             {"style": "width: 10%;"},
@@ -310,9 +309,8 @@ def work_index_page(works: Pagination[Work], work_index_args: WorkIndexArgs) -> 
     return Page(
         [
             PageHeader("Works"),
-            WorkIndexArgsForm(work_index_args),
-            WorkTable(works),
+            Section(WorkIndexArgsForm(work_index_args)),
+            Section(WorkTable(works)),
         ],
-        fluid=False,
         title=["Remotes"],
     )

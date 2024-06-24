@@ -1,6 +1,6 @@
 import flask
 
-from vancelle.html.vancelle.components.header import PageHeader, SectionHeader
+from vancelle.html.vancelle.components.layout import PageHeader, SectionHeader
 from vancelle.html.vancelle.pages.base import Page
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import a, div, h1, p

@@ -24,7 +24,7 @@ def SourceListGroup(sources: typing.Sequence[Source], *, candidate_work: typing.
                         candidate_work=candidate_work,
                     ),
                 },
-                ["Search ", source.name],
+                ["Search ", source.info.noun_full_plural],
             )
             for source in sources
         ],

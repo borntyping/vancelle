@@ -64,7 +64,7 @@ class HomePageGauges(HeavymetalComponent):
         return db.session.execute(query).scalar_one()
 
     def _count_by_type(self, cls: typing.Type[Work | Remote]) -> dict[typing.Type[Work | Remote], int]:
-        subclasses = cls.iter_subclasses()
+        subclasses = cls.subclasses()
 
         count = sqlalchemy.func.count().label("count")
         stmt = sqlalchemy.select(cls.type, count).select_from(cls).order_by(count.desc()).group_by(cls.type)
@@ -96,7 +96,7 @@ class HomePageGauges(HeavymetalComponent):
 
 
 class HomePageHero(HeavymetalComponent):
-    categories: list[str] = [cls.info.noun_plural for cls in Work.iter_subclasses()]
+    categories: list[str] = [cls.info.noun_plural for cls in Work.subclasses()]
 
     def heavymetal(self) -> Heavymetal:
         return section(

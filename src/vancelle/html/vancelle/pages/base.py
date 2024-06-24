@@ -4,7 +4,7 @@ import typing
 import flask
 import markupsafe
 
-from vancelle.controllers.source import ExternalRemoteController
+from vancelle.controllers.source import SourceController
 from vancelle.extensions import htmx, sentry
 from vancelle.html.vancelle.components.footer import PageFooter
 from vancelle.html.vancelle.components.navbar import PageNavbar
@@ -14,7 +14,7 @@ from vancelle.lib.heavymetal import Heavymetal, HeavymetalContent
 from vancelle.lib.heavymetal.html import html5, link, main, meta, script
 
 
-source_controller = ExternalRemoteController()
+source_controller = SourceController()
 
 
 def static(filename: str) -> str:
@@ -24,6 +24,8 @@ def static(filename: str) -> str:
 def Page(
     content: HeavymetalContent,
     *,
+    before: HeavymetalContent = (),
+    after: HeavymetalContent = (),
     fluid: bool = False,
     title: typing.Sequence[str] = (),
 ) -> Heavymetal:
@@ -50,7 +52,9 @@ def Page(
 
     body = [
         PageNavbar(sources=source_controller.sources),
+        *before,
         main({"class": "container-fluid my-5" if fluid else "container my-5"}, content),
+        *after,
         ToastAside(),
         PageFooter(),
         script({"src": static("dist/htmx.org/htmx.min.js")}),

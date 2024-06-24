@@ -18,8 +18,7 @@ class RemoteIndexArgs(PaginationArgs):
 
     type = wtforms.SelectField(
         label="Remote type",
-        choices=[("all", "All remotes")]
-        + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Remote.iter_subclasses()],
+        choices=[("all", "All remotes")] + [(cls.polymorphic_identity(), cls.info.noun_full) for cls in Remote.subclasses()],
         default="all",
         validators=[wtforms.validators.Optional()],
     )

@@ -1,15 +1,15 @@
 import dataclasses
 import typing
 
-from vancelle.controllers.sources import EXTERNAL_SOURCES, Source
+from vancelle.controllers.sources import Source
 
 
 @dataclasses.dataclass(init=False)
-class ExternalRemoteController:
+class SourceController:
     mapping: typing.Mapping[str, Source]
 
     def __init__(self) -> None:
-        self.mapping = {source.remote_type.polymorphic_identity(): source for source in EXTERNAL_SOURCES}
+        self.mapping = {source.remote_type.polymorphic_identity(): source for source in Source.subclasses()}
 
     def __iter__(self) -> typing.Iterable[Source]:
         return self.mapping.values()
@@ -19,4 +19,4 @@ class ExternalRemoteController:
 
     @property
     def sources(self) -> typing.Sequence[Source]:
-        return list(sorted(self.mapping.values(), key=lambda source: source.name))
+        return list(self.mapping.values())

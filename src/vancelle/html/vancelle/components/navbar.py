@@ -8,7 +8,6 @@ from vancelle.ext.flask import url_is_active
 from vancelle.html.bootstrap.components.navbar import (
     dropdown_divider,
     dropdown_item,
-    nav_item,
     nav_item_dropdown,
     navbar,
     navbar_brand,
@@ -23,16 +22,27 @@ def _page_dropdown_item(title: str, endpoint: str, **values: str) -> Heavymetal:
     return dropdown_item(name=title, href=href, active=active)
 
 
+def _board_dropdown() -> Heavymetal:
+    return nav_item_dropdown(
+        "Board",
+        [
+            _page_dropdown_item("All", "board.index"),
+            dropdown_divider(),
+            *(
+                _page_dropdown_item(cls.info.noun_plural_title, "board.index", type=cls.work_type())
+                for cls in Work.subclasses()
+            ),
+        ],
+    )
+
+
 def _works_dropdown() -> Heavymetal:
     return nav_item_dropdown(
         "Works",
         [
             _page_dropdown_item("All", "work.index"),
             dropdown_divider(),
-            *(
-                _page_dropdown_item(cls.info.noun_plural_title, "work.index", type=cls.work_type())
-                for cls in Work.iter_subclasses()
-            ),
+            *(_page_dropdown_item(cls.info.noun_plural_title, "work.index", type=cls.work_type()) for cls in Work.subclasses()),
         ],
     )
 
@@ -43,10 +53,7 @@ def _remotes_dropdown() -> Heavymetal:
         [
             _page_dropdown_item("All", "remote.index"),
             dropdown_divider(),
-            *(
-                _page_dropdown_item(cls.info.noun_full, "remote.index", type=cls.remote_type())
-                for cls in Remote.iter_subclasses()
-            ),
+            *(_page_dropdown_item(cls.info.noun_full, "remote.index", type=cls.remote_type()) for cls in Remote.subclasses()),
         ],
     )
 
@@ -57,10 +64,7 @@ def _new_works_dropdown(sources: typing.Sequence[Source]) -> Heavymetal:
         [
             _page_dropdown_item("Create new work", "work.create"),
             dropdown_divider(),
-            *(
-                _page_dropdown_item(source.name, "source.search", remote_type=source.remote_type.polymorphic_identity())
-                for source in sources
-            ),
+            *(_page_dropdown_item(source.name, "source.search", remote_type=source.type()) for source in Source.subclasses()),
         ],
     )
 
@@ -83,10 +87,10 @@ def PageNavbar(sources: typing.Sequence[Source]) -> Heavymetal:
     return navbar(
         navbar_brand(name="Vancelle", href=flask.url_for("home.home")),
         [
-            nav_item("Board", flask.url_for("board.index"), url_is_active("board.index")),
+            _board_dropdown(),
             _works_dropdown(),
-            _new_works_dropdown(sources=sources),
             _remotes_dropdown(),
+            _new_works_dropdown(sources=sources),
         ],
         [
             _user_dropdown(),

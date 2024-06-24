@@ -2,7 +2,7 @@ import typing
 
 from vancelle.controllers.sources.base import Source
 from vancelle.forms.source import SourceSearchArgs
-from vancelle.html.vancelle.components.header import PageHeader
+from vancelle.html.vancelle.components.layout import PageHeader
 from vancelle.html.vancelle.pages.base import Page
 from vancelle.html.vancelle.components.source import SourceListGroup, SourceSearchForm
 from vancelle.html.vancelle.pages.remote import _RemoteTable
@@ -32,7 +32,7 @@ def ExternalSearchPage(
 ) -> Heavymetal:
     if candidate_work:
         subtitle = fragment([
-            "New remotes will be attached to ",
+            "New remotes will be linked to ",
             a({"href": candidate_work.url_for()}, [candidate_work.resolve_title()]),
         ])
     else:
@@ -40,17 +40,17 @@ def ExternalSearchPage(
 
     return Page(
         [
-            PageHeader(source.name, subtitle),
+            PageHeader(source.info.noun_full_plural, subtitle),
             SourceSearchForm(args=args, placeholder=query),
             _RemoteTable(items, candidate_work),
         ],
-        title=("External sources", source.name),
+        title=("External sources", source.info.noun_full_plural),
     )
 
 
 def ExternalDetailPage(
     *,
-    remote_source: Source,
+    source: Source,
     remote: Remote,
     candidate_work: typing.Optional[Work],
 ):
@@ -58,5 +58,5 @@ def ExternalDetailPage(
         [
             PageHeader(remote.resolve_title()),
         ],
-        title=("External sources", remote_source.name, remote.title),
+        title=("External sources", source.info.noun_full, remote.title),
     )

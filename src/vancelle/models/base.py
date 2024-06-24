@@ -16,7 +16,7 @@ class PolymorphicBase(Base):
         return cls.__mapper__.polymorphic_identity
 
     @classmethod
-    def iter_subclasses(cls) -> typing.Sequence[typing.Type[typing.Self]]:
+    def subclasses(cls) -> typing.Sequence[typing.Type[typing.Self]]:
         return list(
             sorted(
                 (mapper.class_ for mapper in cls.__mapper__.polymorphic_map.values()),

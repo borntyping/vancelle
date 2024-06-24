@@ -2,7 +2,7 @@ import typing
 
 from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalAnything, HeavymetalContent
-from vancelle.lib.heavymetal.html import div, element, header, nothing
+from vancelle.lib.heavymetal.html import div, element, header, nothing, section
 
 
 def _header(
@@ -36,7 +36,7 @@ def PageHeader(title: Heavymetal, subtitle: Heavymetal | None = None, *controls:
         title=title,
         subtitle=subtitle,
         controls=controls,
-        header_classes="mb-4",
+        header_classes="v-block",
         title_classes="display-3",
         subtitle_classes="fs-4 ps-1",
     )
@@ -52,3 +52,11 @@ def SectionHeader(title: Heavymetal, subtitle: Heavymetal | None = None, *contro
         title_classes="m-0",
         subtitle_classes="",
     )
+
+
+def Section(*content: HeavymetalAnything) -> Heavymetal:
+    return section({"class": "v-block"}, [*content])
+
+
+def ControlsHeader(content: HeavymetalContent) -> Heavymetal:
+    return div({"class": "p-5 bg-body-tertiary text-body-secondary"}, [div({"class": "container"}, content)])

@@ -5,6 +5,7 @@ import typing
 import markupsafe
 
 from vancelle.forms.work import WorkIndexArgs
+from vancelle.html.vancelle.components.layout import ControlsHeader
 from vancelle.html.vancelle.pages.work import WorkIndexArgsForm
 from vancelle.inflect import count_plural
 from vancelle.lib.heavymetal.html import a, div, figure, h3, p, section, span, img, fragment
@@ -113,7 +114,7 @@ def shelf_board_item(shelf: Shelf, count: int) -> Heavymetal:
 class BoardPage(HeavymetalComponent):
     work_index_args: WorkIndexArgs
     layout: typing.Literal["vertical", "horizontal"]
-    shelves: typing.Mapping[Shelf, list[Work]]
+    shelves: typing.Mapping[Shelf, list[Work]] = dataclasses.field(repr=False)
     total: int
 
     def heavymetal(self) -> Heavymetal:
@@ -130,7 +131,11 @@ class BoardPage(HeavymetalComponent):
         else:
             raise ValueError
 
-        return Page([section({}, [WorkIndexArgsForm(self.work_index_args), board])], title=["Board"])
+        return Page(
+            content=[section({}, [board])],
+            before=[ControlsHeader([WorkIndexArgsForm(self.work_index_args)])],
+            title=["Board"],
+        )
 
     def vertical_board(self, items: typing.Sequence[Heavymetal]) -> Heavymetal:
         return div({"class": "x-board x-board-vertical"}, items)

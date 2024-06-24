@@ -7,6 +7,7 @@ import structlog
 from vancelle.forms.work import WorkBoardArgs
 from vancelle.controllers.work import WorkController
 from vancelle.html.vancelle.pages.board import BoardPage
+from vancelle.lib.heavymetal import render
 from vancelle.models import Work
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -26,12 +27,14 @@ def before_request():
 def index():
     form = WorkBoardArgs(formdata=flask.request.args)
     shelves, total = form.shelves()
-    return BoardPage(
-        work_index_args=form,
-        shelves=shelves,
-        total=total,
-        layout=form.layout.data,
-    ).render()
+    return render(
+        BoardPage(
+            work_index_args=form,
+            shelves=shelves,
+            total=total,
+            layout=form.layout.data,
+        )
+    )
 
 
 @bp.route("/<work_type:work_type>/", methods={"GET"})

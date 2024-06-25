@@ -1,8 +1,8 @@
 import datetime
+import urllib.parse
 
 import humanize
 import markupsafe
-import urllib.parse
 
 from vancelle.html.bootstrap_icons import bi_svg
 from vancelle.lib.heavymetal import Heavymetal
@@ -23,7 +23,7 @@ def external_url(href: str, text: str | None = None) -> Heavymetal:
             "title": href,
         },
         [
-            span({}, [text or urllib.parse.urlparse(href).hostname]),
+            span({}, [text or urllib.parse.urlparse(href).hostname or "relative-url"]),
             bi_svg("box-arrow-up-right"),
         ],
     )

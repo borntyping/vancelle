@@ -83,7 +83,7 @@ class WorkRecordsPanel(Panel, HeavymetalComponent):
     min_rows: int = 10
 
     def background(self) -> str | None:
-        return self.work.url_for_cover()
+        return self.work.url_for_background()
 
     def heavymetal(self) -> Heavymetal:
         midpoint = max(math.ceil(len(self.work.records) / 2), self.min_rows)
@@ -303,10 +303,10 @@ class WorkDetailsPanel(DetailsPanel):
     work: Work
 
     def cover(self) -> str | None:
-        return self.work.url_for_cover()
+        return self.work.resolve_details().cover
 
     def background(self) -> str | None:
-        return self.work.url_for_background()
+        return self.work.resolve_details().background
 
     def id(self) -> str:
         return f"work-{self.work.id}"

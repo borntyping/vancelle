@@ -8,7 +8,7 @@ from vancelle.html.vancelle.components.details import DetailsBox
 from vancelle.html.vancelle.components.layout import PageHeader
 from vancelle.html.vancelle.components.index import SearchFormControls
 from vancelle.html.vancelle.components.optional import maybe_str, quote_str
-from vancelle.html.vancelle.components.panel import EntryDetailsPanel
+from vancelle.html.vancelle.components.entry import EntryDetailsPanel, EntryPageHeader
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.html.vancelle.pages.base import Page
 from vancelle.lib.heavymetal import Heavymetal
@@ -111,7 +111,7 @@ def EntryDetailPage(entry: Entry) -> Heavymetal:
     details = entry.into_details()
     return Page(
         [
-            PageHeader(maybe_str(details.title), f"{entry.info.noun_full} {entry.id}"),
+            EntryPageHeader(entry),
             EntryDetailsPanel(entry),
         ],
         title=["Entry", maybe_str(details.title)],

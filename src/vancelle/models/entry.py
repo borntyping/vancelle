@@ -166,7 +166,10 @@ class Entry(PolymorphicBase, IntoDetails, IntoProperties):
         yield ExternalUrlProperty("Background", self.background)
 
     def resolve_title(self) -> str:
-        return self.title if self.title else f"{self.info.noun_full} {self.id}"
+        return self.title if self.title else self.resolve_subtitle()
+
+    def resolve_subtitle(self) -> str:
+        return f"{self.info.noun_full} {self.id}"
 
 
 class ImportedWorkAttributes(typing.TypedDict):

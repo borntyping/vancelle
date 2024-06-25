@@ -56,7 +56,7 @@ def detail(entry_type: str, entry_id: str):
     entry = source.fetch(entry_id)
     work = work_controller.get(work_id)
 
-    return SourceDetailPage(source=source, entry=entry, work=work)
+    return render(SourceDetailPage(source=source, entry=entry, work=work))
 
 
 @bp.route("/<string:entry_type>/<string:entry_id>/-/import", methods={"post"}, endpoint="import")

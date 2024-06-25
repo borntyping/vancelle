@@ -3,8 +3,9 @@ import typing
 from vancelle.controllers.sources.base import Source
 from vancelle.forms.source import SourceSearchArgs
 from vancelle.html.vancelle.components.layout import PageHeader
+from vancelle.html.vancelle.components.entry import EntryPageHeader
 from vancelle.html.vancelle.pages.base import Page
-from vancelle.html.vancelle.components.source import SourceListGroup, SourceSearchForm, _EntryTable
+from vancelle.html.vancelle.components.source import RemoteEntryDetailsPanel, SourceListGroup, SourceSearchForm, _EntryTable
 from vancelle.lib.heavymetal import Heavymetal
 from vancelle.lib.heavymetal.html import a, fragment
 from vancelle.lib.pagination import Pagination
@@ -44,15 +45,11 @@ def ExternalSearchPage(
     )
 
 
-def SourceDetailPage(
-    *,
-    source: Source,
-    entry: Entry,
-    work: typing.Optional[Work],
-):
+def SourceDetailPage(*, source: Source, entry: Entry, work: typing.Optional[Work]):
     return Page(
         [
-            PageHeader(entry.resolve_title()),
+            EntryPageHeader(entry),
+            RemoteEntryDetailsPanel(entry),
         ],
         title=("External sources", source.info.noun_full, entry.title),
     )

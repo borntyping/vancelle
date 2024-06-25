@@ -7,7 +7,8 @@ from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.details import DetailsBox
 from vancelle.html.vancelle.components.layout import PageHeader, Section, SectionHeader
 from vancelle.html.vancelle.components.optional import maybe_str, maybe_year, quote_str
-from vancelle.html.vancelle.components.panel import EntryDetailsPanel, WorkDetailsPanel, WorkRecordsPanel
+from vancelle.html.vancelle.components.panel import WorkDetailsPanel, WorkRecordsPanel
+from vancelle.html.vancelle.components.entry import EntryDetailsPanel
 from vancelle.html.vancelle.components.source import SourceListGroup
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.html.vancelle.components.work import return_to_work

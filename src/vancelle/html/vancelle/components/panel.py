@@ -12,13 +12,12 @@ from vancelle.html.bootstrap.components.tabs import Tab, Tabs
 from vancelle.html.bootstrap_icons import bi_font, bi_svg
 from vancelle.lib.html import HtmlClasses, html_classes
 from vancelle.html.vancelle.components.details import DetailsDescription, DetailsJSON
-from vancelle.html.vancelle.components.optional import maybe_str, quote, span_absent
+from vancelle.html.vancelle.components.optional import maybe_str, span_absent
 from vancelle.html.vancelle.components.properties import PropertiesTable
 from vancelle.lib.heavymetal import Heavymetal, HeavymetalComponent
 from vancelle.lib.heavymetal.html import (
     a,
     button,
-    code,
     div,
     figure,
     form,
@@ -26,7 +25,6 @@ from vancelle.lib.heavymetal.html import (
     h3,
     h5,
     img,
-    p,
     span,
     table,
     tbody,
@@ -35,7 +33,7 @@ from vancelle.lib.heavymetal.html import (
     thead,
     tr,
 )
-from vancelle.models import Record, Entry, Work
+from vancelle.models import Record, Work
 from vancelle.models.details import Details
 from vancelle.models.properties import Properties
 
@@ -72,11 +70,11 @@ class PanelControl(HeavymetalComponent):
 
 
 class Panel(HeavymetalComponent):
-    def background_image(self) -> str | None:
+    def background(self) -> str | None:
         raise NotImplementedError
 
     def header_style(self) -> str | None:
-        return f"background-image: url('{url}');" if (url := self.background_image()) else None
+        return f"background-image: url('{url}');" if (url := self.background()) else None
 
 
 @dataclasses.dataclass()
@@ -84,8 +82,8 @@ class WorkRecordsPanel(Panel, HeavymetalComponent):
     work: Work
     min_rows: int = 10
 
-    def background_image(self) -> str | None:
-        return self.work.resolve_details().background
+    def background(self) -> str | None:
+        return self.work.url_for_cover()
 
     def heavymetal(self) -> Heavymetal:
         midpoint = max(math.ceil(len(self.work.records) / 2), self.min_rows)
@@ -214,6 +212,10 @@ class DetailsPanel(Panel, HeavymetalComponent):
 
     def data(self) -> str | None: ...
 
+    def cover(self) -> str | None: ...
+
+    def background(self) -> str | None: ...
+
     def controls(self) -> typing.Iterable[PanelControl]: ...
 
     def description(self) -> Heavymetal: ...
@@ -231,6 +233,8 @@ class DetailsPanel(Panel, HeavymetalComponent):
                 Tab("data", "Data", [DetailsJSON(self.data())]),
             ],
         )
+
+        cover = self.cover()
 
         return div(
             {"class": "v-panel v-panel-details border rounded overflow-hidden"},
@@ -251,11 +255,11 @@ class DetailsPanel(Panel, HeavymetalComponent):
                                 (
                                     img({
                                         "class": "rounded-3 fs-7",
-                                        "src": details.cover,
+                                        "src": cover,
                                         "alt": f"Cover for {details.title}.",
                                         "loading": "lazy",
                                     })
-                                    if details.cover
+                                    if cover
                                     else div({"class": "rounded-3 v-panel-cover-missing"}, [])
                                 )
                             ],
@@ -298,8 +302,11 @@ class DetailsPanel(Panel, HeavymetalComponent):
 class WorkDetailsPanel(DetailsPanel):
     work: Work
 
-    def background_image(self) -> str | None:
-        return self.work.resolve_details().background
+    def cover(self) -> str | None:
+        return self.work.url_for_cover()
+
+    def background(self) -> str | None:
+        return self.work.url_for_background()
 
     def id(self) -> str:
         return f"work-{self.work.id}"
@@ -362,107 +369,3 @@ class WorkDetailsPanel(DetailsPanel):
     def description(self) -> Heavymetal:
         details = self.work.resolve_details()
         return fragment([f"Released {details.release_date}."] if details.release_date else [])
-
-
-@dataclasses.dataclass()
-class EntryDetailsPanel(DetailsPanel):
-    entry: Entry
-
-    def id(self) -> str:
-        return f"entry-{self.entry.id}"
-
-    def background_image(self) -> str | None:
-        return self.entry.background
-
-    def details(self) -> Details:
-        return self.entry.into_details()
-
-    def properties(self) -> Properties:
-        return list(self.entry.into_properties())
-
-    def type_properties(self) -> Properties:
-        return list(self.entry.info.into_properties())
-
-    def data(self) -> str | None:
-        return self.entry.data
-
-    def controls(self) -> typing.Sequence[PanelControl]:
-        yield PanelControl(
-            href=self.entry.url_for(),
-            icon="database",
-            name="Permalink",
-            title="Permalink.",
-        )
-
-        if self.entry.info.is_external_source:
-            yield PanelControl(
-                post=True,
-                href=self.entry.url_for_refresh(),
-                icon="arrow-clockwise",
-                name="Refresh",
-                title="Update this entry from it's source.",
-            )
-
-        if self.entry.deleted:
-            yield PanelControl(
-                post=True,
-                href=self.entry.url_for_restore(),
-                icon="trash",
-                name="Restore",
-                title="Restore this entry.",
-                button_classes="text-success",
-            )
-            yield PanelControl(
-                post=True,
-                href=self.entry.url_for_permanently_delete(),
-                name="Permanently delete",
-                icon="trash",
-                title=(
-                    "Delete this entry. "
-                    "It will not be possible to recover these details without fetching them from the original source."
-                ),
-                button_classes="text-danger",
-            )
-
-        else:
-            yield PanelControl(
-                post=True,
-                href=self.entry.url_for_delete(),
-                icon="trash",
-                name="Delete",
-                title="Delete this entry. You will be able to restore it.",
-            )
-        yield PanelControl(
-            href=self.entry.work.url_for(),
-            icon="easel",
-            name="View linked work",
-            title="View the work linked to this entry.",
-        )
-
-    def description(self) -> Heavymetal:
-        link = a(
-            {
-                "class": "link-body-emphasis",
-                "href": self.entry.external_url(),
-                "rel": "noopener noreferrer nofollow",
-                "target": "_blank",
-            },
-            [f"{self.entry.info.noun_full} ", code({}, self.entry.id)],
-        )
-        released = [f", released {self.entry.release_date}"] if self.entry.release_date else []
-        description = p({}, [link, *released, "."])
-
-        attached_to = (
-            p(
-                {},
-                [
-                    "Attached to ",
-                    quote([a({"href": self.entry.work.url_for()}, [self.entry.work.resolve_details().title])]),
-                    ".",
-                ],
-            )
-            if self.entry.work
-            else ...
-        )
-
-        return fragment([description, attached_to])

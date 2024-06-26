@@ -1,5 +1,4 @@
 import dataclasses
-import typing
 
 import flask_login
 import sqlalchemy
@@ -12,7 +11,6 @@ from vancelle.controllers.sources import (
     OpenlibraryEditionSource,
     OpenlibraryWorkSource,
     RoyalroadFictionSource,
-    Source,
     SteamApplicationSource,
     TmdbMovieSource,
     TmdbTvSeriesSource,
@@ -41,16 +39,7 @@ DEFAULT_MANAGERS = (
 
 @dataclasses.dataclass(init=False)
 class EntryController:
-    managers: typing.Mapping[str, Source]
-
-    def __init__(self, managers: typing.Iterable[Source] = DEFAULT_MANAGERS) -> None:
-        self.managers = {m.entry_type.polymorphic_identity(): m for m in managers}
-
-        for cls in Entry.subclasses():
-            if cls.polymorphic_identity() not in self.managers:
-                raise NotImplementedError(f"No manager registered for {cls.polymorphic_identity()} ({cls.info=})")
-
-    def get(self, entry_type: str, entry_id: str, *, user: User = flask_login.current_user) -> Entry:
+    def get(self, entry_type: str, entry_id: str, *, user: User = flask_login.current_user) -> Entry | None:
         statement = (
             sqlalchemy.select(Entry)
             .join(Work)

@@ -13,6 +13,7 @@ from .base import PolymorphicBase
 from .details import Details, IntoDetails
 from .properties import (
     CodeProperty,
+    DatetimeProperty,
     ExternalUrlProperty,
     InternalUrlProperty,
     IntoProperties,
@@ -98,6 +99,7 @@ class Entry(PolymorphicBase, IntoDetails, IntoProperties):
     time_created: Mapped[datetime.datetime] = mapped_column(default=func.now(), insert_default=func.now())
     time_updated: Mapped[typing.Optional[datetime.datetime]] = mapped_column(default=None, onupdate=func.now())
     time_deleted: Mapped[typing.Optional[datetime.datetime]] = mapped_column(default=None)
+    time_fetched: Mapped[typing.Optional[datetime.datetime]] = mapped_column(default=None)
 
     id: Mapped[str] = mapped_column(Text(collation="numeric"), default=None, primary_key=True)
     title: Mapped[typing.Optional[str]] = mapped_column(default=None)
@@ -162,6 +164,10 @@ class Entry(PolymorphicBase, IntoDetails, IntoProperties):
 
     def into_properties(self) -> typing.Iterable[Property]:
         yield CodeProperty("ID", self.id, title="Unique ID for this entry.")
+        yield DatetimeProperty("Created at", self.time_created)
+        yield DatetimeProperty("Updated at", self.time_updated)
+        yield DatetimeProperty("Deleted at", self.time_deleted)
+        yield DatetimeProperty("Fetched atflask ", self.time_fetched)
         yield ExternalUrlProperty("Cover", self.cover)
         yield ExternalUrlProperty("Background", self.background)
 

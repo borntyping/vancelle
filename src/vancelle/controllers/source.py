@@ -26,15 +26,17 @@ class SourceController:
         source.entry_type.polymorphic_identity(): source for source in Source.subclasses()
     })
 
-    def __iter__(self) -> typing.Iterable[Source]:
-        return self.mapping.values()
-
-    def __getitem__(self, source_type: str) -> Source:
-        return self.mapping[source_type]
-
     @property
     def sources(self) -> typing.Sequence[Source]:
         return list(self.mapping.values())
+
+    def source(self, *, entry_type: str) -> Source:
+        return self.mapping[entry_type]
+
+    def fetch(self, *, entry_type: str, entry_id: str) -> Entry:
+        entry = self.source(entry_type=entry_type).fetch(entry_id)
+        entry.time_fetched = datetime.datetime.now()
+        return entry
 
     def import_entry(
         self,
@@ -57,13 +59,12 @@ class SourceController:
             flask.flash(render(EntryAlreadyExistsFlash(entry)), "Entry already exists")
             return entry.work
 
-        source = self[entry_type]
-        entry = source.fetch(entry_id)
+        entry = self.fetch(entry_type=entry_type, entry_id=entry_id)
 
         if work_id is not None:
             work = self.work_controller.get_or_404(work_id, user=user)
         else:
-            work = source.work_type(id=uuid.uuid4(), user_id=user.id, shelf=self._shelve(entry))
+            work = self.source(entry_type=entry_type).work_type(id=uuid.uuid4(), user_id=user.id, shelf=self._shelve(entry))
 
         work.entries.append(entry)
 
@@ -83,7 +84,7 @@ class SourceController:
     def refresh(self, *, entry_type: str, entry_id: str, user: User = flask_login.current_user) -> Entry:
         old_entry = self.entry_controller.get_or_404(entry_type, entry_id, user=user)
 
-        new_entry = self[entry_type].fetch(entry_id)
+        new_entry = self.fetch(entry_type=entry_type, entry_id=entry_id)
         new_entry.work_id = old_entry.work_id
 
         assert new_entry.id == old_entry.id, f"{new_entry.id=} != {old_entry.id=}"

@@ -53,7 +53,7 @@ def detail(entry_type: str, entry_id: str):
     work_id = flask.request.args.get("work_id", type=uuid.UUID)
 
     source = controller[entry_type]
-    entry = source.fetch(entry_id)
+    entry = controller.fetch(entry_type=entry_type, entry_id=entry_id)
     work = work_controller.get(work_id)
 
     return render(SourceDetailPage(source=source, entry=entry, work=work))

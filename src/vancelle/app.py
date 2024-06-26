@@ -41,9 +41,11 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
     app = VancelleFlask("vancelle")
     app.config["ALEMBIC"] = {
         "script_location": (root / "migrations").as_posix(),
-        "version_locations": [(root / "migrations" / "versions").as_posix()],
     }
-    app.config["ALEMBIC_CONTEXT"] = {}
+    app.config["ALEMBIC_CONTEXT"] = {
+        "alembic_module_prefix": "alembic.op.",
+        "sqlalchemy_module_prefix": "sqlalchemy.",
+    }
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
     app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
@@ -53,11 +55,7 @@ def create_app(config: typing.Mapping[str, typing.Any] = frozendict.frozendict()
     if default := app.config.get("SQLALCHEMY_ENGINES_DEFAULT"):
         app.config["SQLALCHEMY_ENGINES"] = {"default": default}
 
-    # app.url_map.converters["work_type"] = WorkTypeConverter
-    # app.url_map.converters["entry_type"] = EntryTypeConverter
-
     svcs.flask.init_app(app)
-
     svcs.flask.register_value(app, flask.Flask, app)
     svcs.flask.register_factory(app, HttpClientBuilder, HttpClientBuilder.factory)
     svcs.flask.register_factory(app, GoodreadsPublicScraper, GoodreadsPublicScraper.factory)

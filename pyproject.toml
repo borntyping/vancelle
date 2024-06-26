@@ -11,37 +11,37 @@ packages = [{ include = "vancelle", from = "src" }]
 python = "^3.11"
 Flask = "^3.0.0"
 beautifulsoup4 = "^4.12.2"
-flask-alembic = "^3.0.1"
+flask-alembic = "^3.1.0"
 flask-cors = "^4.0.0"
-flask-debugtoolbar = "^0.14.1"
+flask-debugtoolbar = "^0.15.1"
 flask-login = "^0.6.3"
 flask-sqlalchemy-lite = "^0.1.0"
 flask-wtf = "^1.2.1"
 frozendict = "^2.4.1"
-hishel = { extras = ["sqlite"], version = "^0.0.24" }
+hishel = { extras = ["sqlite"], version = "^0.0.29" }
 hotmetal = "^1.0.0"
 httpx = "^0.27.0"
 humanize = "^4.9.0"
 inflect = "^7.0.0"
 platformdirs = "^4.1.0"
 psycopg = { extras = ["binary"], version = "^3.1.14" }
-pydantic = "^2.5.2"
+pydantic = "^2.7.4"
 python-dotenv = "^1.0.0"
 sentry-sdk = "^2.6.0"
-setuptools = "^69.0.2"
+setuptools = "^70.1.1"
 sqlalchemy = "^2.0.23"
-structlog = "^23.2.0"
+structlog = "^24.2.0"
 svcs = "^24.1.0"
 wtforms = "^3.1.2"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.7.1"
-pytest = "^7.4.2"
+pytest = "^8.2.2"
 ruff = "^0.4.9"
 types-requests = "^2.31.0.10"
 
 [tool.poetry.group.server.dependencies]
-gunicorn = "^21.2.0"
+gunicorn = "^22.0.0"
 
 [tool.mypy]
 namespace_packages = true

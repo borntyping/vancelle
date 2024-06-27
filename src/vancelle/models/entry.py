@@ -167,7 +167,7 @@ class Entry(PolymorphicBase, IntoDetails, IntoProperties):
         yield DatetimeProperty("Created at", self.time_created)
         yield DatetimeProperty("Updated at", self.time_updated)
         yield DatetimeProperty("Deleted at", self.time_deleted)
-        yield DatetimeProperty("Fetched atflask ", self.time_fetched)
+        yield DatetimeProperty("Fetched at", self.time_fetched)
         yield ExternalUrlProperty("Cover", self.cover)
         yield ExternalUrlProperty("Background", self.background)
 

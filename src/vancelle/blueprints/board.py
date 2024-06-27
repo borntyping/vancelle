@@ -23,12 +23,12 @@ def before_request():
 @bp.route("/", methods={"GET"})
 def index():
     form = WorkBoardArgs(formdata=flask.request.args)
-    shelves, total = form.shelves()
+    shelves = form.shelves()
     return render(
         BoardPage(
             work_index_args=form,
             shelves=shelves,
-            total=total,
+            total=-1,
             layout=form.layout.data,
         )
     )

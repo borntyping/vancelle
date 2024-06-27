@@ -1,3 +1,4 @@
+import datetime
 import itertools
 import typing
 
@@ -141,38 +142,6 @@ class WorkIndexArgs(PaginationArgs):
         count = query.with_only_columns(func.count(distinct(alias.id)))
         return self.query(db.session, query, count)
 
-    def shelves(self) -> typing.Tuple[typing.Mapping[Shelf, list[Work]], int]:
-        """
-        All shelves in the selection (in 'work_case.shelves' or equal to 'work_shelf') will appear in the result even if empty.
-        Other shelves will only be present in the result if the query somehow returned them.
-        """
-        works = db.session.execute(self._statement()).unique().scalars()
-
-        groups: dict[Shelf, list[Work]] = {
-            shelf: []
-            for shelf in self._iter_shelves(
-                shelf=self.shelf.data,
-                case=self.case.data,
-            )
-        }
-        for work in works:
-            groups[work.shelf].append(work)
-        return groups, 0
-
-    @staticmethod
-    def _iter_shelves(shelf: Shelf, case: Case) -> typing.Tuple[Shelf, ...]:
-        if shelf and case:
-            if shelf not in case.shelves:
-                raise ApplicationError(f"The '{shelf.title}' shelf is not in the '{case.title}' group.")
-
-        if shelf:
-            return (shelf,)
-
-        if case is not None:
-            return case.shelves
-
-        return tuple(Shelf)
-
     def _statement(self) -> Select[tuple[Work]]:
         return (
             select(Work)
@@ -251,6 +220,60 @@ class WorkIndexArgs(PaginationArgs):
                     Entry.series.ilike(f"%{query}%"),
                     Entry.description.ilike(f"%{query}%"),
                 )
+
+    def shelves(self) -> typing.Mapping[Shelf, list[Work]]:
+        works = db.session.execute(self._statement()).unique().scalars()
+        return self._group_shelves(works=works, shelf=self.shelf.data, case=self.case.data)
+
+    @classmethod
+    def _group_shelves(
+        cls,
+        works: typing.Iterable[Work],
+        shelf: Shelf,
+        case: Case,
+    ) -> typing.Mapping[Shelf, list[Work]]:
+        """
+        All shelves in the selection (in 'work_case.shelves' or equal to 'work_shelf') will appear in the result even if empty.
+        Other shelves will only be present in the result if the query somehow returned them.
+        """
+        groups: dict[Shelf, list[Work]] = {s: [] for s in cls._iter_shelves(shelf, case)}
+        for work in works:
+            groups[work.shelf].append(work)
+
+        return {k: sorted(v, key=cls._work_sort_key, reverse=True) for k, v in groups.items()}
+
+    @staticmethod
+    def _iter_shelves(shelf: Shelf, case: Case) -> typing.Tuple[Shelf, ...]:
+        if shelf and case:
+            if shelf not in case.shelves:
+                raise ApplicationError(f"The '{shelf.title}' shelf is not in the '{case.title}' group.")
+
+        if shelf:
+            return (shelf,)
+
+        if case is not None:
+            return case.shelves
+
+        return tuple(Shelf)
+
+    @classmethod
+    def _work_sort_key(cls, work: Work) -> datetime.date | None:
+        if key := cls._work_sort_coalesce(r.date_started or r.date_stopped or None for r in work.records):
+            return key
+
+        if key := cls._work_sort_coalesce(e.release_date for e in work.entries):
+            return key
+
+        if key := work.release_date:
+            return key
+
+        return work.time_created.date()
+
+    @staticmethod
+    def _work_sort_coalesce(iterable: typing.Iterable[datetime.date]) -> datetime.date | None:
+        for item in sorted((item for item in iterable if item is not None), reverse=True):
+            return item
+        return None
 
 
 class WorkBoardArgs(WorkIndexArgs):

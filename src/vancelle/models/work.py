@@ -84,6 +84,8 @@ class Work(PolymorphicBase, IntoDetails, IntoProperties):
     tags: Mapped[typing.Optional[set[str]]] = mapped_column(ARRAY(String), default=None)
     external_url: Mapped[typing.Optional[str]] = mapped_column(default=None)
 
+    notes: Mapped[typing.Optional[str]] = mapped_column(default=None)
+
     records: Mapped[typing.List["Record"]] = relationship(
         back_populates="work",
         order_by=nulls_last(asc(coalesce(Record.date_started, Record.date_stopped))),

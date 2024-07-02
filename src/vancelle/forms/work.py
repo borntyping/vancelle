@@ -18,7 +18,7 @@ from vancelle.forms.bootstrap import BootstrapMeta
 from vancelle.forms.pagination import PaginationArgs
 from vancelle.lib.pagination import Pagination
 from vancelle.models import Record
-from vancelle.models.entry import ImportedWork, Entry
+from vancelle.models.entry import Entry, ImportedWork
 from vancelle.models.work import Book, Work
 from vancelle.shelf import Case, Shelf
 
@@ -63,6 +63,8 @@ class WorkForm(flask_wtf.FlaskForm):
     # Properties
     external_url = wtforms.URLField("External URL", validators=[wtforms.validators.Optional()], filters=[NoneFilter()])
     isbn = wtforms.StringField("ISBN", validators=[wtforms.validators.Optional()], filters=[NoneFilter()])
+
+    notes = wtforms.TextAreaField("Notes", validators=[wtforms.validators.Optional()], filters=[NoneFilter()])
 
 
 class WorkIndexArgs(PaginationArgs):

@@ -57,6 +57,12 @@ def _work_form_page(
                             col({}, [form_control(work_form.shelf)]),
                         ],
                     ),
+                    row(
+                        {"class": "mb-3"},
+                        [
+                            col({}, [form_control(work_form.notes)]),
+                        ],
+                    ),
                     SectionHeader("Details", "These details will overwrite any details provided by entries."),
                     row(
                         {"class": "mb-3"},

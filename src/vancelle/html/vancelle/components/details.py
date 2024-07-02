@@ -19,7 +19,7 @@ class DetailsDescription(HeavymetalComponent):
         return bool(self.lines)
 
     def heavymetal(self) -> Heavymetal:
-        return div({"class": "text-body-secondary"}, [p({}, (line,)) for line in self.lines])
+        return div({"class": "text-body-secondary p-3"}, [p({}, (line,)) for line in self.lines])
 
 
 @dataclasses.dataclass()

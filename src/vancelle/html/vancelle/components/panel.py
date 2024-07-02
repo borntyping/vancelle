@@ -25,6 +25,7 @@ from vancelle.lib.heavymetal.html import (
     h3,
     h5,
     img,
+    p,
     span,
     table,
     tbody,
@@ -220,13 +221,17 @@ class DetailsPanel(Panel, HeavymetalComponent):
 
     def description(self) -> Heavymetal: ...
 
+    def tabs(self) -> typing.Iterable[Tab]:
+        return ()
+
     def heavymetal(self) -> Heavymetal:
         details = self.details()
         tabs = Tabs(
             id=self.id(),
             align_tabs="right",
             tabs=[
-                Tab("description", "Description", [DetailsDescription(details.description)], classes="p-3"),
+                *self.tabs(),
+                Tab("description", "Description", [DetailsDescription(details.description)]),
                 Tab("details", "Details", [PropertiesTable(details.into_properties())]),
                 Tab("properties", "Properties", [PropertiesTable(self.properties())]),
                 Tab("type", "Type", [PropertiesTable(self.type_properties())]),
@@ -247,7 +252,7 @@ class DetailsPanel(Panel, HeavymetalComponent):
                     list(self.controls()),
                 ),
                 div(
-                    {"class": "v-panel-cover border-bottom"},
+                    {"class": "v-panel-cover"},
                     [
                         figure(
                             {"class": "m-0 rounded-3 bg-primary-subtle"},
@@ -299,6 +304,17 @@ class DetailsPanel(Panel, HeavymetalComponent):
 
 
 @dataclasses.dataclass()
+class WorkNotes(HeavymetalComponent):
+    work: Work
+
+    def __bool__(self) -> bool:
+        return bool(self.work.notes)
+
+    def heavymetal(self) -> Heavymetal:
+        return div({"class": "text-body-secondary p-3"}, [p({}, [self.work.notes])])
+
+
+@dataclasses.dataclass()
 class WorkDetailsPanel(DetailsPanel):
     work: Work
 
@@ -319,6 +335,9 @@ class WorkDetailsPanel(DetailsPanel):
 
     def type_properties(self) -> Properties:
         return list(self.work.info.into_properties())
+
+    def tabs(self) -> typing.Iterable[Tab]:
+        yield Tab("notes", "Notes", [WorkNotes(self.work)])
 
     def controls(self) -> typing.Sequence[PanelControl]:
         yield PanelControl(

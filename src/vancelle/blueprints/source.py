@@ -35,12 +35,13 @@ def search(entry_type: str):
     work = work_controller.get(work_id)
 
     query = args.search.data or (work and work.resolve_title()) or ""
-    items = controller[entry_type].search(query)
+    source = controller.source(entry_type=entry_type)
+    items = controller.search(entry_type=entry_type, query=query)
 
     return render(
         ExternalSearchPage(
             query=query,
-            source=controller[entry_type],
+            source=source,
             args=args,
             items=items,
             work=work,
@@ -52,7 +53,7 @@ def search(entry_type: str):
 def detail(entry_type: str, entry_id: str):
     work_id = flask.request.args.get("work_id", type=uuid.UUID)
 
-    source = controller[entry_type]
+    source = controller.source(entry_type=entry_type)
     entry = controller.fetch(entry_type=entry_type, entry_id=entry_id)
     work = work_controller.get(work_id)
 

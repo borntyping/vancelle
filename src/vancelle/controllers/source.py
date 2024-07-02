@@ -14,6 +14,7 @@ from .work import WorkController
 from ..extensions import db
 from ..html.vancelle.components.flash import EntryAlreadyExistsFlash
 from ..lib.heavymetal import render
+from ..lib.pagination import Pagination
 from ..shelf import Shelf
 
 logger = structlog.get_logger(logger_name=__name__)
@@ -37,6 +38,14 @@ class SourceController:
         entry = self.source(entry_type=entry_type).fetch(entry_id)
         entry.time_fetched = datetime.datetime.now()
         return entry
+
+    def search(self, *, entry_type: str, query: str) -> Pagination[Entry]:
+        source = self.source(entry_type=entry_type)
+
+        if not query:
+            return Pagination.empty()
+
+        return source.search(query)
 
     def import_entry(
         self,

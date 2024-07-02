@@ -50,7 +50,7 @@ class HttpClient:
         params: dict[str, str] | None = None,
         headers: dict[str, str] | None = None,
     ) -> httpx.Response:
-        response = self.client.get(url, params=params, headers=headers)
+        response = self.client.get(url, params=params, headers=headers, follow_redirects=True)
         self._debug(response)
         response.raise_for_status()
         return response

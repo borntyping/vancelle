@@ -40,13 +40,8 @@ class Source(typing.Generic[E], abc.ABC):
     def info(self) -> EntryInfo:
         return self.entry_type.info
 
-    @classmethod
-    def polymorphic_identity(cls) -> str:
-        return cls.entry_type.polymorphic_identity()
-
-    def context(self, entry: E) -> typing.Mapping[str, typing.Any]:
-        """Context for detail pages."""
-        return {}
+    def polymorphic_identity(self) -> str:
+        return self.entry_type.polymorphic_identity()
 
     def url_for_search(self, work: Work | None) -> str:
         return flask.url_for("source.search", entry_type=self.polymorphic_identity(), work_id=work.id if work else None)

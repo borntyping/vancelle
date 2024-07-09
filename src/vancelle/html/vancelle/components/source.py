@@ -8,7 +8,7 @@ from vancelle.forms.source import SourceSearchArgs
 from vancelle.html.bootstrap.layout.grid import col, row
 from vancelle.html.vancelle.components.details import DetailsBox
 from vancelle.html.vancelle.components.index import SearchFormControls
-from vancelle.html.vancelle.components.optional import quote
+from vancelle.html.vancelle.components.optional import quote_str
 from vancelle.html.vancelle.components.panel import DetailsPanel, PanelControl
 from vancelle.html.vancelle.components.table import generate_table_from_pagination
 from vancelle.lib.heavymetal import Heavymetal
@@ -47,7 +47,7 @@ def _ImportEntryButton(entry: Entry, work: Work) -> Heavymetal:
     action = flask.url_for("source.import", entry_type=entry.type, entry_id=entry.id, work_id=work.id if work else None)
     return form(
         {"method": "post", "action": action},
-        [button({"class": "btn btn-sm btn-primary", "type": "submit", "title": f"Import {quote(title)}."}, ["Import"])],
+        [button({"class": "btn btn-sm btn-primary", "type": "submit", "title": f"Import {quote_str(title)}."}, ["Import"])],
     )
 
 

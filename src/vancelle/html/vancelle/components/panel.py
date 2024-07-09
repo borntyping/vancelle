@@ -25,6 +25,7 @@ from vancelle.lib.heavymetal.html import (
     h3,
     h5,
     img,
+    nothing,
     p,
     span,
     table,
@@ -387,4 +388,10 @@ class WorkDetailsPanel(DetailsPanel):
 
     def description(self) -> Heavymetal:
         details = self.work.resolve_details()
-        return fragment([f"Released {details.release_date}."] if details.release_date else [])
+
+        if not details.release_date:
+            return nothing()
+        elif details.release_date >= datetime.date.today():
+            return span({"class": "text-danger"}, [f"Expected to release on {details.release_date}."])
+        else:
+            return span({}, [f"Released {details.release_date}."])

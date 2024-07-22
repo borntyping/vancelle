@@ -69,7 +69,17 @@ class OpenLibraryAPI(HttpClient):
         id = self.parse_key("works", data["key"])
         title = data["title"]
         author = self._author_references([author["author"] for author in data["authors"]])
-        description = data.get("description", {}).get("value")
+
+        if d := data.get("description"):
+            if isinstance(d, dict):
+                description = d["value"]
+            elif isinstance(d, str):
+                description = d
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
+
         cover = self.cover_url("ID", data["covers"][0]) if data.get("covers") else None
 
         return OpenlibraryWork(

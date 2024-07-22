@@ -47,7 +47,7 @@ class OpenLibraryAPI(HttpClient):
                 title=doc["title"],
                 author=", ".join(doc.get("author_name", [])),
                 data={
-                    "url": response.url,
+                    "url": str(response.url),
                     "doc": data,
                 },
             )
@@ -78,7 +78,7 @@ class OpenLibraryAPI(HttpClient):
             author=author,
             description=description,
             cover=cover,
-            data={"url": response.url, "work": data},
+            data={"url": str(response.url), "work": data},
         )
 
     def _author_references(self, references: list[Reference]) -> str:
@@ -153,7 +153,7 @@ class OpenLibraryAPI(HttpClient):
 
         https://openlibrary.org/authors/OL1425963A.json
         """
-        response = self.session.get(f"https://openlibrary.org/authors/{id}.json")
+        response = self.get(f"https://openlibrary.org/authors/{id}.json")
         response.raise_for_status()
         author = response.json()
         return author

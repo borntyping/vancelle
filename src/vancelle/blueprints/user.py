@@ -85,7 +85,7 @@ def export():
     )
 
 
-@bp.route("/reload-steam-cache")
+@bp.route("/reload-steam-cache", methods={"GET", "POST"})
 def reload_steam_cache():
     application_settings.reload_steam_cache()
     return flask.redirect(flask.url_for(".settings"))

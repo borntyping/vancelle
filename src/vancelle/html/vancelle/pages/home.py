@@ -53,16 +53,6 @@ class HomePageGauges(HeavymetalComponent):
         )
         return db.session.execute(query).scalar_one()
 
-    def _count_entries(self) -> int:
-        query = (
-            sqlalchemy.select(sqlalchemy.func.count())
-            .select_from(Entry)
-            .join(Work)
-            .join(User)
-            .filter(User.id == flask_login.current_user.id)
-        )
-        return db.session.execute(query).scalar_one()
-
     def _count_by_type(self, cls: typing.Type[Work | Entry]) -> dict[typing.Type[Work | Entry], int]:
         subclasses = cls.subclasses()
 
@@ -74,17 +64,14 @@ class HomePageGauges(HeavymetalComponent):
 
     def __iter__(self) -> typing.Iterator[HomePageGauge]:
         works = self._count_works()
-        yield HomePageGauge(works, p.plural("Work", works), flask.url_for("work.index"), "primary")
-
-        entries = self._count_entries()
-        yield HomePageGauge(entries, p.plural("Entry", entries), flask.url_for("entry.index"), "primary")
+        yield HomePageGauge(works, p.plural("Work", works), flask.url_for("board.index"), "primary")
 
         for cls, count in self._count_by_type(Work).items():
-            url = flask.url_for("work.index", work_type=cls.polymorphic_identity())
+            url = flask.url_for("board.index", work_type=cls.polymorphic_identity())
             yield HomePageGauge(count, cls.info.noun_plural_title, url, "info")
 
         for cls, count in self._count_by_type(Entry).items():
-            url = flask.url_for("entry.index", entry_type=cls.polymorphic_identity())
+            url = flask.url_for("board.index", entry_type=cls.polymorphic_identity())
             yield HomePageGauge(count, cls.info.noun_full_plural, url, cls.info.colour)
 
     def heavymetal(self) -> Heavymetal:

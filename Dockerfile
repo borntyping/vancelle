@@ -41,9 +41,9 @@ RUN tar -C /opt/ -xzvf "/opt/dart-sass-${DART_VERSION}-linux-${DART_ARCH}.tar.gz
 ENV PATH="/opt/dart-sass/:$PATH"
 WORKDIR /opt/app
 COPY "Makefile" "package.json" "package-lock.json" ./
-COPY "src/vancelle/assets/" "src/vancelle/assets/"
 RUN npm ci
-RUN make
+COPY "src/vancelle/assets/" "src/vancelle/assets/"
+RUN make default
 
 #
 # Configure the final image and copy files from build stages.

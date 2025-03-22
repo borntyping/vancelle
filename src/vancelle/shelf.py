@@ -31,7 +31,8 @@ class Shelf(enum.Enum):
     SHELVED = ("shelved", "Shelved", "Might continue one day.", "Paused")
     REFERENCE = ("reference", "Reference", "Reference material with no status.", "Paused")
 
-    COMPLETED = ("completed", "Completed", "A completed work.", "Completed", True)
+    PLAYED = ("played", "Played", "Finished playing.", "Completed", True)
+    COMPLETED = ("completed", "Completed", "Played and completed.", "Completed", True)
     ABANDONED = ("abandoned", "Abandoned", "Gave up on.", "Completed")
     UNTOUCHED = ("untouched", "Untouched", "Never started.", "Completed")
 
@@ -57,7 +58,7 @@ class Case(enum.Enum):
     UPCOMING = ("upcoming", "Upcoming", (Shelf.UPCOMING, Shelf.UNRELEASED, Shelf.UNDECIDED, Shelf.RETURNING))
     PLAYING = ("playing", "Playing", (Shelf.PLAYING, Shelf.REPLAYING, Shelf.ONGOING, Shelf.INFINITE))
     PAUSED = ("paused", "Paused", (Shelf.PAUSED, Shelf.SHELVED))
-    COMPLETED = ("completed", "Completed", (Shelf.COMPLETED, Shelf.ABANDONED))
+    COMPLETED = ("completed", "Completed", (Shelf.PLAYED, Shelf.COMPLETED, Shelf.ABANDONED))
     OTHER = ("other", "Other", (Shelf.UNSORTED, Shelf.REFERENCE, Shelf.UNTOUCHED))
 
     title: str

@@ -76,6 +76,7 @@ $x-board-card-cover: 2fr;
         &[data-shelf="infinite"],
         &[data-shelf="paused"],
         &[data-shelf="shelved"],
+        &[data-shelf="played"],
         &[data-shelf="completed"]
         {
           grid-column: 2;
@@ -119,6 +120,7 @@ $x-board-card-cover: 2fr;
         }
 
         &[data-shelf="completed"],
+        &[data-shelf="played"],
         &[data-shelf="abandoned"],
         &[data-shelf="untouched"] {
           grid-column: 5;

@@ -39,7 +39,7 @@ class SteamApplicationSource(Source):
 
         release_date = api.parse_release_date(appdetails["release_date"])
         vertical_capsule = api.vertical_capsule(appdetails, check=True)
-        author = p.join(appdetails["developers"] if appdetails["developers"] else [])
+        author = p.join(appdetails.get("developers", []))
 
         return SteamApplication(
             id=str(appdetails["steam_appid"]),
